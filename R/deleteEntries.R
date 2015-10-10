@@ -28,7 +28,7 @@ deleteEntries<-function(obj,...){
         obj$Meta=obj$Meta[l2keep,]
         obj$File=obj$File[l2keep,]
         obj$Data=lapply(obj$Data,function(x) x[l2keep,,drop=F])
-        cat("Samples removed based on ",argname,":\n",sidori[!sidori%in%obj$Sid],"\n",sep=" ")
+        if(any(!sidori%in%obj$Sid)) cat("Samples removed based on ",argname,":\n",sidori[!sidori%in%obj$Sid],"\n",sep=" ")
       }
     }
     
@@ -39,7 +39,7 @@ deleteEntries<-function(obj,...){
         obj$Analyte=obj$Analyte[l2keep]
         obj$Annot=obj$Annot[l2keep,]
         obj$Data=lapply(obj$Data,function(x) x[,l2keep,drop=F])
-        cat("Analytes removed based on ",argname,":\n",anaori[!anaori%in%obj$Analyte],"\n",sep=" ")
+        if(any(!anaori%in%obj$Analyte)) cat("Analytes removed based on ",argname,":\n",anaori[!anaori%in%obj$Analyte],"\n",sep=" ")
       }
     }
   }

@@ -22,14 +22,11 @@ David Enot \email{david.enot@gustaveroussy.fr}
 testfiles=list.files(system.file( package = "GRMeta"),pattern = "txt$",full.names = TRUE)
 
 mydata=loadAgilentData(ifile =testfiles[1])
-print(mydata$Analyte)
-print(mydata$Meta)
+print(mydata)
 
 mydata=loadAgilentData(ifile =testfiles[1],params = list(AssayName="lc"))
-print(mydata$Analyte)
+print(mydata)
 
-mydata=loadAgilentData(ifile =testfiles[1],params = list(AssayName="lc",regTypes="^([BlStQC]+)_.*"))
-print(mydata$Meta)
 }
 
 \keyword{misc}

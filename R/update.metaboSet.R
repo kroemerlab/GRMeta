@@ -2,7 +2,7 @@ update.metaboSet<-function(obj,what="Sid",formerid=NULL,newid=NULL,exact=TRUE,sw
   
   if(!inherits(obj, "metaboSet")) stop("This is not a metaboSet object")
   if(what!="Sid") print("Only Sid considered for now")
-  if(length(formerid)!=length(newid) | is.null(formerid)) stop("old and new inputs are of different length")
+  if(length(formerid)!=length(newid) | is.null(formerid)) stop("former and new inputs are of different length")
   
   oldnames=newnames=obj$Sid
   if(exact & !swap) for(i in 1:length(formerid)) newnames[which(oldnames==formerid[i])]=newid[i]
@@ -19,7 +19,7 @@ update.metaboSet<-function(obj,what="Sid",formerid=NULL,newid=NULL,exact=TRUE,sw
   obj$Meta$Sid=rownames(obj$Meta)=newnames
   obj$File$Sid=rownames(obj$File)=newnames
   obj$Data=lapply(obj$Data,function(x){rownames(x)=newnames;x})
-  print(rbind(Old=oldnames[newnames!=oldnames],New=newnames[newnames!=oldnames]))
+  if(any(newnames!=oldnames)) print(rbind(Old=oldnames[newnames!=oldnames],New=newnames[newnames!=oldnames]))
   
   invisible(obj)
 }

@@ -2,7 +2,7 @@
 # export(addSBRMatrix,changeDataSids,loadAgilentData,mergeDataMethods,cleanMetaboNames,mergeDataBatch,remDataEntries)
 # exportPattern("^[^\\.]")
 
-export(addSBRMatrix,cleanMetaboNames,loadAgilentData,mergeSet,deleteEntries, exportDataXLSX)
+export(addSBRMatrix,cleanMetaboNames,compSetStats,loadAgilentData,mergeSet,deleteEntries, exportDataXLSX)
 
 ### register S3 methods
 S3method(plot, metaboSet)

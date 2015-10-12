@@ -37,7 +37,7 @@ exportDataXLSX<-function(obj,outfile,ldata=names(obj$Data),sortSample=c("sType",
   write.xlsx2(indf(obj$File[lsoSa,which(names(obj$File)!="Sid")],nround,characterNA[1],"Sid"),
                 file = outfile,col.names=FALSE, row.names=FALSE,append=TRUE,sheetName ="FileInfos")  
   write.xlsx2(indf(obj$Annot[lsoAna,which(names(obj$Annot)!="Analyte")],nround,characterNA[1],"Analyte"),
-                file = outfile,col.names=FALSE, row.names=FALSE,append=TRUE,sheetName ="MetabInfos")
+                file = outfile,col.names=FALSE, row.names=FALSE,append=TRUE,sheetName ="VarInfos")
   
   for(i in ldata){
     if(transpose) m=round(t(obj$Data[[i]][lsoSa,lsoAna,drop=FALSE]),nround)

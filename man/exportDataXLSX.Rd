@@ -24,8 +24,11 @@ David Enot \email{david.enot@gustaveroussy.fr}
 testfiles=list.files(system.file( package = "GRMeta"),pattern = "txt$",full.names = TRUE)
 
 mydata=loadAgilentData(ifile =testfiles[1])
+myratios=compSetRatios(mydata,l2add="Area",conv2set=TRUE)
+
 \dontrun{
 exportDataXLSX(mydata,outfile="test.xlsx",ldata=c("Area","RT"),characterNA=c("Missing","NAssss"))
+exportDataXLSX(myratios,outfile="testratios.xlsx",ldata=c("Area","RT"),characterNA=c("Missing","NAssss"))
 }
 
 }

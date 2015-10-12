@@ -1,10 +1,10 @@
-exportDataXLSX<-function(obj,outfile,ldata=names(obj$Data),sortSid=c("sType","InjOrder"),sortAnalyte=c("Method","RT"),transpose=FALSE,nround=3,characterNA=c("-","NA")){
+exportDataXLSX<-function(obj,outfile,ldata=names(obj$Data),sortSample=c("sType","InjOrder"),sortAnalyte=c("Method","RT"),transpose=FALSE,nround=3,characterNA=c("-","NA")){
   
   if(!inherits(obj, "metaboSet")) stop("This is not a metaboSet object")
   
   ldata=ldata[which(ldata%in%names(obj$Data))]
   sortAnalyte=sortAnalyte[which(sortAnalyte%in%names(obj$Annot))]
-  sortSample=sortSid[which(sortSid%in%names(obj$Meta))]
+  sortSample=sortSample[which(sortSample%in%names(obj$Meta))]
   
   lsoAna=1:length(obj$Analyte)
   if(!is.null(sortAnalyte)){
@@ -44,8 +44,8 @@ exportDataXLSX<-function(obj,outfile,ldata=names(obj$Data),sortSid=c("sType","In
     if(!transpose) m=round(obj$Data[[i]][lsoSa,lsoAna,drop=FALSE],nround)
     m=apply(m,2,as.character)
 #    print(str(m))
-    if(transpose) df=cbind("Analyte"=obj$Analyte[lsoAna],m,stringsAsFactors=FALSE)
-    if(!transpose) df=cbind("Sid"=obj$Sid[lsoSa],m,stringsAsFactors=FALSE)
+    if(transpose) df=cbind("Analyte"=obj$Analyte[lsoAna],m)
+    if(!transpose) df=cbind("Sid"=obj$Sid[lsoSa],m)
     #   print(names(df))
     df=rbind(colnames(df),df)
     df[is.na(df)]=characterNA[2]

@@ -62,6 +62,7 @@ mergeSet<-function(...){
   metainfos=do.call("rbind",lapply(re,function(x) x$Meta))
   fileinfos=do.call("rbind",lapply(re,function(x) x$File))
   metainfos$InjOrder=order(order(fileinfos$Batch,metainfos$InjOrder))
+ 
   lso=order(metainfos$sType,metainfos$InjOrder)
   metainfos=metainfos[lso,]
   fileinfos=fileinfos[lso,]
@@ -135,10 +136,13 @@ mergeSet<-function(...){
   neworder2=apply(neworder,2,function(x) order(order(x)))
   neworder2[is.na(neworder)]=NA
   meta$InjOrder=order(order(rowMeans(neworder2,na.rm=T)))
+  
+  ###
   lso=order(meta$sType,meta$InjOrder)
   meta=meta[lso,]
   lusamp=lusamp[lso]
   fileinfos=fileinfos[lso,]
+  matexSa=sapply(re,function(x) match(lusamp,x$Sid))
   
   ##############
   cat("Check analytes:\n")

@@ -46,13 +46,23 @@ head(result)
 ##### Compute CVs on QC with at least 2 non NAs and check the number of "St" with SBR>5 / add to the object
 mydata2=addSBRMatrix(mydata,thresh=10,SidBlank = c("Bl_prerun-eau_1","Bl_prerun-eau_1b"),newname = "SBR")
 ## Compute CVs on QC with at least 2 non NAs
-mydata2=compSetStats(mydata2,lStats=list(c("CV","Area",2)),sType="QC",addtoname="myQC",addtoobject=TRUE)
+mydata3=compSetStats(mydata3,lStats=list(c("CV","Area",2)),sType="QC",addtoname="myQC",addtoobject=TRUE)
 ## Compute on St: CV with at least 2 non NAs, number of SBR>5 and number of non missing
-mydata2=compSetStats(mydata2,lStats=list(c("CV","Area",2),c("Sum","SBR>5"),c("Sum","Height>0")),sType="St",addtoname="myST",addtoobject=TRUE)
-head(mydata2$Annot)
+mydata3=compSetStats(mydata3,lStats=list(c("CV","Area",2),c("Sum","SBR>5"),c("Sum","Height>0")),sType="St",addtoname="myST",addtoobject=TRUE)
+head(mydata3$Annot)
+
+l2rm=mydata3$Analyte[which(mydata3$Annot$myQC_CV_Area_2>20 | mydata3$Annot$`myST_Sum_SBR>5`==0)]
+deleteEntries(mydata3,Analyte=l2rm)
+
+###############
+## Looping over each sType for e.g.
+mydata4=mydata2
+for(i in unique(mydata4$Meta$sType))
+    mydata4=compSetStats(mydata4,lStats=list(c("CV","Area",0),c("Sum","SBR>5"),c("Sum","Height>0")),Sids=mydata4$Sid[mydata4$Meta$sType==i],addtoname=i,addtoobject=T)
 
 
 
+ 
 
 }
 \keyword{misc}

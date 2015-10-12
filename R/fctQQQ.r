@@ -26,7 +26,7 @@ cleanMetaboNames<-function(metnam,RegExpr=dictRegExpr,Syno=dictSyno){
 
 #################################################################################################
 
-addSBRMatrix<-function(obj,thresh=1,SidBlank=NULL,what="Height",newname="SBR",fct=median){
+addSBRMatrix<-function(obj,thresh=1,SidBlank=NULL,what="Height",newname=NULL,fct=median){
   
   lbl=which(obj$Sid%in%SidBlank)
   if(!what%in%names(obj$Data)){cat(what," doesn't exist\n");return(obj)}
@@ -36,9 +36,13 @@ addSBRMatrix<-function(obj,thresh=1,SidBlank=NULL,what="Height",newname="SBR",fc
   norm[is.na(norm) | norm<thresh]=thresh
   nmat=sweep(mat,2,norm,"/")
   nmat[which(nmat<1)]=1
-  obj$Data[[newname]]=nmat
-  obj$Annot$SBR=norm
-  return(obj)
+  
+  if(is.null(newname)) invisible(nmat) else{
+    obj$Data[[newname]]=nmat
+    obj$Annot$SBR=norm
+    invisible(obj)
+  }
+  
 }
 
 

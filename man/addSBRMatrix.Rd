@@ -4,13 +4,13 @@
 
 \description{Compute signal to blank matrix and add to the metaboSet data object}
 
-\usage{addSBRMatrix(obj, thresh = 1, SidBlank = NULL, what = "Height", newname = "SBR", fct = median)}
+\usage{addSBRMatrix(obj, thresh = 1, SidBlank = NULL, what = "Height", newname = NULL, fct = median)}
 \arguments{
   \item{obj}{Experiment object}
   \item{thresh}{Threshold used for NAs and censoring low intensities}
   \item{SidBlank}{Vector of Sids used for blank calculations}
   \item{what}{Matrix on which SBR calculation is performed}
-  \item{newname}{Name of the SBR matrix}
+  \item{newname}{Name of the SBR matrix to be added - if NULL returns the matrix rather than the object}
   \item{fct}{Function used to compute the blank level for each analyte}
 }
 
@@ -27,12 +27,15 @@ mydata=loadAgilentData(ifile =testfiles[1])
 mydata$Sid
 
 newdata=addSBRMatrix(mydata,thresh=10,SidBlank=c( "Bl_prerun-eau_1","Bl_prerun-eau_1b", "Bl_prerun-matrice_4","Bl_postrun-matrice_4"),fct=median)
-str(mydata$Data)
+mydata
 
 newdata=addSBRMatrix(mydata,thresh=10,SidBlank=NULL,newname="SBR")
-str(mydata$Data)
-newdata$Annot$SBR
+newdata
+head(newdata$Annot$SBR)
 
+## return the SBR matrix  and not the metaboSet object
+newdata=addSBRMatrix(mydata,thresh=10,SidBlank=NULL)
+str(newdata)
 
 }
 

@@ -3,13 +3,13 @@
 \title{Export object to Xlsx}
 \description{Export object to Xlsx}
 \usage{
-exportDataXLSX(obj,outfile,ldata=names(obj$Data),sortSid=c("sType","InjOrder"),sortAnalyte=c("Method","RT"),transpose=FALSE,nround=3,characterNA=c("-","NA"))
+exportDataXLSX(obj,outfile,ldata=names(obj$Data),sortSample=c("sType","InjOrder"),sortAnalyte=c("Method","RT"),transpose=FALSE,nround=3,characterNA=c("-","NA"))
 }
 \arguments{
   \item{obj}{metaboSet}
   \item{outfile}{Output file}
   \item{ldata}{Matrices from obj$Data}
-  \item{sortSid}{Sorting sample based on obj$Meta names}
+  \item{sortSample}{Sorting sample based on obj$Meta names}
   \item{sortAnalyte}{Sorting analytes based on obj$Annot names}
   \item{transpose}{Transposing obj$Data matrices}
   \item{nround}{Rounding numerical data}

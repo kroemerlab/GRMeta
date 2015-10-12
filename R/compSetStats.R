@@ -1,5 +1,5 @@
 
-compSetStats<-function(obj,lStats=list(),whatSamp="Sa",whatQC="QC"){
+compSetStats<-function(obj,lStats=list(),whatSamp="Sa",whatQC="QC",add=FALSE){
   
   cvf<-function(x,n=0) ifelse(sum(!is.na(x))>=n,100*sd(x,na.rm=T)/mean(x,na.rm=T),NA)
   cvrf<-function(x,n=0) ifelse(sum(!is.na(x))>=n,100*mad(x,na.rm=T)/median(x,na.rm=T),NA)
@@ -29,7 +29,13 @@ compSetStats<-function(obj,lStats=list(),whatSamp="Sa",whatQC="QC"){
     if("try-error"%in%class(re)) cat("Cannot compute:",istats,"\n")
   }
   
-  return(do.call("cbind",allst))
-  
+  res=do.call("cbind",allst)
+  if(add){
+    if(!is.null(res)) obj$Annot=cbind(obj$Annot,res)
+    invisible(obj)
+  }
+
+  if(!add) invisible(res)
+    
 }
 

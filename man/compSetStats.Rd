@@ -5,13 +5,14 @@
 \description{
 Compute sample statistics in a metaboSet object}
 \usage{
-compSetStats(obj, lStats = list(), whatSamp = "Sa", whatQC = "QC")
+compSetStats(obj, lStats = list(), whatSamp = "Sa", whatQC = "QC",add=FALSE)
 }
 \arguments{
   \item{obj}{metaboSet object}
   \item{lStats}{List of stats to be performed}
   \item{whatSamp}{sType level or vector of Sids for samples}
   \item{whatQC}{sType level or vector of Sids for QCs}
+  \item{add}{If TRUE the stats will be added to the obj$Annot and the result object returned}
 }
 \details{
 }

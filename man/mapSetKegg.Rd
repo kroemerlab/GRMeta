@@ -3,13 +3,14 @@
 \title{Create KEGG map from object}
 \description{Create KEGG map from object}
 \usage{
-mapSetKegg(obj, cols = NULL, sizes = 4, ftsize = "16px", conv2pdf = FALSE)
+mapSetKegg(obj, cols = NULL, sizes = 4,mixcol="grey70", ftsize = 16, conv2pdf = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{obj}{metaboSet object}
   \item{cols}{Colors used for each method in the object}
   \item{sizes}{Relative size for each node}
+  \item{mixcol}{If null, mixing colors is done for entries in several methods}
   \item{ftsize}{Size of the label}
   \item{conv2pdf}{Convert SVG to PDF with Inkscape: command line}
 }

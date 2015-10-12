@@ -3,8 +3,8 @@
 \title{Plot analyte data from a metaboSet object}
 \description{Plot analytes matrices}
 \usage{
-\method{plot}{metaboSet}(obj,outfile=NULL,analyte=obj$Analyte[1],lgraphs=list(c("InjOrder","RT"),c("InjOrder","Area"),c("Height"),c("Height","Area")),
-                         mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots="sType",...)
+\method{plot}{metaboSet}(obj,outfile=NULL,analyte=obj$Analyte[1],lgraphs=list(c("InjOrder","RT"),c("InjOrder","Area"),c("Area"),c("Height","Area")),
+                         mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots="sType",cexBP=0.5,...)
 }
 \arguments{
   \item{obj}{Experiment obj}
@@ -14,6 +14,7 @@
   \item{deltaRT}{Censoring around the RT median}
   \item{linking}{Linking points from the specified sample type when injection order is on the x-axis}
   \item{orderBPlots}{Ordering barplots, default is "sType"}
+  \item{cexBP}{cex.axis value for labelling x-axis of the barplots}
   \item{\dots}{Arguments passed to \code{\link{par}} and \code{\link{pdf}}, excepted mfrow}
 }
 \value{Experiment object}

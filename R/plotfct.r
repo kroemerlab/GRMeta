@@ -1,5 +1,5 @@
-plot.metaboSet<-function(obj,outfile=NULL,lgraphs=list(c("InjOrder","RT"),c("InjOrder","Area"),c("Height"),c("Height","Area")),
-                mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots="sType",...){
+plot.metaboSet<-function(obj,outfile=NULL,lgraphs=list(c("InjOrder","RT"),c("InjOrder","Area"),c("Area"),c("Height","Area")),
+                mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots="sType",cexBP=0.5,...){
   
   lgraphs=lgraphs[sapply(lgraphs,function(x) all(x%in%c(names(obj$Meta),names(obj$Data))))]
   if(length(lgraphs)==0) stop("Graphs cannot be matched to the obj$Meta or obj$Data")
@@ -153,7 +153,7 @@ if(!is.null(linking) & "InjOrder" %in%lgraphs[[iplot]])
     lso=match(lso,idf$Sid)
     re=barplot(vx[lso],axes=F,ylab=whatx,bty="n",log=ifelse(logs=="","","y"),ylim=range(xlim),main=analyte,col=idf$color[lso])
     axis(2,at=xlim,las=2)
-    for(i in 1:nrow(re)) axis(1,at=re[i,1],labels = idf$Sid[lso][i],cex.axis=par()$cex.axis/2,las=2,tick=F,pos=xlim[1])
+    for(i in 1:nrow(re)) axis(1,at=re[i,1],labels = idf$Sid[lso][i],cex.axis=cexBP,las=2,tick=F,pos=xlim[1])
   }
 
 

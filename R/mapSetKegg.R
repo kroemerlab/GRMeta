@@ -1,4 +1,4 @@
-mapSetKegg<-function(obj,outfile=NULL, cols=NULL,sizes=4,ftsize="16px",conv2pdf=FALSE){
+mapSetKegg<-function(obj,outfile=NULL, cols=NULL,sizes=4,mixcol="grey70",ftsize=16,conv2pdf=FALSE){
   
   
   if(length(cols)!=length(obj$Method))  cols=brewer.pal(8,"Set2")[1:length(obj$Method)]
@@ -24,9 +24,16 @@ mapSetKegg<-function(obj,outfile=NULL, cols=NULL,sizes=4,ftsize="16px",conv2pdf=
   keggids$cols=gsub("^ ","",keggids$cols)
   keggids$assay=gsub("^ ","",keggids$assay)
   keggids$size=gsub("^ ","",keggids$size)
+  
+  if(!is.null(mixcol)){
+    lcols=rowMeans(col2rgb(mixcol))/255
+    mixcol=rgb(lcols[1],lcols[2],lcols[3])
+  }
+  
   for(i in grep(" ",keggids$cols)){
-    lcols=rowMeans(col2rgb(sort(strsplit(keggids$cols[i]," ")[[1]])))/255
-    keggids$cols[i]=rgb(lcols[1],lcols[2],lcols[3])
+    if(is.null(mixcol)){lcols=rowMeans(col2rgb(sort(strsplit(keggids$cols[i]," ")[[1]])))/255
+    keggids$cols[i]=rgb(lcols[1],lcols[2],lcols[3])} else{keggids$cols[i]=mixcol}
+    
     keggids$assay[i]=paste(sort(strsplit(keggids$assay[i]," ")[[1]]),collapse=" ")
     keggids$size[i]=mean(as.numeric(strsplit(keggids$size[i]," ")[[1]]))
   }
@@ -61,8 +68,8 @@ mapSetKegg<-function(obj,outfile=NULL, cols=NULL,sizes=4,ftsize="16px",conv2pdf=
       csvg[[ix+1]]=new
       
       what=keggids$knam[i]
-      ltext=c(ltext,list(paste("<g><text> <tspan y=\"",cy+newry*keggids$size[i]+16,"\" x=\"",cx-newrx*keggids$size[i],
-                               "\" style=\"font-size:",ftsize,";font-style:normal;font-weight:normal;fill:",
+      ltext=c(ltext,list(paste("<g><text> <tspan y=\"",cy+newry*keggids$size[i]+ftsize,"\" x=\"",cx-newrx*keggids$size[i],
+                               "\" style=\"font-size:",ftsize,"px;font-style:normal;font-weight:normal;fill:",
                                tolower(keggids$col[i]),";font-family:Arial\">",what,"</tspan></text></g>",sep="")))
       
     }

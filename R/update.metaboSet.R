@@ -10,8 +10,10 @@ update.metaboSet<-function(obj,what="Sid",formerid=NULL,newid=NULL,exact=TRUE,sw
   if(swap) for(i in 1:length(formerid)){
     i1=which(oldnames==formerid[i])
     i2=which(oldnames==newid[i])
-    newnames[i1]=newid[i]
-    newnames[i2]=formerid[i]
+    if(length(i1)>0 & length(i2)){
+      newnames[i1]=newid[i]
+      newnames[i2]=formerid[i]
+    }
   }
   if(any(table(newnames)>1)) stop(paste(c("duplicated names: ",names(which(table(newnames)>1))), collapse=" "))
   

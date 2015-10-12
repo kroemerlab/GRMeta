@@ -43,7 +43,7 @@ exportDataXLSX<-function(obj,outfile,ldata=names(obj$Data),sortSid=c("sType","In
     if(transpose) m=round(t(obj$Data[[i]][lsoSa,lsoAna,drop=FALSE]),nround)
     if(!transpose) m=round(obj$Data[[i]][lsoSa,lsoAna,drop=FALSE],nround)
     m=apply(m,2,as.character)
-    print(str(m))
+#    print(str(m))
     if(transpose) df=cbind("Analyte"=obj$Analyte,m,stringsAsFactors=FALSE)
     if(!transpose) df=cbind("Sid"=obj$Sid,m,stringsAsFactors=FALSE)
     #   print(names(df))

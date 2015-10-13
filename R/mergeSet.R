@@ -63,9 +63,9 @@ mergeSet<-function(...){
   fileinfos=do.call("rbind",lapply(re,function(x) x$File))
   metainfos$InjOrder=order(order(fileinfos$Batch,metainfos$InjOrder))
  
-  lso=order(metainfos$sType,metainfos$InjOrder)
-  metainfos=metainfos[lso,]
-  fileinfos=fileinfos[lso,]
+#   lso=order(metainfos$sType,metainfos$InjOrder)
+#   metainfos=metainfos[lso,]
+#   fileinfos=fileinfos[lso,]
   lusamp=metainfos$Sid
   
   cat("Check analytes\n")

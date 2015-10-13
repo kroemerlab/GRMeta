@@ -3,23 +3,17 @@
 \title{Compute QC adjusted matrices}
 \description{Compute QC adjusted matrices}
 \usage{
-corrSetQC(obj, Samp2Corr = obj$Sid, Var2Corr = obj$Analyte, lQC = obj$Sid[which(obj$Meta$sType == "QC")], nminQC = 3, propNNA = 0.5, lPcs = 1:2, what = "Area", outfile = NULL, doplot = TRUE, complete = "nothing", ipc = 1, imod = 4)
+corrSetQC(obj,what, Samp2Corr = obj$Sid, Var2Corr = obj$Analyte, lQC = obj$Sid[which(obj$Meta$sType == "QC")], nminQC = 3, propNNA = 0.5, lPcs = 1:2, outfile = NULL, doplot = TRUE, complete = "nothing", ipc = 1, imod = 4)
 }
 \arguments{
   \item{obj}{metaboSet object}
-  \item{Samp2Corr}{
-%%     ~~Describe \code{Samp2Corr} here~~
-}
-  \item{Var2Corr}{
-%%     ~~Describe \code{Var2Corr} here~~
-}
-  \item{lQC}{
-%%     ~~Describe \code{lQC} here~~
-}
+  \item{what}{Which matrix to use}
+  \item{Samp2Corr}{List of Sids to be corrected}
+  \item{Var2Corr}{List of Analyte used for correction}
+  \item{lQC}{List of QC Sids}
   \item{nminQC}{Number of non-missing QC for each variables. Default: 3}
   \item{propNNA}{Proportion of non-missing allowed in the QC samples. Default: 0.5}
   \item{lPcs}{Vector of PCs to be investigated. Default: 1:2}
-  \item{what}{Which matrix to use}
   \item{outfile}{Optional PDF file to dum p the plots}
   \item{doplot}{Do plots?}
   \item{complete}{If any Sid not in Samp2Corr or Analyte in Var2Corr excluded or missing. 

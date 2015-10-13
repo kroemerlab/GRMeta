@@ -1,6 +1,6 @@
 
-corrSetQC<-function(obj,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[which(obj$Meta$sType=="QC")],
-                    nminQC=3,propNNA=0.5,lPcs=1:2,what="Area",outfile=NULL,doplot=TRUE,complete="nothing",ipc=1,imod=4){
+corrSetQC<-function(obj,what,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[which(obj$Meta$sType=="QC")],
+                    nminQC=3,propNNA=0.5,lPcs=1:2,outfile=NULL,doplot=TRUE,complete="nothing",ipc=1,imod=4){
   
   Samp2Corr=Samp2Corr[!is.na(obj$File[Samp2Corr,]$Date)]
   m=obj$Data[[what]][Samp2Corr,Var2Corr]
@@ -49,7 +49,8 @@ corrSetQC<-function(obj,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[which
     ndfsa$pr3=predict(lmm3,newdata=ndfsa,se=TRUE)$fit
     ndfsa$se3=predict(lmm3,newdata=ndfsa,se=TRUE)$se.fit
     ###
-    lmm4=gam(pcqc$x[,i]~s(dts2))
+    try(lmm4<-gam(pcqc$x[,i]~s(dts2)),TRUE)
+    if("try-error"%in%class(lmm4)) lmm4=gam(pcqc$x[,i]~dts2)
     ndf$pr4=predict(lmm4,newdata=ndf,se=TRUE)$fit
     ndf$se4=predict(lmm4,newdata=ndf,se=TRUE)$se.fit
     ndfsa$pr4=predict(lmm4,newdata=ndfsa,se=TRUE)$fit
@@ -63,25 +64,41 @@ corrSetQC<-function(obj,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[which
     andf[[as.character(i)]]=ndf
     
   }
+  cat("\n")
   
   if(doplot | !is.null(outfile)) .incorrplot(pcqc,andf,andfsa,outfile=outfile)
   
   if(!is.null(ipc) & !is.null(imod)){
+    cat("Using model ",imod," on PC",ipc," to correct ",what,"\n",sep="")
     m0=obj$Data[[what]]
-    ml=mlc=mlc2=log2(obj$Data[[what]])
+    ml=ml2=mlc=mlc2=log2(obj$Data[[what]])
     mlc[Samp2Corr,Var2Corr]=sweep(ml[Samp2Corr,Var2Corr],2,meqc[Var2Corr])
     mlc2[Samp2Corr,Var2Corr]=mlc[Samp2Corr,Var2Corr]-andfsa[[as.character(ipc)]][Samp2Corr,paste("pr",imod,sep="")]%*%t(pcqc$r[Var2Corr,ipc,drop=F])
-    ml2=2^sweep(mlc2,2,meqc,"+")
+    ml2[Samp2Corr,Var2Corr]=sweep(mlc2[Samp2Corr,Var2Corr],2,meqc[Var2Corr],"+")
+    ml2=2^ml2
     
+    if(all(rownames(ml2)%in%Samp2Corr) & all(colnames(ml2)%in%Var2Corr)) cat("All samples and analytes from the original set were adjusted")
+    if(any(!rownames(ml2)%in%Samp2Corr) | any(!colnames(ml2)%in%Var2Corr)){
+      lsa=which(!rownames(ml2)%in%Samp2Corr)
+      lv=which((!colnames(ml2)%in%Var2Corr))
     if(complete=="NA"){
-      if(any((!rownames(ml2)%in%Samp2Corr))) ml2[which(!rownames(ml2)%in%Samp2Corr),]=NA
-      if(any(!colnames(ml2)%in%Var2Corr)) ml2[,which(!colnames(ml2)%in%Var2Corr)]=NA
+      cat("Adding NAs for:\n")
+      if(any((!rownames(ml2)%in%Samp2Corr))){ml2[lsa,]=NA;cat(" *Sid:",rownames(ml2)[lsa],"\n")}
+      if(any(!colnames(ml2)%in%Var2Corr)){ml2[lv,]=NA;cat(" *Analytes:",colnames(ml2)[lv],"\n")}
     }
-    if(complete=="remove") ml2=ml2[Samp2Corr,Var2Corr]
+    if(complete=="remove"){
+      cat("Removing:\n")
+      if(any((!rownames(ml2)%in%Samp2Corr))){cat(" *Sid:",rownames(ml2)[lsa],"\n");ml2=ml2[-lsa,,drop=F]=NA;}
+      if(any(!colnames(ml2)%in%Var2Corr)){cat(" *Analytes:",colnames(ml2)[lv],"\n");ml2=ml2[,-lv,drop=F]}
+    }
+    if(complete=="nothing"){
+        cat("Former data used for:\n")
+        if(any((!rownames(ml2)%in%Samp2Corr))){cat(" *Sid:",rownames(ml2)[lsa],"\n")}
+        if(any(!colnames(ml2)%in%Var2Corr)){cat(" *Analytes:",colnames(ml2)[lv],"\n")}
+    }
+    }
     invisible(ml2)
-  }
-  
-  if(is.null(ipc) | is.null(imod)) invisible(pcqc)
+  } else{invisible(pcqc)}
 }
 
 .incorrplot<-function(pcqc,andf,andfsa,outfile=NULL){

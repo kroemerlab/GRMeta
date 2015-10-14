@@ -1,15 +1,17 @@
+.InDBMatchfct<-function(x,what,NewDB){
+  l=which(NewDB$GName%in%strsplit(x,";")[[1]])
+  if(length(l)==0) return(NA)
+  if(is.numeric(NewDB[,what])) return(mean(NewDB[l,what],na.rm=T))
+  l=unique(strsplit(NewDB[l,what],";")[[1]])
+  l=l[which(l!="")]
+  if(length(l)==0) return(NA)
+  paste(l,collapse=";")
+}
+
+
 loadAgilentData<-function(ifile,ofile=NULL,params=list()){
   
-  InDBMatchfct<-function(x,what,NewDB){
-    l=which(NewDB$GName%in%strsplit(x,";")[[1]])
-    if(length(l)==0) return(NA)
-    if(is.numeric(NewDB[,what])) return(mean(NewDB[l,what],na.rm=T))
-    l=unique(strsplit(NewDB[l,what],";")[[1]])
-    l=l[which(l!="")]
-    if(length(l)==0) return(NA)
-    paste(l,collapse=";")
-  }
-  
+
   paramsvals <- paramsParsing()
   if (!missing(params)) paramsvals[names(params)] <- params
   params=paramsvals
@@ -107,7 +109,7 @@ loadAgilentData<-function(ifile,ofile=NULL,params=list()){
       lnotfound=unique(vnam0[!vnam0%in%NewDB$GName])
       if(length(lnotfound)>0) cat("Not found in annotation database:\n",lnotfound,"\n",sep=" ")
       l2add=names(NewDB)[names(NewDB)!="GName"]
-      toadd=data.frame(sapply(l2add,function(i) sapply(annot$PutativeName,InDBMatchfct,i,NewDB)),stringsAsFactors = F)
+      toadd=data.frame(sapply(l2add,function(i) sapply(annot$PutativeName,.InDBMatchfct,i,NewDB)),stringsAsFactors = F)
       for(i in names(which(sapply(l2add,function(i) is.numeric(NewDB[,i]))))) toadd[,i]=as.numeric(toadd[,i])
       for(i in names(which(sapply(l2add,function(i) is.character(NewDB[,i]))))) toadd[,i]=as.character(toadd[,i])
       annot=cbind(annot,toadd)

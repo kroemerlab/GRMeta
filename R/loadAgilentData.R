@@ -98,7 +98,7 @@ loadAgilentData<-function(ifile,ofile=NULL,params=list()){
   newnam=oldnam=lumetnams
   
   if(params$checkNams){
-    newnam=cleanMetaboNames(oldnam)$newnam
+    newnam=cleanMetaboNames(oldnam,RegExpr = NA,Syno = NA)$newnam
     annot$MetName=newnam
     annot$Analyte=gsub("@NA$","",paste(newnam,"@",sprintf("%.2f",rtmed),"-",params$AssayName,sep=""))
     annot$IsSTD[grep("_ISTD",newnam)]=TRUE

@@ -1,4 +1,4 @@
-export(addSBRMatrix,cleanMetaboNames,compSetStats,compSetRatios,corrSetQC,
+export(cleanMetaboNames,compSetSBR,compSetStats,compSetRatios,corrSetQC,
 loadAgilentData,mapSetKegg,mergeSet,deleteEntries, exportDataXLSX)
 
 ### register S3 methods

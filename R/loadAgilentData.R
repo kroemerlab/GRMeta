@@ -94,7 +94,7 @@ loadAgilentData<-function(ifile,ofile=NULL,params=list()){
   #########
   rtmed=round(apply(allmat$RT,2,median,na.rm=T),4)
   nm=gsub("@NA$","",paste(lumetnams,"@",sprintf("%.2f",rtmed),"-",params$AssayName,sep=""))
-  annot=data.frame(Analyte=nm,MetName=lumetnams,IsSTD=FALSE,RT=rtmed,stringsAsFactors = F)
+  annot=data.frame(Analyte=nm,MetName=lumetnams,IsSTD=FALSE,RT=rtmed,LevelAnnot=1,stringsAsFactors = F)
   newnam=oldnam=lumetnams
   
   if(params$checkNams){

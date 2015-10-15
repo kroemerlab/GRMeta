@@ -46,7 +46,7 @@ plot(finaldata,outfile="All.pdf")
 
 ### Export "Area", replace NA by "-" and "NA"
 \dontrun{
-exportDataXLSX(mydata,outfile="test.xlsx",ldata="Area",sortSid="Sid",characterNA=c("-","NA"))
+exportSetXLSX(mydata,outfile="test.xlsx",ldata="Area",sortSid="Sid",characterNA=c("-","NA"))
 }
 
 

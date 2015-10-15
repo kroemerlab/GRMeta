@@ -1,9 +1,9 @@
-\name{exportDataXLSX}
-\alias{exportDataXLSX}
+\name{exportSetXLSX}
+\alias{exportSetXLSX}
 \title{Export object to Xlsx}
 \description{Export object to Xlsx}
 \usage{
-exportDataXLSX(obj,outfile,ldata=names(obj$Data),sortSample=c("sType","InjOrder"),sortAnalyte=c("Method","RT"),transpose=FALSE,nround=3,characterNA=c("-","NA"))
+exportSetXLSX(obj,outfile,ldata=names(obj$Data),sortSample=c("sType","InjOrder"),sortAnalyte=c("Method","RT"),transpose=FALSE,nround=3,characterNA=c("-","NA"))
 }
 \arguments{
   \item{obj}{metaboSet}
@@ -27,8 +27,8 @@ mydata=loadAgilentData(ifile =testfiles[1])
 myratios=compSetRatios(mydata,l2add="Area",conv2set=TRUE)
 
 \dontrun{
-exportDataXLSX(mydata,outfile="test.xlsx",ldata=c("Area","RT"),characterNA=c("Missing","NAssss"))
-exportDataXLSX(myratios,outfile="testratios.xlsx",ldata=c("Area","RT"),characterNA=c("Missing","NAssss"))
+exportSetXLSX(mydata,outfile="test.xlsx",ldata=c("Area","RT"),characterNA=c("Missing","NAssss"))
+exportSetXLSX(myratios,outfile="testratios.xlsx",ldata=c("Area","RT"),characterNA=c("Missing","NAssss"))
 }
 
 }

@@ -1,4 +1,4 @@
-exportDataXLSX<-function(obj,outfile,ldata=names(obj$Data),sortSample=c("sType","InjOrder"),sortAnalyte=c("Method","RT"),transpose=FALSE,nround=3,characterNA=c("-","NA")){
+exportSetXLSX<-function(obj,outfile,ldata=names(obj$Data),sortSample=c("sType","InjOrder"),sortAnalyte=c("Method","RT"),transpose=FALSE,nround=3,characterNA=c("-","NA")){
   
   if(!inherits(obj, "metaboSet")) stop("This is not a metaboSet object")
   

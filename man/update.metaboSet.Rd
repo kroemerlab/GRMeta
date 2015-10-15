@@ -1,14 +1,14 @@
 \name{update.metaboSet}
 \alias{update.metaboSet}
 
-\title{Update sample ids in a metaboSet object}
-\description{Update sample ids in an experiment object}
+\title{Update ids in a metaboSet object}
+\description{Update sample or analyte ids in an experiment object}
 \usage{
 \method{update}{metaboSet}(obj,what="Sid",formerid=NULL,newid=NULL,exact=TRUE,swap=FALSE)
 }
 \arguments{
   \item{obj}{Metaboset object}
-  item{what}{Only Sid supported}
+  \item{what}{Only Sid supported}
   \item{formerid}{Vector of current Sids}
   \item{newid}{Vector of new Sids}
   \item{exact}{Exact matching}

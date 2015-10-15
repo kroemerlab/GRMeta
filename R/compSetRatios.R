@@ -1,9 +1,9 @@
 
 compSetRatios<-function(obj,l2add=names(obj$Data),lpairs=RatiosGR,conv2set=FALSE){
   
-  lnna=which(!is.na(obj$Annot$PutativeName))
+  lnna=which(!is.na(obj$Annot$MetName))
   cmet=do.call("rbind",lapply(lnna,function(ix) data.frame(Id=obj$Annot$Analyte[ix],Typ=1,Ds=obj$Annot$Method[ix],
-                                                           PutNam=strsplit(obj$Annot$PutativeName[ix],"[;/]")[[1]],stringsAsFactors=FALSE)))
+                                                           PutNam=strsplit(obj$Annot$MetName[ix],"[;/]")[[1]],stringsAsFactors=FALSE)))
   cmet$PutNam=gsub("\\?","",cmet$PutNam)
   
   
@@ -25,7 +25,7 @@ compSetRatios<-function(obj,l2add=names(obj$Data),lpairs=RatiosGR,conv2set=FALSE
       NNam=gsub("_0","",paste(ix,(1:length(lnums)-1),sep="_"))
       meth=cbind(cmet$Ds[lnums],cmet$Ds[ldens])
       meth=apply(meth,1,function(x) paste(unique(sort(x)),collapse="/"))
-      icmb=data.frame(Analyte=NNam,PutativeName=ix,AnalyteNum=cmet$Id[lnums],AnalyteDen=cmet$Id[ldens],Method=meth,stringsAsFactors=F)
+      icmb=data.frame(Analyte=NNam,MetName=ix,AnalyteNum=cmet$Id[lnums],AnalyteDen=cmet$Id[ldens],Method=meth,stringsAsFactors=F)
       
       cmb[[ix]]=icmb
     }

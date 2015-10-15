@@ -94,12 +94,12 @@ loadAgilentData<-function(ifile,ofile=NULL,params=list()){
   #########
   rtmed=round(apply(allmat$RT,2,median,na.rm=T),4)
   nm=gsub("@NA$","",paste(lumetnams,"@",sprintf("%.2f",rtmed),"-",params$AssayName,sep=""))
-  annot=data.frame(Analyte=nm,PutativeName=lumetnams,IsSTD=FALSE,RT=rtmed,stringsAsFactors = F)
+  annot=data.frame(Analyte=nm,MetName=lumetnams,IsSTD=FALSE,RT=rtmed,stringsAsFactors = F)
   newnam=oldnam=lumetnams
   
   if(params$checkNams){
     newnam=cleanMetaboNames(oldnam)$newnam
-    annot$PutativeName=newnam
+    annot$MetName=newnam
     annot$Analyte=gsub("@NA$","",paste(newnam,"@",sprintf("%.2f",rtmed),"-",params$AssayName,sep=""))
     annot$IsSTD[grep("_ISTD",newnam)]=TRUE
     annot$OriginalName=oldnam
@@ -109,7 +109,7 @@ loadAgilentData<-function(ifile,ofile=NULL,params=list()){
       lnotfound=unique(vnam0[!vnam0%in%NewDB$GName])
       if(length(lnotfound)>0) cat("Not found in annotation database:\n",lnotfound,"\n",sep=" ")
       l2add=names(NewDB)[names(NewDB)!="GName"]
-      toadd=data.frame(sapply(l2add,function(i) sapply(annot$PutativeName,.InDBMatchfct,i,NewDB)),stringsAsFactors = F)
+      toadd=data.frame(sapply(l2add,function(i) sapply(annot$MetName,.InDBMatchfct,i,NewDB)),stringsAsFactors = F)
       for(i in names(which(sapply(l2add,function(i) is.numeric(NewDB[,i]))))) toadd[,i]=as.numeric(toadd[,i])
       for(i in names(which(sapply(l2add,function(i) is.character(NewDB[,i]))))) toadd[,i]=as.character(toadd[,i])
       annot=cbind(annot,toadd)

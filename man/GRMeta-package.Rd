@@ -34,7 +34,7 @@ gcdata=update(gcdata,what="Sid",formerid = c("Sa_cond1_5.gcdata1"),newid = c("Sa
 finaldata=mergeSet(lcdata,gcdata)
 
 ## plot analytes that correspond to AMP
-plot(lcdata,PutativeName="AMP")
+plot(lcdata,MetName="AMP")
 
 ## plot all analytes from method="lc"
 plot(finaldata,Method="lc")

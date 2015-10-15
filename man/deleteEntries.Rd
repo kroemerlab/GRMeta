@@ -22,10 +22,10 @@ library(GRMeta)
 mydata=loadAgilentData(ifile =testfiles[1])
 
 deleteEntries(mydata,Sid=c( "St_ATP_2","St_ATP_2b","St_ATP_2c" ))$File
-deleteEntries(mydata,PutativeName="CoA")$Annot
+deleteEntries(mydata,MetName="CoA")$Annot
 
 str(mydata$Data$Area)
-newdata=deleteEntries(mydata,Sid=c("Bl_prerun-eau_1", "Bl_prerun-eau_1b", "Bl_prerun-matrice_4" ),PutativeName="Cytidine")
+newdata=deleteEntries(mydata,Sid=c("Bl_prerun-eau_1", "Bl_prerun-eau_1b", "Bl_prerun-matrice_4" ),MetName="Cytidine")
 str(newdata$Data$Area)
 }
 

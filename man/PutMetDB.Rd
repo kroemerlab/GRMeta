@@ -18,7 +18,7 @@ data(PutMetDB)
 Data frame:
  \item{GName}{Given name}
  \item{MF}{Molecular formula}
- \item{MW}{Exact monoisotopic mass of neutral molecule}
+ \item{Mass}{Exact monoisotopic mass of neutral molecule}
  \item{DBIds}{Original databse Ids}
 }
 

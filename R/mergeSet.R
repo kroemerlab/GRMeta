@@ -69,8 +69,8 @@ mergeSet<-function(...){
   lusamp=metainfos$Sid
   
   cat("Check analytes\n")
-  lumet=unique(unlist(lapply(re,function(x) x$Annot$PutativeName)))
-  matexVar=sapply(re,function(x) match(lumet,x$Annot$PutativeName))
+  lumet=unique(unlist(lapply(re,function(x) x$Annot$MetName)))
+  matexVar=sapply(re,function(x) match(lumet,x$Annot$MetName))
   whichds=apply(matexVar,1,function(x) which(!is.na(x))[1])
   annot=re[[1]]$Annot
   for(i in which(whichds>1)) annot[i,]=re[[whichds[i]]]$Annot[matexVar[i,whichds[i]],]
@@ -89,7 +89,7 @@ mergeSet<-function(...){
     allmat[[i]]=do.call("rbind",tmp)
   }
   annot$RT=round(apply(allmat$RT,2,median,na.rm=T),4)
-  annot$Analyte=paste(annot$PutativeName,"@",sprintf("%.2f",annot$RT),"-",annot$Method[1],sep="")
+  annot$Analyte=paste(annot$MetName,"@",sprintf("%.2f",annot$RT),"-",annot$Method[1],sep="")
   rownames(annot)=annot$Analyte
   allmat=lapply(allmat,function(x){dimnames(x)=list(metainfos$Sid,annot$Analyte);x})
   

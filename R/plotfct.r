@@ -164,12 +164,12 @@ par(par.def)
 }
 
 ##################
-# plotManyAnalyte<-function(obj,outfile=NULL,width=8,height=6, Analyte=obj$Analyte,PutativeName=NULL,Method=NULL,...){
+# plotManyAnalyte<-function(obj,outfile=NULL,width=8,height=6, Analyte=obj$Analyte,MetName=NULL,Method=NULL,...){
 #   
 #   
 #   lanalytes=NULL
 #   if(!is.null(Analyte)) lanalytes=Analyte[Analyte%in%obj$Annot$Analyte]
-#   if(!is.null(PutativeName)) lanalytes=c(lanalytes,obj$Annot$PutativeName[obj$Annot$PutativeName%in%PutativeName])
+#   if(!is.null(MetName)) lanalytes=c(lanalytes,obj$Annot$MetName[obj$Annot$MetName%in%MetName])
 #   if(!is.null(Method)) lanalytes=c(lanalytes,obj$Annot$Method[obj$Annot$Method%in%Method])
 #   if(!is.null(outfile)) pdf(file=outfile,width = width,height = 8)
 #   for(i in lanalytes) plotOneAnalyte(obj,analyte = i,... )

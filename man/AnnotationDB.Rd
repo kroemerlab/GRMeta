@@ -19,7 +19,7 @@ Data frame:
  \item{GName}{GName}
  \item{Class}{Chemical class}
  \item{MF}{Molecular formula}
- \item{MW}{Exact monoisotopic mass}
+ \item{Mass}{Exact monoisotopic mass}
  \item{HMDB}{HMDB}
  \item{KEGG}{KEGG}
  \item{PC}{PC}"  

@@ -22,7 +22,7 @@ Data frame:
  \item{Method}{Assay id}
  \item{Type}{1: standard, 2: infered from MF, 3: to be tested}
  \item{MF}{Molecular formula}
- \item{MW}{Exact monoisotopic mass of neutral molecule}
+ \item{Mass}{Exact monoisotopic mass of neutral molecule}
 
 }
 

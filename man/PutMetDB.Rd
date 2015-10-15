@@ -19,7 +19,9 @@ Data frame:
  \item{GName}{Given name}
  \item{MF}{Molecular formula}
  \item{Mass}{Exact monoisotopic mass of neutral molecule}
- \item{DBIds}{Original databse Ids}
+ \item{HMDB}{HMDB ids}
+ \item{KEGG}{Kegg ids}
+ \item{CHEBI}{ChEbi ids}
 }
 
 

@@ -20,7 +20,7 @@ David Enot \email{david.enot@gustaveroussy.fr}
 
 \examples{
 ### Default dictionaries
-cleanMetaboNames(metnam = c("Beta.glucose","ACETYLCOA POS","ACETYLCOA PS"),RegExpr=dictRegExpr,Syno=dictSyno)
+cleanMetaboNames(metnam = c("Beta.glucose","ACETYLCOA POS","ACETYLCOA PS"),RegExpr=NA,Syno=NA)
 cleanMetaboNames(metnam = c("Beta.glucose","ACETYLCOA POS","ACETYLCOA PS"))
 ### Do not replace
 cleanMetaboNames(metnam = c("Beta.glucose","ACETYLCOA POS","ACETYLCOA PS"),RegExpr=NULL,Syno=NULL)

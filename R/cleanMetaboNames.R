@@ -1,18 +1,4 @@
 
-#  dictSyno=data.frame(Before=c("Dimethyl oxoglutaric acid","1-5.anhydroglucitol","Glyceraldehyde-3-phosphate" ,"Glyceraldehyde 3.phosphate", "Maltose Trehalose",
-#                               "Dimethyl glycine","Di methyl glycine","Alpha tocopherol","Tocopherol","5-aminovaleric","Aminovaleric", "Phosphoenol pyruvate",
-#                               "cytidine","adenosine","xanthosine","AMPc","AMP.10C13.5N15","COA", "ACETYLCOA POS", "ACETYLCOENZYME A.2C13", "malonyl coA"  ,  "SuccCoA"),
-#                      After=c("Dimethyl-oxoglutaric acid","1,5-anhydroglucitol","Glyceraldehyde 3-phosphate", "Glyceraldehyde 3-phosphate" ,"Maltose;Trehalose" ,        
-#                              "Dimethylglycine","Dimethylglycine","Alpha-tocopherol","Alpha-tocopherol","5-aminovaleric acid" , "5-aminovaleric acid","Phosphoenolpyruvic acid",
-#                              "Cytidine","Adenosine","Xanthosine","cAMP","AMP_ISTD","CoA", "AcetylCoA", "AcetylCoA_ISTD", "MalonylCoA"  ,  "SuccinylCoA"  ),
-#                      stringsAsFactors = FALSE)
-#  save(file="dictSyno.rda",dictSyno)
-#  dictRegExpr=data.frame(Before=c("__","_","^Beta\\.","^O\\.","^N\\.","^X([0-9]+)\\.","([A-Za-z])\\.([0-9])\\.([A-Za-z])","([A-Za-z])\\.([A-Za-z])","\\.$"," C13"),
-#                         After=c(";"," ","Beta-","O-","N-","\\1-","\\1-\\2-\\3","\\1 \\2","","_ISTD"),stringsAsFactors = FALSE)
-#  save(file="dictRegExpr.rda",dictRegExpr)
- 
- 
-
 cleanMetaboNames<-function(metnam,RegExpr=NULL,Syno=NULL){
 
   if(is.na(RegExpr)){
@@ -33,6 +19,20 @@ cleanMetaboNames<-function(metnam,RegExpr=NULL,Syno=NULL){
   
   return(list(newnam=vnam,oldnams=metnam))
 }
+
+
+#  dictSyno=data.frame(Before=c("Dimethyl oxoglutaric acid","1-5.anhydroglucitol","Glyceraldehyde-3-phosphate" ,"Glyceraldehyde 3.phosphate", "Maltose Trehalose",
+#                               "Dimethyl glycine","Di methyl glycine","Alpha tocopherol","Tocopherol","5-aminovaleric","Aminovaleric", "Phosphoenol pyruvate",
+#                               "cytidine","adenosine","xanthosine","AMPc","AMP.10C13.5N15","COA", "ACETYLCOA POS", "ACETYLCOENZYME A.2C13", "malonyl coA"  ,  "SuccCoA"),
+#                      After=c("Dimethyl-oxoglutaric acid","1,5-anhydroglucitol","Glyceraldehyde 3-phosphate", "Glyceraldehyde 3-phosphate" ,"Maltose;Trehalose" ,        
+#                              "Dimethylglycine","Dimethylglycine","Alpha-tocopherol","Alpha-tocopherol","5-aminovaleric acid" , "5-aminovaleric acid","Phosphoenolpyruvic acid",
+#                              "Cytidine","Adenosine","Xanthosine","cAMP","AMP_ISTD","CoA", "AcetylCoA", "AcetylCoA_ISTD", "MalonylCoA"  ,  "SuccinylCoA"  ),
+#                      stringsAsFactors = FALSE)
+#  save(file="dictSyno.rda",dictSyno)
+#  dictRegExpr=data.frame(Before=c("__","_","^Beta\\.","^O\\.","^N\\.","^X([0-9]+)\\.","([A-Za-z])\\.([0-9])\\.([A-Za-z])","([A-Za-z])\\.([A-Za-z])","\\.$"," C13"),
+#                         After=c(";"," ","Beta-","O-","N-","\\1-","\\1-\\2-\\3","\\1 \\2","","_ISTD"),stringsAsFactors = FALSE)
+#  save(file="dictRegExpr.rda",dictRegExpr)
+
 
 
 #################################################################################################

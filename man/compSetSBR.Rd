@@ -1,5 +1,5 @@
 \name{compSetSBR}
-\alias{metaboSet}
+\alias{compSetSBR}
 \title{Add SBR matrix to the experiment data object}
 
 \description{Compute signal to blank matrix and add to the metaboSet data object}

@@ -9,7 +9,7 @@ compSetSBR<-function(obj,thresh=1,SidBlank=NULL,what="Height",newname=NULL,fct=m
   nmat=sweep(mat,2,norm,"/")
   nmat[which(nmat<1)]=1
   
-  if(is.null(newname)) invisible(nmat) else{
+  if(is.null(newname)) invisible(list(SBR=nmat,Norm=norm)) else{
     obj$Data[[newname]]=nmat
     obj$Annot$SBR=norm
     invisible(obj)

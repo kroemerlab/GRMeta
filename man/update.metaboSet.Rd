@@ -8,16 +8,13 @@
 }
 \arguments{
   \item{obj}{Metaboset object}
-  \item{what}{Only Sid supported}
+  \item{what}{Only Sid or Analyte supported}
   \item{formerid}{Vector of current Sids}
   \item{newid}{Vector of new Sids}
   \item{exact}{Exact matching}
   \item{swap}{Should names in oldname be swaped with corresponding newname}
 }
-\details{
-If necessary, more details than the description above ~~
-}
-\value{Experiment object}
+\value{metaboSet object}
 \author{
 David Enot \email{david.enot@gustaveroussy.fr}
 }
@@ -40,6 +37,14 @@ print(mydata2$Meta)
 print(mydata$File)
 mydata2=update(mydata,what="Sid",formerid="Bl_prerun-eau_1b",newid = "Bl_prerun-matrice_4",swap = TRUE)
 print(mydata2$File)
+
+############# With Analyte: exclude the method name from the analyte id
+testfiles=list.files(system.file( package = "GRMeta"),pattern = "txt$",full.names = TRUE)
+mydata=loadAgilentData(ifile =testfiles[1])
+mydata$Analyte
+mydata2=update(mydata,what="Analyte",formerid="-myassay",newid = "",exact=FALSE)
+mydata2$Analyte
+
 
 }
 \keyword{misc}

@@ -14,7 +14,7 @@
   \item{fct}{Function used to compute the blank level for each analyte}
 }
 
-\value{metaboSet object}
+\value{metaboSet object or list of SBR matrix and the normalisation factor}
 
 \author{
 David Enot \email{david.enot@gustaveroussy.fr}

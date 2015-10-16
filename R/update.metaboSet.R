@@ -29,6 +29,7 @@ update.metaboSet<-function(obj,what="Sid",formerid=NULL,newid=NULL,exact=TRUE,sw
   if(what=="Analyte"){
     obj$Analyte=newnames
     obj$Annot$Analyte=rownames(obj$Annot)=newnames
+    if(!is.null(obj$Eic)) obj$Eic$Analyte=rownames(obj$Eic)=newnames
     obj$Data=lapply(obj$Data,function(x){colnames(x)=newnames;x})
     if(any(newnames!=oldnames)) print(rbind(Old=oldnames[newnames!=oldnames],New=newnames[newnames!=oldnames]))
   }

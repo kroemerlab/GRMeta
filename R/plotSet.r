@@ -4,8 +4,11 @@ plot.metaboSet<-function(obj,outfile=NULL,
   
   mgraphs=t(sapply(lgraphs,function(x) strsplit(x[1],"~")[[1]][1:2]))
   mgraphs[grep("^[0-9]$",mgraphs[,2]),2]=NA
-  ltyps=c(names(obj$Meta),names(obj$Data),NA)
-  lgraphs=lgraphs[which(mgraphs[,1]%in%ltyps & mgraphs[,2]%in%ltyps)]
+  ltyps=c(names(obj$Meta),names(obj$Data))
+  l2keep=which(mgraphs[,1]%in%ltyps & (mgraphs[,2]%in%ltyps | is.na(mgraphs[,2])))
+  lgraphs=lgraphs[l2keep]
+  mgraphs=na.omit(unique(as.vector(mgraphs[l2keep,])))
+  
   if(length(lgraphs)==0) stop("Graphs cannot be matched to the obj$Meta or obj$Data")
 
   dots<-list(...)
@@ -19,16 +22,17 @@ plot.metaboSet<-function(obj,outfile=NULL,
   msg=FALSE
   if(is.null(lanalytes)){
     msg=TRUE
-    lanalytes=names(which(colSums(!is.na(obj$Data$RT))>2))
+    lanalytes=obj$Analyte
   }
   
   ###########
 #   lugraph=unique(lapply(lgraphs,function(x) strsplit(x[1],"~")[[1]][1:2]))
 #   
 #   l1=unique(unlist(lgraphs)[unlist(lgraphs)%in%names(obj$Data)])
-#   m1=do.call("cbind",lapply(l1,function(x) colSums(!is.na(obj$Data[[x]][,lanalytes,drop=F]))))
-#   lanalytes=names(which(rowSums(m1>2)>0))
-  lanalytes=names(which(colSums(!is.na(obj$Data$RT[,lanalytes,drop=F]))>2))
+  l1=mgraphs[mgraphs%in%names(obj$Data)]
+  m1=do.call("cbind",lapply(l1,function(x) colSums(!is.na(obj$Data[[x]][,lanalytes,drop=F]))))
+  lanalytes=names(which(rowSums(m1>1)>0))
+#  lanalytes=names(which(colSums(!is.na(obj$Data$RT[,lanalytes,drop=F]))>2))
   
   if(!is.null(outfile)){
       if(msg) cat("Analytes could not be matched: all are exported to ",outfile,"\n",sep="")
@@ -246,9 +250,10 @@ par(par.def)
   #if(!all(c(whatx,whaty)%in%c("RT","InjOrder"))){
   ndf=data.frame(x=seq(min(xlim),max(xlim),length.out = 100))
   trdf=data.frame(x=vx,y=vy)
-  inlm<-function(form,trdf,ndf){
+  inlm<-function(form,form2,trdf,ndf){
     mod<-try(gam(form,data=trdf),TRUE)
-    if( "try-error"%in%class(mod)) mod<-lm(form,data=trdf)
+    if( "try-error"%in%class(mod)) mod<-try(mod<-lm(form2,data=trdf),TRUE)
+    if( "try-error"%in%class(mod)) return(NULL)
     if(any(as.character(form)=="log10(y)")) myfct<-function(i) 10^i else  myfct<-function(i) i
     pr=predict(mod,ndf,se.fit = T)
     pr=data.frame(pr)
@@ -258,15 +263,17 @@ par(par.def)
     pr$fit=myfct(pr$fit)
     pr
   }
-  pr=inlm(y~s(x),trdf,ndf)
-  if(logs%in%c("yx","xy"))  pr=inlm(log10(y)~s(log10(x)),trdf,ndf)
-  if(logs=="y")  pr=inlm(log10(y)~s(x),trdf,ndf)
-  if(logs=="x")  pr=inlm(y~s(log10(x)),trdf,ndf)
   
+  if(logs=="") pr=inlm(y~s(x),y~x,trdf,ndf)
+  if(logs%in%c("yx","xy"))  pr=inlm(log10(y)~s(log10(x)),log10(y)~log10(x),trdf,ndf)
+  if(logs=="y")  pr=inlm(log10(y)~s(x),log10(y)~x,trdf,ndf)
+  if(logs=="x")  pr=inlm(y~s(log10(x)),y~log10(x),trdf,ndf)
+  
+  if(!is.null(pr)){
   lines(pr$x,pr$fit,col="grey20")
   lines(pr$x,pr$fitl,col="grey30",lty=2)
   lines(pr$x,pr$fitu,col="grey30",lty=2)
-  
+  }
   points(vx,vy,col=idf$color,pch=16)
   if(!is.null(linking) & "InjOrder"==whatx)
     for(i in linking) lines(vx[which(idf$sType==i)],vy[which(idf$sType==i)],col=idf$color[which(idf$sType==i)][1])

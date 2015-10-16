@@ -21,15 +21,15 @@ library(GRMeta)
 
 (testfiles=list.files(system.file( package = "GRMeta"),pattern = "txt$",full.names = TRUE))
 lcdata=loadAgilentData(ifile =testfiles[1],params = list(AssayName="lc"))
-gcdata1=loadAgilentData(ifile =testfiles[2],params = list(AssayName="gc"))
-gcdata2=loadAgilentData(ifile =testfiles[3],params = list(AssayName="gc"))
+gcdata1=loadAgilentData(ifile =testfiles[2],params = list(AssayName="gc",Batch="B1"))
+gcdata2=loadAgilentData(ifile =testfiles[3],params = list(AssayName="gc",Batch="B2"))
 
 finaldata=mergeSet(lcdata,gcdata1,gcdata2)
 finaldata
 ## or step by step
 gcdata=mergeSet(gcdata1,gcdata2)
-gcdata=deleteEntries(gcdata,Sid=c("Sa_cond1_5.gcdata2"))
-gcdata=update(gcdata,what="Sid",formerid = c("Sa_cond1_5.gcdata1"),newid = c("Sa_cond1_5"))
+gcdata=deleteEntries(gcdata,Sid=c("Sa_cond1_5.B2"))
+gcdata=update(gcdata,what="Sid",formerid = c("Sa_cond1_5.B1"),newid = c("Sa_cond1_5"))
 
 finaldata=mergeSet(lcdata,gcdata)
 

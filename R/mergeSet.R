@@ -35,7 +35,7 @@ mergeSet<-function(...){
   eval(parse(text=cmd))
   return(invisible(res))  
 }
-
+######################################################
 .joinDF<-function(ldf,lmin){
   ldfn=unique(unlist(lapply(ldf,names)))
   ldfn=c(lmin,ldfn[!ldfn%in%lmin])
@@ -50,6 +50,25 @@ mergeSet<-function(...){
   ndf
 }
 
+.joinDF2<-function(ldf,lmin,matex){
+  ldfn=unique(unlist(lapply(ldf,names)))
+  ldfn=c(lmin,ldfn[!ldfn%in%lmin])
+  for(i in 1:length(ldf)){
+    lmiss=ldfn[!ldfn%in%names(ldf[[i]])]
+    if(length(lmiss)>0) 
+      ldf[[i]]=cbind(ldf[[i]],matrix(NA,nrow=nrow(ldf[[i]]),ncol=length(lmiss),dimnames=list(rownames(ldf[[i]]),lmiss)))
+    
+    ldf[[i]]=ldf[[i]][matex[,i],ldfn]
+  }
+  fdf=ldf[[1]]
+  for(j in 2:length(ldf)){
+    torep=which(is.na(fdf) & ! is.na(ldf[[j]]),arr.ind =TRUE)
+    if(nrow(torep)>0)  for(k in 1:nrow(torep))
+      fdf[torep[k,1],torep[k,2]]=ldf[[j]][torep[k,1],torep[k,2]]
+  }
+  fdf
+}
+#################################################################
 
 .mergeDataBatch<-function(...){
   
@@ -131,25 +150,6 @@ mergeSet<-function(...){
   invisible(allmat)
 }
 
-#############
-.joinDF2<-function(ldf,lmin,matex){
-  ldfn=unique(unlist(lapply(ldf,names)))
-  ldfn=c(lmin,ldfn[!ldfn%in%lmin])
-  for(i in 1:length(ldf)){
-    lmiss=ldfn[!ldfn%in%names(ldf[[i]])]
-    if(length(lmiss)>0) 
-      ldf[[i]]=cbind(ldf[[i]],matrix(NA,nrow=nrow(ldf[[i]]),ncol=length(lmiss),dimnames=list(rownames(ldf[[i]]),lmiss)))
-    
-    ldf[[i]]=ldf[[i]][matex[,i],ldfn]
-  }
-  fdf=ldf[[1]]
-  for(j in 2:length(ldf)){
-    torep=which(is.na(fdf) & ! is.na(ldf[[j]]),arr.ind =TRUE)
-    if(nrow(torep)>0)  for(k in 1:nrow(torep))
-      fdf[torep[k,1],torep[k,2]]=ldf[[j]][torep[k,1],torep[k,2]]
-  }
-  fdf
-}
 
 #####################################################################################################
 .mergeDataMethods<-function(...){
@@ -173,6 +173,7 @@ mergeSet<-function(...){
   lnmatch=lapply(colnames(matexSa),function(x) lusamp[which(is.na(matexSa[,x]))])
   names(lnmatch)=colnames(matexSa)
   if(any(is.na(matexSa))){cat("Missing samples in :\n");print(lnmatch[!sapply(lnmatch,is.null)])}
+  if(all(rowSums(is.na(matexSa))==0)) cat(sum(rowSums(is.na(matexSa))==0)," samples found everywhere\n")
   ##
   meta=.joinDF2(lapply(re,function(x) x$Meta),c("Sid","sType"),matexSa)
   fileinfos=data.frame(Sid=lusamp,stringsAsFactors = FALSE)
@@ -211,7 +212,7 @@ mergeSet<-function(...){
   matexVar=sapply(re,function(x) match(lumet,x$Analyte))
   
   ##############
-  cat("Merge data:\n")
+  cat("Merge data: ")
   #for(i in names(re)) re[[i]]$Data=lapply(re[[i]]$Data,function(x) x[,matexVar[,i]])
   lumeas=unique(unlist(lapply(re,function(x) names(x$Data))))
   allmat=list()
@@ -228,6 +229,7 @@ mergeSet<-function(...){
       }
     }
   }
+  cat("\n")
   
   allmat=lapply(allmat,function(x){dimnames(x)=list(meta$Sid,annot$Analyte);x})
   

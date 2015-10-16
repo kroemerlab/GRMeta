@@ -14,23 +14,38 @@ David Enot \email{david.enot@gustaveroussy.fr}
 }
 \examples{
 (testfiles=list.files(system.file( package = "GRMeta"),pattern = "txt$",full.names = TRUE))
-mydata1=loadAgilentData(ifile =testfiles[2])
+## Better to give an explicit name for the batch
+mydata1=loadAgilentData(ifile =testfiles[2],params = list(AssayName="A1",Batch="B1"))
 mydata1
-mydata2=loadAgilentData(ifile =testfiles[3])
+mydata2=loadAgilentData(ifile =testfiles[3],params = list(AssayName="A1",Batch="B2"))
 mydata2
 
 ## merge 1 and 2
 mydatacmb=mergeSet(mydata1,mydata2)
-mydatacmb
+str(mydatacmb$Meta)
 
 ## order matters
 mydatacmb=mergeSet(mydata2,mydata1)
+str(mydatacmb$Meta)
+
+## Infos in Meta/Annot/File will carried forward
+mydata1$Meta$Grp=factor(rbinom(nrow(mydata1$Meta),1,.5))
+mydatacmb=mergeSet(mydata1,mydata2)
+mydatacmb$Meta$Grp
+
+## remerging -> duplicating same samples!!!
+mydatacmb2=mergeSet(mydata2,mydatacmb)
+(mydatacmb2$File)
+mydatacmb2$Sid[order(mydatacmb2$Meta$InjOrder)]
+
+######## two different assays
+mydata3=loadAgilentData(ifile =testfiles[1],params = list(AssayName="A2"))
+mydatacmb=mergeSet(mydata1,mydata3)
 mydatacmb
 
-######## all assays
-mydata3=loadAgilentData(ifile =testfiles[1],params = list(AssayName="assay1"))
-mydatacmb=mergeSet(mydata1,mydata3)
-print(mydatacmb$Analyte)
+######## alltogether
+mydatacmb=mergeSet(mydata1,mydata2,mydata3)
+mydatacmb
 
 }
 \keyword{misc}

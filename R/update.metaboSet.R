@@ -23,14 +23,19 @@ update.metaboSet<-function(obj,what="Sid",formerid=NULL,newid=NULL,exact=TRUE,sw
   obj$Meta$Sid=rownames(obj$Meta)=newnames
   obj$File$Sid=rownames(obj$File)=newnames
   obj$Data=lapply(obj$Data,function(x){rownames(x)=newnames;x})
+  
+  if(!is.null(obj$Eic)) obj$Eic$Sample$Sid=rownames(obj$Eic$Sample)=newnames
+  
   if(any(newnames!=oldnames)) print(rbind(Old=oldnames[newnames!=oldnames],New=newnames[newnames!=oldnames]))
   }
   
   if(what=="Analyte"){
     obj$Analyte=newnames
     obj$Annot$Analyte=rownames(obj$Annot)=newnames
-    if(!is.null(obj$Eic)) obj$Eic$Analyte=rownames(obj$Eic)=newnames
     obj$Data=lapply(obj$Data,function(x){colnames(x)=newnames;x})
+    
+    if(!is.null(obj$Eic)) obj$Eic$File$Analyte=rownames(obj$Eic$File)=newnames
+    
     if(any(newnames!=oldnames)) print(rbind(Old=oldnames[newnames!=oldnames],New=newnames[newnames!=oldnames]))
   }
   

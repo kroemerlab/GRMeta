@@ -28,6 +28,9 @@ deleteEntries<-function(obj,...){
         obj$Meta=obj$Meta[l2keep,]
         obj$File=obj$File[l2keep,]
         obj$Data=lapply(obj$Data,function(x) x[l2keep,,drop=F])
+
+        if(!is.null(obj$Eic)) obj$Sample=obj$Eic$Sample[l2keep,]
+
         if(any(!sidori%in%obj$Sid)) cat("Samples removed based on ",argname,":\n",sidori[!sidori%in%obj$Sid],"\n",sep=" ")
         if(any(what%in%obj$Sid)) cat("Samples not excluded based on ",argname,":\n",what[what%in%obj$Sid],"\n",sep=" ")
       }
@@ -41,7 +44,7 @@ deleteEntries<-function(obj,...){
         obj$Annot=obj$Annot[l2keep,]
         obj$Data=lapply(obj$Data,function(x) x[,l2keep,drop=F])
         
-        if(!is.null(obj$Eic)) obj$Eic=obj$Eic[l2keep,]
+        if(!is.null(obj$Eic)) obj$Eic=obj$Eic$File[l2keep,]
         
         if(any(!anaori%in%obj$Analyte)) cat("Analytes removed based on ",argname,":\n",anaori[!anaori%in%obj$Analyte],"\n",sep=" ")
         if(any(what%in%obj$Analyte)) cat("Analytes not excluded based on ",argname,":\n",what[what%in%obj$Analyte],"\n",sep=" ")

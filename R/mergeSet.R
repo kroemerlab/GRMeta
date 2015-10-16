@@ -36,6 +36,20 @@ mergeSet<-function(...){
   return(invisible(res))  
 }
 
+.joinDF<-function(ldf,lmin){
+  ldfn=unique(unlist(lapply(ldf,names)))
+  ldfn=c(lmin,ldfn[!ldfn%in%lmin])
+  for(i in 1:length(ldf)){
+    lmiss=ldfn[!ldfn%in%names(ldf[[i]])]
+    if(length(lmiss)>0) 
+      ldf[[i]]=cbind(ldf[[i]],matrix(NA,nrow=nrow(ldf[[i]]),ncol=length(lmiss),dimnames=list(rownames(ldf[[i]]),lmiss)))
+    ldf[[i]]=ldf[[i]][,ldfn]
+  }
+  ndf=do.call("rbind",ldf)
+  chkfac=sapply(ldf,function(y) sapply(names(y),function(x) is.factor(y[,x])))
+  ndf
+}
+
 
 .mergeDataBatch<-function(...){
   
@@ -50,30 +64,49 @@ mergeSet<-function(...){
   lmethods=unique(sapply(re,function(x) x$Method))
   if(length(lmethods)>1) stop("Applicable to datasets from the same method\n")
   
-  cat("Check samples\n")
+  cat("Creating batches:")
+  lbatch=c()
+  for(i in names(re)){
+    if(!is.null(re[[i]]$File$Batch)){
+      if(any(re[[i]]$File$Batch%in%lbatch)){
+        l=re[[i]]$File$Batch%in%lbatch
+        re[[i]]$File$Batch[l]=paste(re[[i]]$File$Batch[l],".1",sep="")
+      }
+    }
+    if(is.null(re[[i]]$File$Batch))
+      re[[i]]$File$Batch=paste(i,ifelse(i%in%lbatch,".1",""),sep="")
+
+    lbatch=append(lbatch,unique(re[[i]]$File$Batch))
+  }
+  cat(lbatch,"\n")
+  
+  cat("Updating sample ids\n")
   lusamp=unlist(lapply(re,function(x) x$Sid))
   lsamp2change=names(which(table(lusamp)>1))
   for(i in names(re)){
-    re[[i]]$File$Batch=i
-    if(length(lsamp2change)>0)
-      re[[i]]=update(re[[i]],what="Sid",formerid =lsamp2change,newid = paste(lsamp2change,i,sep="."),exact = T,swap=F )
+    if(any(re[[i]]$Sid%in%lsamp2change)){
+      l=which(re[[i]]$Sid%in%lsamp2change)
+      re[[i]]=update(re[[i]],what="Sid",formerid =re[[i]]$Sid[l],
+                newid = paste(re[[i]]$Sid[l],re[[i]]$File$Batch[l],sep="."),exact = T,swap=F )
+    }
   }
   
-  metainfos=do.call("rbind",lapply(re,function(x) x$Meta))
-  fileinfos=do.call("rbind",lapply(re,function(x) x$File))
-  metainfos$InjOrder=order(order(fileinfos$Batch,metainfos$InjOrder))
- 
+  cat("Merging sample ids\n")
+  metainfos=.joinDF(lapply(re,function(x) x$Meta),c("Sid","sType","InjOrder"))
+  fileinfos=.joinDF(lapply(re,function(x) x$File),c( "File" ,"Date",  "Name",  "Sid", "Batch"))
+  metainfos$InjOrder=order(order(fileinfos$Date,factor(fileinfos$Batch,levels=lbatch),metainfos$InjOrder))
+  rownames(fileinfos)=rownames(metainfos)=metainfos$Sid
+  lusamp=metainfos$Sid
+  
 #   lso=order(metainfos$sType,metainfos$InjOrder)
 #   metainfos=metainfos[lso,]
 #   fileinfos=fileinfos[lso,]
-  lusamp=metainfos$Sid
   
   cat("Check analytes\n")
   lumet=unique(unlist(lapply(re,function(x) x$Annot$MetName)))
   matexVar=sapply(re,function(x) match(lumet,x$Annot$MetName))
-  whichds=apply(matexVar,1,function(x) which(!is.na(x))[1])
-  annot=re[[1]]$Annot
-  for(i in which(whichds>1)) annot[i,]=re[[whichds[i]]]$Annot[matexVar[i,whichds[i]],]
+  annot=.joinDF2(lapply(re,function(x) x$Annot),
+           c("Analyte","MetName","IsSTD","RT","LevelAnnot","OriginalName"),matexVar)
   addAnnot=data.frame(sapply(1:length(re),function(x) re[[x]]$Analyte[matexVar[,x]]),stringsAsFactors=F)
   names(addAnnot)=paste("Analyte.",names(re),sep="")
   annot=cbind(annot,addAnnot)
@@ -98,6 +131,26 @@ mergeSet<-function(...){
   invisible(allmat)
 }
 
+#############
+.joinDF2<-function(ldf,lmin,matex){
+  ldfn=unique(unlist(lapply(ldf,names)))
+  ldfn=c(lmin,ldfn[!ldfn%in%lmin])
+  for(i in 1:length(ldf)){
+    lmiss=ldfn[!ldfn%in%names(ldf[[i]])]
+    if(length(lmiss)>0) 
+      ldf[[i]]=cbind(ldf[[i]],matrix(NA,nrow=nrow(ldf[[i]]),ncol=length(lmiss),dimnames=list(rownames(ldf[[i]]),lmiss)))
+    
+    ldf[[i]]=ldf[[i]][matex[,i],ldfn]
+  }
+  fdf=ldf[[1]]
+  for(j in 2:length(ldf)){
+    torep=which(is.na(fdf) & ! is.na(ldf[[j]]),arr.ind =TRUE)
+    if(nrow(torep)>0)  for(k in 1:nrow(torep))
+      fdf[torep[k,1],torep[k,2]]=ldf[[j]][torep[k,1],torep[k,2]]
+  }
+  fdf
+}
+
 #####################################################################################################
 .mergeDataMethods<-function(...){
   
@@ -113,17 +166,15 @@ mergeSet<-function(...){
   if(max(table(lmethods))>1) stop("Applicable to datasets from different methods\n")
   names(re)=lmethods
   
-  
+  cat("Checking samples\n")
   lusamp=unique(unlist(lapply(re,function(x) x$Sid)))
   matexSa=sapply(re,function(x) match(lusamp,x$Sid))
+  ##
   lnmatch=lapply(colnames(matexSa),function(x) lusamp[which(is.na(matexSa[,x]))])
   names(lnmatch)=colnames(matexSa)
-  
   if(any(is.na(matexSa))){cat("Missing samples in :\n");print(lnmatch[!sapply(lnmatch,is.null)])}
-  whichds=colnames(matexSa)[apply(matexSa,1,function(x) which(!is.na(x))[1])]
-  meta=re[[1]]$Meta[,c("Sid","sType")]
-  for(i in which(whichds!=colnames(matexSa)[1])) meta[i,]=re[[whichds[i]]]$Meta[matexSa[i,whichds[i]],c("Sid","sType")]
-  
+  ##
+  meta=.joinDF2(lapply(re,function(x) x$Meta),c("Sid","sType"),matexSa)
   fileinfos=data.frame(Sid=lusamp,stringsAsFactors = FALSE)
   rownames(fileinfos)=lusamp
   for(i in names(re)){
@@ -137,7 +188,7 @@ mergeSet<-function(...){
   neworder2[is.na(neworder)]=NA
   meta$InjOrder=order(order(rowMeans(neworder2,na.rm=T)))
   
-  ###
+  ##############
   lso=order(meta$sType,meta$InjOrder)
   meta=meta[lso,]
   lusamp=lusamp[lso]

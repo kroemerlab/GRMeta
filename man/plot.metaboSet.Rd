@@ -4,7 +4,7 @@
 \description{Plot analytes matrices}
 \usage{
 \method{plot}{metaboSet}(obj,outfile=NULL,analyte=obj$Analyte[1],
-lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1"),c("Height~Area",log="xy")),
+ lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1",log="y"),c("Height~Area",log="xy")),
                          mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots=c("sType","Injorder"),cexBP=0.5,...)
 }
 \arguments{

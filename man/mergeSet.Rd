@@ -29,7 +29,7 @@ mydatacmb
 
 ######## all assays
 mydata3=loadAgilentData(ifile =testfiles[1],params = list(AssayName="assay1"))
-mydatacmb=mergeSet(mydata1,mydata2)
+mydatacmb=mergeSet(mydata1,mydata3)
 print(mydatacmb$Analyte)
 
 }

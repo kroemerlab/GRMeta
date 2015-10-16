@@ -61,7 +61,7 @@ loadAgilentData<-function(ifile,ofile=NULL,params=list()){
   rownames(metainfos)=metainfos$Sid
   fileinfos=data.frame(File=filenam,Date=dts,Name=nams,Sid=sid,stringsAsFactors=FALSE)
   rownames(fileinfos)=fileinfos$Sid
-  
+  if(!is.null(params$Batch)) fileinfos$Batch=params$Batch
   #   if(params$ConvReps){
   #   letcode=paste(rep(letters,each=26),letters,sep="")
   #   letcode=c(letters,letcode,paste(rep(letcode,each=26),letters,sep=""))
@@ -141,11 +141,11 @@ loadAgilentData<-function(ifile,ofile=NULL,params=list()){
 
 paramsParsing<-function(AssayName="myassay",FileCol="Data File",TimeCol="Acq. Date-Time",ordering=TRUE,
                         regTypes="^([blBLQCcSTDstda]+)_.*",NameClean=c("_GCMRM","_MRM","_DBAA"),
-                        checkNams=TRUE,AnnotDB=AnnotationDB){
+                        checkNams=TRUE,Batch=NULL,AnnotDB=AnnotationDB){
   
   list(AssayName="myassay",FileCol="Data File",TimeCol="Acq. Date-Time",ordering=TRUE,
        regTypes="^([blBLQCcSTDstda]+)_.*",NameClean=c("_GCMRM","_MRM","_DBAA"),
-       checkNams=TRUE,AnnotDB=AnnotationDB)
+       checkNams=TRUE,Batch=NULL,AnnotDB=AnnotationDB)
 }
 
 

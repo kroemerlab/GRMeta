@@ -1,5 +1,5 @@
 plot.metaboSet<-function(obj,outfile=NULL,
-                         lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1"),c("Height~Area",log="xy")),
+                         lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1",log="y"),c("Height~Area",log="xy")),
                          mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,...){
   
   mgraphs=t(sapply(lgraphs,function(x) strsplit(x[1],"~")[[1]][1:2]))

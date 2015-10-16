@@ -26,13 +26,12 @@ plot.metaboSet<-function(obj,outfile=NULL,
   }
   
   ###########
-#   lugraph=unique(lapply(lgraphs,function(x) strsplit(x[1],"~")[[1]][1:2]))
-#   
-#   l1=unique(unlist(lgraphs)[unlist(lgraphs)%in%names(obj$Data)])
+  ## Exclude some analytes that have no information on Data to be plotted
   l1=mgraphs[mgraphs%in%names(obj$Data)]
   m1=do.call("cbind",lapply(l1,function(x) colSums(!is.na(obj$Data[[x]][,lanalytes,drop=F]))))
   lanalytes=names(which(rowSums(m1>1)>0))
-#  lanalytes=names(which(colSums(!is.na(obj$Data$RT[,lanalytes,drop=F]))>2))
+ if(any(rowSums(m1>1)==0)) cat("Excluded:",names(which(rowSums(m1>1)==0)),"\n")
+  ###
   
   if(!is.null(outfile)){
       if(msg) cat("Analytes could not be matched: all are exported to ",outfile,"\n",sep="")

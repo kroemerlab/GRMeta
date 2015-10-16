@@ -26,7 +26,10 @@ update.metaboSet<-function(obj,what="Sid",formerid=NULL,newid=NULL,exact=TRUE,sw
   
   if(!is.null(obj$Eic)) obj$Eic$Sample$Sid=rownames(obj$Eic$Sample)=newnames
   
-  if(any(newnames!=oldnames)) print(rbind(Old=oldnames[newnames!=oldnames],New=newnames[newnames!=oldnames]))
+  if(any(newnames!=oldnames)){
+   cat("Samples with updated id:\n")
+     print(rbind(Former=oldnames[newnames!=oldnames],New=newnames[newnames!=oldnames]))
+  }
   }
   
   if(what=="Analyte"){
@@ -36,7 +39,10 @@ update.metaboSet<-function(obj,what="Sid",formerid=NULL,newid=NULL,exact=TRUE,sw
     
     if(!is.null(obj$Eic)) obj$Eic$File$Analyte=rownames(obj$Eic$File)=newnames
     
-    if(any(newnames!=oldnames)) print(rbind(Old=oldnames[newnames!=oldnames],New=newnames[newnames!=oldnames]))
+    if(any(newnames!=oldnames)){
+      cat("Analytes with updated id:\n")
+      print(rbind(Former=oldnames[newnames!=oldnames],New=newnames[newnames!=oldnames]))
+    }
   }
   
   invisible(obj)

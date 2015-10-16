@@ -1,8 +1,11 @@
 plot.metaboSet<-function(obj,outfile=NULL,
                          lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1"),c("Height~Area",log="xy")),
-                         mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots=c("sType","Injorder"),cexBP=0.5,...){
+                         mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,...){
   
-  lgraphs=lgraphs[sapply(lgraphs,function(x) all(x%in%c(names(obj$Meta),names(obj$Data))))]
+  mgraphs=t(sapply(lgraphs,function(x) strsplit(x[1],"~")[[1]][1:2]))
+  mgraphs[grep("^[0-9]$",mgraphs[,2]),2]=NA
+  ltyps=c(names(obj$Meta),names(obj$Data),NA)
+  lgraphs=lgraphs[which(mgraphs[,1]%in%ltyps & mgraphs[,2]%in%ltyps)]
   if(length(lgraphs)==0) stop("Graphs cannot be matched to the obj$Meta or obj$Data")
 
   dots<-list(...)
@@ -16,14 +19,17 @@ plot.metaboSet<-function(obj,outfile=NULL,
   msg=FALSE
   if(is.null(lanalytes)){
     msg=TRUE
-    lanalytes=obj$Annot$Analyte
+    lanalytes=names(which(colSums(!is.na(obj$Data$RT))>2))
   }
   
   ###########
-  l1=unique(unlist(lgraphs)[unlist(lgraphs)%in%names(obj$Data)])
-  m1=do.call("cbind",lapply(l1,function(x) colSums(!is.na(obj$Data[[x]][,lanalytes,drop=F]))))
-  lanalytes=names(which(rowSums(m1>2)>0))
-
+#   lugraph=unique(lapply(lgraphs,function(x) strsplit(x[1],"~")[[1]][1:2]))
+#   
+#   l1=unique(unlist(lgraphs)[unlist(lgraphs)%in%names(obj$Data)])
+#   m1=do.call("cbind",lapply(l1,function(x) colSums(!is.na(obj$Data[[x]][,lanalytes,drop=F]))))
+#   lanalytes=names(which(rowSums(m1>2)>0))
+  lanalytes=names(which(colSums(!is.na(obj$Data$RT[,lanalytes,drop=F]))>2))
+  
   if(!is.null(outfile)){
       if(msg) cat("Analytes could not be matched: all are exported to ",outfile,"\n",sep="")
     pdf(file=outfile,width = ifelse(is.null(dots$width),8,dots$width),height = ifelse(is.null(dots$height),6,dots$height))
@@ -62,7 +68,7 @@ plot.metaboSet<-function(obj,outfile=NULL,
 ################################
 .plotOneAnalyte<-function(obj,analyte=obj$Analyte[1],
                          lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1"),c("Height~Area",log="xy")),
-                         mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots=c("sType","Injorder"),cexBP=0.5,...){
+                         mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,...){
 
 # dots=list();analyte=obj$Analyte[1];lgraphs=list(c("RT~InjOrder"),c("Area~Height",log="yx"),c("Height~1"),c("Height~Sid",log="xy"));mfrow=c(2,2);deltaRT=0.05;linking=NULL;orderBPlots="sType";cexBP=0.5
 # obj$Meta$Grp=factor(obj$Meta$sType,levels=c("Sa","QC"))
@@ -71,11 +77,11 @@ dots<-list(...)
 dots=dots[names(dots)%in%names(par())]
 
 lparams=unique(unlist(lapply(lgraphs,function(x) strsplit(x[1],"~")[[1]])))
-print(lparams)
+#print(lparams)
 lparams1=unique(c(lparams[lparams%in%names(obj$Meta)],orderBPlots[orderBPlots%in%names(obj$Meta)]))
 lparams2=lparams[lparams%in%names(obj$Data)]
 
-idf=obj$Meta[,c("Sid","sType",lparams1)]
+idf=obj$Meta[,unique(c("Sid","sType",lparams1))]
 for(i in lparams2)
   if(sum(!is.na(obj$Data[[i]][,analyte]))>2)
     eval(parse(text=paste("idf$",i,"=obj$Data[[i]][,analyte]",sep="")))
@@ -84,7 +90,8 @@ if(!is.null(obj$Meta$Color)){idf$color=obj$Meta$Color}else{
   idf$color=brewer.pal(9,"Set1")[-6][as.numeric(factor(idf$sType))]
   idf$color[is.na(idf$color)]="black"
 }
-idf=idf[order(idf$InjOrder),]
+#print(str(idf))
+if("InjOrder"%in%names(idf)) idf=idf[order(idf$InjOrder),]
 
 par.def=par(no.readonly = TRUE)
 ###############
@@ -95,7 +102,7 @@ if("RT"%in%lparams){
   medRT0=median(idf$RT,na.rm=TRUE)
   medRT=round(median(idf$RT,na.rm=TRUE),nround)
   rtlim=c(medRT0+c(-1,1)*deltaRT)
-  print(c(medRT0,medRT,deltaRT,rtlim))
+#  print(c(medRT0,medRT,deltaRT,rtlim))
   rtlim=c(floor(rtlim[1]*10^nround),ceiling(rtlim[2]*10^nround))/10^nround
   rtlim=seq(rtlim[1],rtlim[2],deltaRT/5)
   ly=range(idf$RT,medRT+deltaRT/2,medRT-deltaRT/2,na.rm=TRUE)
@@ -130,9 +137,9 @@ for(iplot in 1:length(lgraphs)){
   if(whaty=="InjOrder") ylim=injlim
   if(is.null(ylim)){
     if(length(grep("y",logs))>0){
-      vy[which(vy<=0)]=min(vy,na.rm=T)/2
+      vy[which(vy<=0)]=min(vy,na.rm=TRUE)/2
       ylim=.infctlimlog(vy)
-    } else ylim=pretty(seq(min(vy),max(vy),length.out = 7))
+    } else ylim=pretty(seq(min(vy,na.rm=TRUE),max(vy,na.rm=TRUE),length.out = 7))
   }
   idf$Y=vy
   if(sum(!is.na(vy))<2){plot.new();next}
@@ -179,7 +186,7 @@ for(iplot in 1:length(lgraphs)){
 
   }  
   if(is.null(whatx))
-    .plotBarP(idf[lsoSa,],whaty,gsub("y","",logs),ylim,analyte,cexBP)
+    .plotBarP(idf[lsoSa,],whaty,gsub("x","",logs),ylim,analyte,cexBP)
 
 
 }
@@ -193,7 +200,7 @@ par(par.def)
 ##### whatx is null
 .plotBarP<-function(idf,whaty,logs="",ylim,analyte,cexBP){
   
-  re=barplot(idf$Y,axes=F,ylab=whaty,bty="n",log=logs,ylim=range(ylim),main=analyte,col=idf$color)
+  re=barplot(idf$Y,axes=F,ylab=whaty,bty="n",log=logs,ylim=range(ylim),main=analyte,col=idf$color,xpd=FALSE)
   axis(2,at=ylim,las=2)
   for(i in 1:nrow(re)) axis(1,at=re[i,1],labels = idf$Sid[i],cex.axis=cexBP,las=2,tick=F,pos=ylim[1])
 }

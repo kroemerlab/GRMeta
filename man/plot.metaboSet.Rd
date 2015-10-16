@@ -31,8 +31,30 @@ mydata$Analyte
 
 analyte=mydata$Analyte[2]
 \dontrun{
-plot(obj,Analyte=mydata$Analyte[2],lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder"),c("Height"),c("Height","Area",log="xy")),
+plot(mydata,Analyte=mydata$Analyte[2],
+    lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Height"),c("Height~Area",log="xy")),
                          mfrow=c(2,2),deltaRT=0.05,linking="QC")
+                         
 }
+\dontrun{
+#### sType: character
+#### sTypeFac: factor
+mydata$Meta$sTypeFac=factor(mydata$Meta$sType)
+plot(mydata,Analyte=mydata$Analyte[2],
+    lgraphs=list(c("Area",log="y"),c("Area~Sid",log="y"),
+      c("Area~sType",log="y"),c("Area~sTypeFac",log="y")),
+      mfrow=c(2,2),orderBPlots=c("sType","InjOrder"))
+      
+#### Only 1 boxplot -> mfrow=c(1,1)
+plot(mydata,Analyte=mydata$Analyte[2],
+    lgraphs=list(c("Area~sTypeFac",log="y")),
+      mfrow=c(1,1))
+}
+#### Dump them all in a file
+\dontrun{
+plot(mydata,outfile="DumpAll.pdf",Analyte=mydata$Analyte,cex.main=1,height=8,cexBP = 0.4)
+}
+
+
 }
 \keyword{misc}

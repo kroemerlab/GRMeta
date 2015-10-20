@@ -1,18 +1,20 @@
-.InDBMatchfct<-function(x,what,NewDB){
-  l=which(NewDB$GName%in%strsplit(x,";")[[1]])
-  if(length(l)==0) return(NA)
-  if(is.numeric(NewDB[,what])) return(mean(NewDB[l,what],na.rm=T))
-  l=unique(strsplit(NewDB[l,what],";")[[1]])
-  l=l[which(l!="")]
-  if(length(l)==0) return(NA)
-  paste(l,collapse=";")
-}
+rm(list=ls())
+setwd("~/Metabo/PARP13/qqq/")
+library(GRMeta)
+load("~/Metabo/Chimio/FluxAnnot.rda")
+AnnotFlux=fluxannot[,c("GName", "MFfrag", "FragMass","FragTyp","Q1","MF")]
+names(AnnotFlux)=c( "GName" , "MF","Mass","FragType","Q1th","MFori")
+AnnotFlux=cbind(AnnotFlux,AnnotationDB[match(AnnotFlux$GName,AnnotationDB$GName),c("Class","HMDB","KEGG","PC")])
+AnnotFluxGC=AnnotFlux
+params=list(AnnotDB=AnnotFlux,AssayName="Flux",FileCol="Name")
+ifile="./Florine_Fluxomique2_GCMS_20150723.txt"
 
+params=list(AnnotDB=AnnotFlux,AssayName="Flux")
+ifile="./PARP13-florine_2015-06-25_SDD_2015-10-20_SDD.txt"
 
-loadAgilentData<-function(ifile,ofile=NULL,params=list()){
-  
+loadAgilentDataFlux<-function(ifile,ofile=NULL,params=list()){
 
-  paramsvals <- paramsParsing()
+  paramsvals <- GRMeta:::paramsParsing()
   if (!missing(params)) paramsvals[names(params)] <- params
   params=paramsvals
   
@@ -61,22 +63,44 @@ loadAgilentData<-function(ifile,ofile=NULL,params=list()){
   rownames(metainfos)=metainfos$Sid
   fileinfos=data.frame(File=filenam,Date=dts,Name=nams,Sid=sid,stringsAsFactors=FALSE)
   rownames(fileinfos)=fileinfos$Sid
-  if(!is.null(params$Batch)) fileinfos$Batch=params$Batch
 ####################################################################################################
   
-  lmets=grep("Results$",names(tab))
+  lmets=sort(c(grep("Results$",names(tab)),grep("Results\\.[1-9]$",names(tab))))
   lmetinfos=as.matrix(tab[1,])[,lmets[1]:ncol(tab)]
   metnams=rep("",length(lmetinfos))
-  metnams[lmets-lmets[1]+1]=gsub("\\.Results$","",names(tab)[lmets])
+  niso=q1=q3=rep(NA,length(lmetinfos))
+  metnams[lmets-lmets[1]+1]=gsub("[\\.]{2,}","_",gsub("[\\.]{1,}Results\\.[1-9]$","",gsub("[\\.]{1,}Results$","",names(tab)[lmets])))
   for(i in which(metnams=="")) metnams[i]=metnams[i-1]
-  lumetnams=unique(metnams)
+  metnams2=metnams;metnams2[grep("^Qualifi",metnams2)]=""
+  metnams2=cleanMetaboNames(metnam=metnams2,RegExpr=NA,Syno=NA)$newnam
+  metnams2=gsub("Cysteine;Cystine","Cysteine",gsub("Citric;Isocitric acid","Citric acid",
+                                                   gsub("Uracile","Uracil",metnams2)))
+  
+  for(i in which(metnams2=="")) metnams2[i]=metnams2[i-1]
+  q1[grep("^Qualif",metnams)]=as.numeric(sapply(strsplit(metnams[grep("^Qualif",metnams)],"_"),function(x) x[2]))
+  q3[grep("^Qualif",metnams)]=as.numeric(sapply(strsplit(metnams[grep("^Qualif",metnams)],"_"),function(x) x[3]))
+  for(i in unique(metnams2)){
+  q1[which(metnams2==i & is.na(q1))]=min(q1[which(metnams2==i & !is.na(q1))])-1
+  q3[which(metnams2==i & is.na(q3))]=q3[which(metnams2==i & !is.na(q3))][1]
+  niso[which(metnams2==i)]=q1[which(metnams2==i)]-min(q1[which(metnams2==i)])
+  }
+  
+  newnam=paste(metnams2,"_M",niso,sep="")
+  lumetnams=tapply(newnam,newnam,unique)
+  annot=data.frame(Analyte=tapply(newnam,newnam,unique),MetName=tapply(metnams2,newnam,unique),
+                   IsSTD=FALSE,RT=NA,
+                   OriginalName=tapply(metnams,newnam,unique),
+                   Q1=tapply(q1,newnam,unique),
+                   Q3=tapply(q3,newnam,unique),
+                   Iso=tapply(niso,newnam,unique),
+                   stringsAsFactors = F)
   
   mat=apply(as.matrix(tab[-1,lmets[1]:ncol(tab)]),2,function(x) as.numeric(gsub(",",".",x)))
   
   ldatatype=sort(unique(lmetinfos))
   allmat=lapply(ldatatype,function(x){
     imat=mat[,which(lmetinfos==x)]
-    imat=imat[,match(lumetnams,metnams[which(lmetinfos==x)])]
+    imat=imat[,match(annot$Analyte,newnam[which(lmetinfos==x)])]
     dimnames(imat)=list(rownames(metainfos),lumetnams)
     imat
   })
@@ -84,31 +108,21 @@ loadAgilentData<-function(ifile,ofile=NULL,params=list()){
   
   #########
   rtmed=round(apply(allmat$RT,2,median,na.rm=T),4)
-  nm=gsub("@NA$","",paste(lumetnams,"@",sprintf("%.2f",rtmed),"-",params$AssayName,sep=""))
-  annot=data.frame(Analyte=nm,MetName=lumetnams,IsSTD=FALSE,RT=rtmed,LevelAnnot=1,stringsAsFactors = F)
-  newnam=oldnam=lumetnams
-  
-  if(params$checkNams){
-    newnam=cleanMetaboNames(oldnam,RegExpr = NA,Syno = NA)$newnam
-    annot$MetName=newnam
-    annot$Analyte=gsub("@NA$","",paste(newnam,"@",sprintf("%.2f",rtmed),"-",params$AssayName,sep=""))
-    annot$IsSTD[grep("_ISTD",newnam)]=TRUE
-    annot$OriginalName=oldnam
-    if(!is.null(params$AnnotDB)){
-      NewDB=params$AnnotDB
-      vnam0=unique(unlist(strsplit(newnam,";")))
-      lnotfound=unique(vnam0[!vnam0%in%NewDB$GName])
-      if(length(lnotfound)>0) cat("Not found in annotation database:\n",lnotfound,"\n",sep=" ")
-      l2add=names(NewDB)[names(NewDB)!="GName"]
-      toadd=data.frame(sapply(l2add,function(i) sapply(annot$MetName,.InDBMatchfct,i,NewDB)),stringsAsFactors = F)
+  annot$Analyte=gsub("@NA$","",paste(annot$Analyte,"@",sprintf("%.2f",rtmed),"-",params$AssayName,sep=""))
+  NewDB=params$AnnotDB
+  vnam0=unique(unlist(strsplit(annot$MetName,";")))
+  lnotfound=unique(vnam0[!vnam0%in%NewDB$GName])
+  if(length(lnotfound)>0) cat("Not found in annotation database:\n",lnotfound,"\n",sep=" ")
+  l2add=names(NewDB)[names(NewDB)!="GName"]
+      toadd=data.frame(sapply(l2add,function(i) sapply(annot$MetName,GRMeta:::.InDBMatchfct,i,NewDB)),stringsAsFactors = F)
       for(i in names(which(sapply(l2add,function(i) is.numeric(NewDB[,i]))))) toadd[,i]=as.numeric(toadd[,i])
       for(i in names(which(sapply(l2add,function(i) is.character(NewDB[,i]))))) toadd[,i]=as.character(toadd[,i])
       annot=cbind(annot,toadd)
       allmat=lapply(allmat,function(x){colnames(x)=annot$Analyte;x})
-    }
     rownames(annot)=annot$Analyte
-  }
   annot$Method=params$AssayName
+  
+ 
   if(params$ordering){
     lso=order(metainfos$sType,fileinfos$Date)
     metainfos=metainfos[lso,]
@@ -132,11 +146,11 @@ loadAgilentData<-function(ifile,ofile=NULL,params=list()){
 
 paramsParsing<-function(AssayName="myassay",FileCol="Data File",TimeCol="Acq. Date-Time",ordering=TRUE,
                         regTypes="^([blBLQCcSTDstda]+)_.*",NameClean=c("_GCMRM","_MRM","_DBAA"),
-                        checkNams=TRUE,Batch=NULL,AnnotDB=AnnotationDB){
+                        checkNams=TRUE,AnnotDB=AnnotationDB){
   
   list(AssayName="myassay",FileCol="Data File",TimeCol="Acq. Date-Time",ordering=TRUE,
        regTypes="^([blBLQCcSTDstda]+)_.*",NameClean=c("_GCMRM","_MRM","_DBAA"),
-       checkNams=TRUE,Batch=NULL,AnnotDB=AnnotationDB)
+       checkNams=TRUE,AnnotDB=AnnotationDB)
 }
 
 

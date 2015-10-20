@@ -135,7 +135,7 @@ loadAgilentDataFlux<-function(ifile,ofile=NULL,params=list()){
   
   
   allmat=list(Method=params$AssayName,Sid=metainfos$Sid,Analyte=annot$Analyte,Annot=annot,Meta=metainfos,File=fileinfos,Data=allmat)
-  class(allmat)=append(class(allmat),"metaboSet")
+  class(allmat)=append(class(allmat),"metaboSet","fluxoSet")
   if(!is.null(ofile)) save(file=ofile,allmat)
   invisible(allmat)
 }

@@ -122,10 +122,18 @@ mergeSet<-function(...){
 #   fileinfos=fileinfos[lso,]
   
   cat("Check analytes\n")
+  if(!"fluxoSet" %in%class(re[[1]])){
   lumet=unique(unlist(lapply(re,function(x) x$Annot$MetName)))
   matexVar=sapply(re,function(x) match(lumet,x$Annot$MetName))
   annot=.joinDF2(lapply(re,function(x) x$Annot),
            c("Analyte","MetName","IsSTD","RT","LevelAnnot","OriginalName"),matexVar)
+  }
+  if("fluxoSet" %in%class(re[[1]])){
+    lumet=unique(unlist(lapply(re,function(x) paste(x$Annot$MetName,x$Annot$Iso,sep="_M"))))
+    matexVar=sapply(re,function(x) match(lumet,paste(x$Annot$MetName,x$Annot$Iso,sep="_M")))
+    annot=.joinDF2(lapply(re,function(x) x$Annot),
+                   c("Analyte","MetName","IsSTD","RT",  "Iso" ,"LevelAnnot","OriginalName"),matexVar)
+  }
   addAnnot=data.frame(sapply(1:length(re),function(x) re[[x]]$Analyte[matexVar[,x]]),stringsAsFactors=F)
   names(addAnnot)=paste("Analyte.",names(re),sep="")
   annot=cbind(annot,addAnnot)
@@ -141,12 +149,14 @@ mergeSet<-function(...){
     allmat[[i]]=do.call("rbind",tmp)
   }
   annot$RT=round(apply(allmat$RT,2,median,na.rm=T),4)
-  annot$Analyte=paste(annot$MetName,"@",sprintf("%.2f",annot$RT),"-",annot$Method[1],sep="")
+  if(!"fluxoSet" %in%class(re[[1]]))  annot$Analyte=paste(annot$MetName,"@",sprintf("%.2f",annot$RT),"-",annot$Method[1],sep="")
+  if("fluxoSet" %in%class(re[[1]]))  annot$Analyte=paste(annot$MetName,"_M",annot$Iso,"@",sprintf("%.2f",annot$RT),"-",annot$Method[1],sep="")
   rownames(annot)=annot$Analyte
   allmat=lapply(allmat,function(x){dimnames(x)=list(metainfos$Sid,annot$Analyte);x})
   
   allmat=list(Method=lmethods,Sid=metainfos$Sid,Analyte=annot$Analyte,Annot=annot,Meta=metainfos,File=fileinfos,Data=allmat)
   class(allmat)=append(class(allmat),"metaboSet")
+  if("fluxoSet"%in%class(re[[1]])) class(allmat)=append(class(allmat),"fluxoSet")
   invisible(allmat)
 }
 
@@ -235,5 +245,7 @@ mergeSet<-function(...){
   
   allmat=list(Method=names(re),Sid=meta$Sid,Analyte=annot$Analyte,Annot=annot,Meta=meta,File=fileinfos,Data=allmat)
   class(allmat)=append(class(allmat),"metaboSet")
+  if(any(sapply(re,function(x) "fluxoSet"%in%class(x)))) class(allmat)=append(class(allmat),"fluxoSet")
+  
   invisible(allmat)
 }

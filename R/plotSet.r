@@ -50,6 +50,7 @@ plot.metaboSet<-function(obj,outfile=NULL,
 
 
 .infctlimlog=function(v){
+  v=v[v>0]
   lly=rep(c(1,2,5),31)*10^rep(-10:20,each=3)
   llyt=as.character(lly)
   names(lly)=llyt

@@ -121,19 +121,14 @@ mergeSet<-function(...){
 #   metainfos=metainfos[lso,]
 #   fileinfos=fileinfos[lso,]
   
-  cat("Check analytes\n")
-  if(!"fluxoSet" %in%class(re[[1]])){
-  lumet=unique(unlist(lapply(re,function(x) x$Annot$MetName)))
-  matexVar=sapply(re,function(x) match(lumet,x$Annot$MetName))
+  if(!"fluxoSet" %in%class(re[[1]])) lvarfct=function(x) x$Annot$MetName
+  if("fluxoSet" %in%class(re[[1]]))  lvarfct=function(x) paste(x$Annot$MetName,x$Annot$Iso,sep="_M")
+  lumet=unique(unlist(lapply(re,lvarfct)))
+  cat("Found",length(lumet),"unique analytes\n")
+  matexVar=sapply(re,function(x) match(lumet,lvarfct(x)))
+  for(i in colnames(matexVar)) if(any(is.na(matexVar[,i]))) cat("  *missing in",i,":",lumet[which(is.na(matexVar[,i]))],"\n")
   annot=.joinDF2(lapply(re,function(x) x$Annot),
-           c("Analyte","MetName","IsSTD","RT","LevelAnnot","OriginalName"),matexVar)
-  }
-  if("fluxoSet" %in%class(re[[1]])){
-    lumet=unique(unlist(lapply(re,function(x) paste(x$Annot$MetName,x$Annot$Iso,sep="_M"))))
-    matexVar=sapply(re,function(x) match(lumet,paste(x$Annot$MetName,x$Annot$Iso,sep="_M")))
-    annot=.joinDF2(lapply(re,function(x) x$Annot),
-                   c("Analyte","MetName","IsSTD","RT",  "Iso" ,"LevelAnnot","OriginalName"),matexVar)
-  }
+           c("Analyte","MetName","IsSTD","RT", ifelse("fluxoSet" %in%class(re[[1]]),"Iso",NULL),"LevelAnnot","OriginalName"),matexVar)
   addAnnot=data.frame(sapply(1:length(re),function(x) re[[x]]$Analyte[matexVar[,x]]),stringsAsFactors=F)
   names(addAnnot)=paste("Analyte.",names(re),sep="")
   annot=cbind(annot,addAnnot)

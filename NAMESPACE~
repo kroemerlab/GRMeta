@@ -1,5 +1,5 @@
 export(cleanMetaboNames,compSetSBR,compSetStats,compSetRatios,corrSetQC,
-loadAgilentData,mapSetKegg,mergeSet,deleteEntries, exportDataXLSX)
+loadAgilentData,mapSetKegg,mergeSet,deleteEntries, exportSetXLSX)
 
 ### register S3 methods
 S3method(plot, metaboSet)

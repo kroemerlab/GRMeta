@@ -5,7 +5,7 @@
 \usage{
 \method{plot}{metaboSet}(obj,outfile=NULL,analyte=obj$Analyte[1],
  lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1",log="y"),c("Height~Area",log="xy")),
-                         mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots=c("sType","Injorder"),cexBP=0.5,...)
+                         mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots=c("sType","Injorder"),cexBP=0.5,cexBX=0.8,...)
 }
 \arguments{
   \item{obj}{Experiment obj}
@@ -15,7 +15,8 @@
   \item{deltaRT}{Censoring around the RT median}
   \item{linking}{Linking points from the specified sample type when injection order is on the x-axis}
   \item{orderBPlots}{Ordering barplots, default is sType foollowed by injection order}
-  \item{cexBP}{cex.axis value for labelling x-axis of the barplots}
+  \item{cexBP}{cex.axis value for labelling x-axis of the BarPlots}
+  \item{cexBX}{cex.axis value for labelling x-axis of the BoXplots}
   \item{\dots}{Arguments passed to \code{\link{par}} and \code{\link{pdf}}, excepted mfrow}
 }
 \note{ For graphing, any parameter that is equal to RT or starting by RT. will be considered as a retention time

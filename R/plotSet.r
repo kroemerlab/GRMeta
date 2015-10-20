@@ -1,6 +1,6 @@
 plot.metaboSet<-function(obj,outfile=NULL,
                          lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1",log="y"),c("Height~Area",log="xy")),
-                         mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,...){
+                         mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,cexBX=.8,...){
   
   mgraphs=t(sapply(lgraphs,function(x) strsplit(x[1],"~")[[1]][1:2]))
   mgraphs[grep("^[0-9]$",mgraphs[,2]),2]=NA
@@ -42,7 +42,7 @@ plot.metaboSet<-function(obj,outfile=NULL,
     lanalytes=lanalytes[1]
   }
   for(i in unique(lanalytes))
-    .plotOneAnalyte(obj,analyte = i,lgraphs=lgraphs,mfrow=mfrow,deltaRT=deltaRT,linking=linking,orderBPlots=orderBPlots,cexBP=cexBP,... )
+    .plotOneAnalyte(obj,analyte = i,lgraphs=lgraphs,mfrow=mfrow,deltaRT=deltaRT,linking=linking,orderBPlots=orderBPlots,cexBP=cexBP,cexBX=cexBX,... )
   
   if(!is.null(outfile)) dev.off()
   
@@ -71,7 +71,7 @@ plot.metaboSet<-function(obj,outfile=NULL,
 ################################
 .plotOneAnalyte<-function(obj,analyte=obj$Analyte[1],
                          lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1"),c("Height~Area",log="xy")),
-                         mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,...){
+                         mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,cexBX=0.8,...){
 
 # dots=list();analyte=obj$Analyte[1];lgraphs=list(c("RT~InjOrder"),c("Area~Height",log="yx"),c("Height~1"),c("Height~Sid",log="xy"));mfrow=c(2,2);deltaRT=0.05;linking=NULL;orderBPlots="sType";cexBP=0.5
 # obj$Meta$Grp=factor(obj$Meta$sType,levels=c("Sa","QC"))
@@ -192,7 +192,7 @@ for(iplot in 1:length(lgraphs)){
     if(is.character(idf$X))
       .plotLinP(idf[lsoSa,],whaty,logs=gsub("x","",logs),xlim,ylim,analyte,cexBP)
     if(is.factor(idf$X))
-      .plotBoxP(idf[lsoSa,],whaty,logs=gsub("x","",logs),xlim,ylim,analyte)
+      .plotBoxP(idf[lsoSa,],whaty,logs=gsub("x","",logs),xlim,ylim,analyte,cexBX)
 
   }  
   if(is.null(whatx))
@@ -226,7 +226,7 @@ par(par.def)
   for(i in 1:nrow(idf)) axis(1,at=i,labels = idf$X[i],cex.axis=cexBP,las=2,tick=F,pos=min(ylim[ylim2]))
 }
 
-.plotBoxP<-function(idf,whaty,logs="",xlim,ylim,analyte){
+.plotBoxP<-function(idf,whaty,logs="",xlim,ylim,analyte,cexBX){
   
   l=which(!is.na(idf$X))
  # print(idf$Y[l])
@@ -236,7 +236,7 @@ par(par.def)
   beeswarm(Y~X,data=idf,add=T,pwcol = idf$color,pch=16)
   axis(2,at=ylim[ylim2],las=2)
   labs=paste(re$names,"\n(",re$n,")",sep="")
-  for(i in 1:length(labs)) axis(1,at=i,labels =labs[i],tick=F)
+  for(i in 1:length(labs)) axis(1,at=i,labels =labs[i],tick=F,cex.axis=cexBX)
 }
 
 

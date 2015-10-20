@@ -18,6 +18,8 @@
   \item{cexBP}{cex.axis value for labelling x-axis of the barplots}
   \item{\dots}{Arguments passed to \code{\link{par}} and \code{\link{pdf}}, excepted mfrow}
 }
+\note{ For graphing, any parameter that is equal to RT or starting by RT. will be considered as a retention time
+}
 \value{Experiment object}
 \author{
 David Enot \email{david.enot@gustaveroussy.fr}

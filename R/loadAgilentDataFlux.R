@@ -81,14 +81,15 @@ loadAgilentDataFlux<-function(ifile,ofile=NULL,params=list()){
                    Q3=tapply(q3,newnam,unique),
                    Iso=tapply(niso,newnam,unique),
                    stringsAsFactors = F)
-  
+  lso=order(factor(annot$MetName,levels=unique(annot$MetName)),annot$Iso)
+  annot=annot[lso,]
   mat=apply(as.matrix(tab[-1,lmets[1]:ncol(tab)]),2,function(x) as.numeric(gsub(",",".",x)))
   
   ldatatype=sort(unique(lmetinfos))
   allmat=lapply(ldatatype,function(x){
     imat=mat[,which(lmetinfos==x)]
     imat=imat[,match(annot$Analyte,newnam[which(lmetinfos==x)])]
-    dimnames(imat)=list(rownames(metainfos),lumetnams)
+    dimnames(imat)=list(rownames(metainfos),annot$Analyte)
     imat
   })
   names(allmat)=ldatatype

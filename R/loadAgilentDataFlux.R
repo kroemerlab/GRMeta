@@ -1,16 +1,3 @@
-rm(list=ls())
-setwd("~/Metabo/PARP13/qqq/")
-library(GRMeta)
-load("~/Metabo/Chimio/FluxAnnot.rda")
-AnnotFlux=fluxannot[,c("GName", "MFfrag", "FragMass","FragTyp","Q1","MF")]
-names(AnnotFlux)=c( "GName" , "MF","Mass","FragType","Q1th","MFori")
-AnnotFlux=cbind(AnnotFlux,AnnotationDB[match(AnnotFlux$GName,AnnotationDB$GName),c("Class","HMDB","KEGG","PC")])
-AnnotFluxGC=AnnotFlux
-params=list(AnnotDB=AnnotFlux,AssayName="Flux",FileCol="Name")
-ifile="./Florine_Fluxomique2_GCMS_20150723.txt"
-
-params=list(AnnotDB=AnnotFlux,AssayName="Flux")
-ifile="./PARP13-florine_2015-06-25_SDD_2015-10-20_SDD.txt"
 
 loadAgilentDataFlux<-function(ifile,ofile=NULL,params=list()){
 

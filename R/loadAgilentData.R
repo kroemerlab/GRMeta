@@ -62,8 +62,7 @@ loadAgilentData<-function(ifile,ofile=NULL,params=list()){
   fileinfos=data.frame(File=filenam,Date=dts,Name=nams,Sid=sid,stringsAsFactors=FALSE)
   rownames(fileinfos)=fileinfos$Sid
   if(!is.null(params$Batch)) fileinfos$Batch=params$Batch
-####################################################################################################
-  
+
   lmets=grep("Results$",names(tab))
   lmetinfos=as.matrix(tab[1,])[,lmets[1]:ncol(tab)]
   metnams=rep("",length(lmetinfos))

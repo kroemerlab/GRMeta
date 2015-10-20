@@ -73,16 +73,18 @@ loadAgilentDataFlux<-function(ifile,ofile=NULL,params=list()){
   }
   
   newnam=paste(metnams2,"_M",niso,sep="")
-  lumetnams=tapply(newnam,newnam,unique)
-  annot=data.frame(Analyte=tapply(newnam,newnam,unique),MetName=tapply(metnams2,newnam,unique),
+  newnamf=factor(newnam,levels=unique(newnam))
+  lumetnams=tapply(newnam,newnamf,unique)
+  annot=data.frame(Analyte=tapply(newnam,newnamf,unique),MetName=tapply(metnams2,newnamf,unique),
                    IsSTD=FALSE,RT=NA,LevelAnnot=1,
-                   OriginalName=tapply(metnams,newnam,unique),
-                   Q1=tapply(q1,newnam,unique),
-                   Q3=tapply(q3,newnam,unique),
-                   Iso=tapply(niso,newnam,unique),
+                   OriginalName=tapply(metnams,newnamf,unique),
+                   Q1=tapply(q1,newnamf,unique),
+                   Q3=tapply(q3,newnamf,unique),
+                   Iso=tapply(niso,newnamf,unique),
                    stringsAsFactors = F)
   lso=order(factor(annot$MetName,levels=unique(annot$MetName)),annot$Iso)
   annot=annot[lso,]
+  
   mat=apply(as.matrix(tab[-1,lmets[1]:ncol(tab)]),2,function(x) as.numeric(gsub(",",".",x)))
   
   ldatatype=sort(unique(lmetinfos))

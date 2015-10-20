@@ -229,7 +229,8 @@ par(par.def)
 .plotBoxP<-function(idf,whaty,logs="",xlim,ylim,analyte){
   
   l=which(!is.na(idf$X))
-  ylim2=which(ylim>min(idf$Y[l]) & ylim<max(idf$Y[l]))
+  print(idf$Y[l])
+  ylim2=which(ylim>min(idf$Y[l],na.rm=T) & ylim<max(idf$Y[l],na.rm=T))
   ylim2=max(min(ylim2)-1,1):min(max(ylim2)+1,length(ylim))
   re=boxplot(Y~X,data=idf,axes=F,xlab="",ylab=whaty,bty="n",log=logs,ylim=range(ylim[ylim2]),xlim=range(xlim),main=analyte,cex=0)
   beeswarm(Y~X,data=idf,add=T,pwcol = idf$color,pch=16)

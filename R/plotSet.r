@@ -138,6 +138,7 @@ for(iplot in 1:length(lgraphs)){
   if(!whaty%in%names(idf)){plot.new();next}
   ylim=NULL
   vy=idf[,whaty]
+ # print(whaty)
   if(whaty=="RT" | grepl("^RT\\.",whaty)){
     rtlims=.getrtlim(idf,whaty,deltaRT);rtlim=rtlims$rtlim;medRT0=rtlims$medRT0;medRT=rtlims$medRT;
     ylim=rtlim;vy[which(vy>=max(rtlim))]=max(rtlim);vy[which(vy<=min(rtlim))]=min(rtlim)
@@ -151,7 +152,7 @@ for(iplot in 1:length(lgraphs)){
   }
   idf$Y=vy
   if(sum(!is.na(vy))<2){plot.new();next}
-  
+#  print(ylim)
   #### x-axis
   if(is.na(whatx) | !whatx%in%names(idf)){
     whatx=NULL
@@ -176,7 +177,6 @@ for(iplot in 1:length(lgraphs)){
     idf$X=vx
     if(!is.null(whatx)) if(sum(!is.na(idf[,whatx]))<2){plot.new();next}
   }
-  
   ########################
   par(dots)
 #  print(c(whatx,whaty,logs))
@@ -228,10 +228,10 @@ par(par.def)
 }
 
 .plotBoxP<-function(idf,whaty,logs="",xlim,ylim,analyte,cexBX){
-  
+#  cat("Ylim: ",ylim)
   l=which(!is.na(idf$X))
- # print(idf$Y[l])
   ylim2=which(ylim>min(idf$Y[l],na.rm=T) & ylim<max(idf$Y[l],na.rm=T))
+  if(length(ylim2)<2) ylim2=1:length(ylim)
   ylim2=max(min(ylim2)-1,1):min(max(ylim2)+1,length(ylim))
   re=boxplot(Y~X,data=idf,axes=F,xlab="",ylab=whaty,bty="n",log=logs,ylim=range(ylim[ylim2]),xlim=range(xlim),main=analyte,cex=0)
   beeswarm(Y~X,data=idf,add=T,pwcol = idf$color,pch=16)

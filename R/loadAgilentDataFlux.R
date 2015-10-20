@@ -75,7 +75,7 @@ loadAgilentDataFlux<-function(ifile,ofile=NULL,params=list()){
   newnam=paste(metnams2,"_M",niso,sep="")
   lumetnams=tapply(newnam,newnam,unique)
   annot=data.frame(Analyte=tapply(newnam,newnam,unique),MetName=tapply(metnams2,newnam,unique),
-                   IsSTD=FALSE,RT=NA,
+                   IsSTD=FALSE,RT=NA,LevelAnnot=1,
                    OriginalName=tapply(metnams,newnam,unique),
                    Q1=tapply(q1,newnam,unique),
                    Q3=tapply(q3,newnam,unique),
@@ -95,6 +95,7 @@ loadAgilentDataFlux<-function(ifile,ofile=NULL,params=list()){
   
   #########
   rtmed=round(apply(allmat$RT,2,median,na.rm=T),4)
+  annot$RT=rtmed
   annot$Analyte=gsub("@NA$","",paste(annot$Analyte,"@",sprintf("%.2f",rtmed),"-",params$AssayName,sep=""))
   NewDB=params$AnnotDB
   vnam0=unique(unlist(strsplit(annot$MetName,";")))
@@ -122,6 +123,14 @@ loadAgilentDataFlux<-function(ifile,ofile=NULL,params=list()){
   for(i in 1:length(l1)) names(allmat)[names(allmat)==l1[i]]=l2[i]
   
   allmat=lapply(allmat,function(x){x[which(x<0)]=NA;x})
+  
+  m=allmat$RT
+  newrt=tapply(annot$RT,annot$MetName,function(x) x[1])
+  oldrt=annot$RT
+  newrt=newrt[match(annot$MetName,names(newrt))]
+  allmat$pseudoRT=sweep(m,2,oldrt-newrt)
+  
+  
   allmat=list(Method=params$AssayName,Sid=metainfos$Sid,Analyte=annot$Analyte,Annot=annot,Meta=metainfos,File=fileinfos,Data=allmat)
   class(allmat)=append(class(allmat),"metaboSet")
   if(!is.null(ofile)) save(file=ofile,allmat)

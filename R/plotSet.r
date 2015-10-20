@@ -100,16 +100,17 @@ par.def=par(no.readonly = TRUE)
 ###############
 # Set RT/InjOrder/MZ
 medRT0=injlim=NULL
-if("RT"%in%lparams){
+.getrtlim<-function(idf,irt="RT",deltaRT){
   nround=ceiling(abs(log10(0.05)))
-  medRT0=median(idf$RT,na.rm=TRUE)
-  medRT=round(median(idf$RT,na.rm=TRUE),nround)
+  medRT0=median(idf[,irt],na.rm=TRUE)
+  medRT=round(median(idf[,irt],na.rm=TRUE),nround)
   rtlim=c(medRT0+c(-1,1)*deltaRT)
 #  print(c(medRT0,medRT,deltaRT,rtlim))
   rtlim=c(floor(rtlim[1]*10^nround),ceiling(rtlim[2]*10^nround))/10^nround
   rtlim=seq(rtlim[1],rtlim[2],deltaRT/5)
   ly=range(idf$RT,medRT+deltaRT/2,medRT-deltaRT/2,na.rm=TRUE)
   rtlim=rtlim[rtlim>=min(ly) & rtlim<=max(ly)]
+  return(list(rtlim=rtlim,medRT0=medRT0,medRT=medRT))
 }
 
 if("InjOrder"%in%lparams){
@@ -136,7 +137,10 @@ for(iplot in 1:length(lgraphs)){
   if(!whaty%in%names(idf)){plot.new();next}
   ylim=NULL
   vy=idf[,whaty]
-  if(whaty=="RT"){ylim=rtlim;vy[which(vy>=max(rtlim))]=max(rtlim);vy[which(vy<=min(rtlim))]=min(rtlim)}
+  if(whaty%in%c("RT","pseudoRT")){
+    rtlims=.getrtlim(idf,whaty,deltaRT);rtlim=rtlims$rtlim;medRT0=rtlims$medRT0;medRT=rtlims$medRT;
+    ylim=rtlim;vy[which(vy>=max(rtlim))]=max(rtlim);vy[which(vy<=min(rtlim))]=min(rtlim)
+  }
   if(whaty=="InjOrder") ylim=injlim
   if(is.null(ylim)){
     if(length(grep("y",logs))>0){
@@ -155,7 +159,10 @@ for(iplot in 1:length(lgraphs)){
   xlim=vx=NULL  
   if(!is.null(whatx)){
     vx=idf[,whatx]
-    if(whatx=="RT"){xlim=rtlim;vx[which(vx>=max(rtlim))]=max(rtlim);vx[which(vx<=min(rtlim))]=min(rtlim)}
+    if(whatx%in%c("RT","pseudoRT")){
+      rtlims=.getrtlim(idf,whatx,deltaRT);rtlim=rtlims$rtlim;medRT0=rtlims$medRT0;medRT=rtlims$medRT;
+      xlim=rtlim;vx[which(vx>=max(rtlim))]=max(rtlim);vx[which(vx<=min(rtlim))]=min(rtlim)
+    }
     if(whatx=="InjOrder") xlim=injlim
     if(is.character(vx)) xlim=c(0.3,length(vx)+.7)      
     if(is.factor(vx)) xlim=c(0.3,nlevels(vx)+.7)      
@@ -239,8 +246,8 @@ par(par.def)
   vy=idf$Y
   
   plot(range(xlim),range(ylim),cex=0,axes=F,xlab=whatx,ylab=whaty,bty="n",log=logs,xlim=range(xlim),ylim=range(ylim),main=analyte)
-  if(whatx=="RT") abline(v=medRT0+c(-.5,0,.5)*deltaRT,lty=c(2,1,2),lwd=par()$lwd*2)
-  if(whaty=="RT") abline(h=medRT0+c(-.5,0,.5)*deltaRT,lty=c(2,1,2),lwd=par()$lwd*2)
+  if(whatx%in%c("RT","pseudoRT")) abline(v=medRT0+c(-.5,0,.5)*deltaRT,lty=c(2,1,2),lwd=par()$lwd*2)
+  if(whaty%in%c("RT","pseudoRT")) abline(h=medRT0+c(-.5,0,.5)*deltaRT,lty=c(2,1,2),lwd=par()$lwd*2)
   if(whatx=="InjOrder") abline(v=xlim,col="grey")
   if(whaty=="InjOrder") abline(h=ylim,col="grey")
   axis(1,at=xlim)

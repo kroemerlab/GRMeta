@@ -137,7 +137,7 @@ for(iplot in 1:length(lgraphs)){
   if(!whaty%in%names(idf)){plot.new();next}
   ylim=NULL
   vy=idf[,whaty]
-  if(whaty%in%c("RT","pseudoRT")){
+  if(whaty=="RT" | grepl("^RT\\.",whaty)){
     rtlims=.getrtlim(idf,whaty,deltaRT);rtlim=rtlims$rtlim;medRT0=rtlims$medRT0;medRT=rtlims$medRT;
     ylim=rtlim;vy[which(vy>=max(rtlim))]=max(rtlim);vy[which(vy<=min(rtlim))]=min(rtlim)
   }
@@ -159,7 +159,7 @@ for(iplot in 1:length(lgraphs)){
   xlim=vx=NULL  
   if(!is.null(whatx)){
     vx=idf[,whatx]
-    if(whatx%in%c("RT","pseudoRT")){
+    if(whatx=="RT" | grepl("^RT\\.",whatx)){
       rtlims=.getrtlim(idf,whatx,deltaRT);rtlim=rtlims$rtlim;medRT0=rtlims$medRT0;medRT=rtlims$medRT;
       xlim=rtlim;vx[which(vx>=max(rtlim))]=max(rtlim);vx[which(vx<=min(rtlim))]=min(rtlim)
     }
@@ -246,8 +246,8 @@ par(par.def)
   vy=idf$Y
   
   plot(range(xlim),range(ylim),cex=0,axes=F,xlab=whatx,ylab=whaty,bty="n",log=logs,xlim=range(xlim),ylim=range(ylim),main=analyte)
-  if(whatx%in%c("RT","pseudoRT")) abline(v=medRT0+c(-.5,0,.5)*deltaRT,lty=c(2,1,2),lwd=par()$lwd*2)
-  if(whaty%in%c("RT","pseudoRT")) abline(h=medRT0+c(-.5,0,.5)*deltaRT,lty=c(2,1,2),lwd=par()$lwd*2)
+  if(whatx=="RT" | grepl("^RT\\.",whatx)) abline(v=medRT0+c(-.5,0,.5)*deltaRT,lty=c(2,1,2),lwd=par()$lwd*2)
+  if(whaty=="RT" | grepl("^RT\\.",whaty)) abline(h=medRT0+c(-.5,0,.5)*deltaRT,lty=c(2,1,2),lwd=par()$lwd*2)
   if(whatx=="InjOrder") abline(v=xlim,col="grey")
   if(whaty=="InjOrder") abline(h=ylim,col="grey")
   axis(1,at=xlim)

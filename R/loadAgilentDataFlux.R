@@ -128,7 +128,7 @@ loadAgilentDataFlux<-function(ifile,ofile=NULL,params=list()){
   newrt=tapply(annot$RT,annot$MetName,function(x) x[1])
   oldrt=annot$RT
   newrt=newrt[match(annot$MetName,names(newrt))]
-  allmat$pseudoRT=sweep(m,2,oldrt-newrt)
+  allmat$RT.adjM0=sweep(m,2,oldrt-newrt)
   
   
   allmat=list(Method=params$AssayName,Sid=metainfos$Sid,Analyte=annot$Analyte,Annot=annot,Meta=metainfos,File=fileinfos,Data=allmat)

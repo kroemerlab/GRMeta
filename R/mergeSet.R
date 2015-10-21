@@ -9,15 +9,15 @@ mergeSet<-function(...){
   if(length(re)==1) return(invisible(re[[1]]))
   
   lmethods=sapply(re,function(x) x$Method)
-  #  print(lmethods)
   while(any(table(lmethods)>1)){
     i=names(which(table(lmethods)>1))[1]
     lred=names(which(lmethods==i))
     j=paste(lred,collapse = "")
     cmd=paste(paste(lred,"=re[['",lred,"']]",sep=""),collapse=";")
     eval(parse(text=cmd))
-    #      print(lred)
+          print(lred)
     cmd=paste("re[[lred[1]]]=.mergeDataBatch(",paste(lred,collapse=","),")",sep="")
+    print(cmd)
     eval(parse(text=cmd))
     cmd=paste("rm(list='",paste(lred,collapse="','"),"')",sep="")
     eval(parse(text=cmd))
@@ -121,14 +121,16 @@ mergeSet<-function(...){
 #   metainfos=metainfos[lso,]
 #   fileinfos=fileinfos[lso,]
   
+  lvar2join= c("Analyte","MetName","IsSTD","RT", "LevelAnnot","OriginalName")
+  if("fluxoSet" %in%class(re[[1]])) lvar2join= c("Analyte","MetName","IsSTD","RT", "Iso","LevelAnnot","OriginalName")
+  
   if(!"fluxoSet" %in%class(re[[1]])) lvarfct=function(x) x$Annot$MetName
   if("fluxoSet" %in%class(re[[1]]))  lvarfct=function(x) paste(x$Annot$MetName,x$Annot$Iso,sep="_M")
   lumet=unique(unlist(lapply(re,lvarfct)))
   cat("Found",length(lumet),"unique analytes\n")
   matexVar=sapply(re,function(x) match(lumet,lvarfct(x)))
   for(i in colnames(matexVar)) if(any(is.na(matexVar[,i]))) cat("  *missing in",i,":",lumet[which(is.na(matexVar[,i]))],"\n")
-  annot=.joinDF2(lapply(re,function(x) x$Annot),
-           c("Analyte","MetName","IsSTD","RT", ifelse("fluxoSet" %in%class(re[[1]]),"Iso",NULL),"LevelAnnot","OriginalName"),matexVar)
+  annot=.joinDF2(lapply(re,function(x) x$Annot),lvar2join,matexVar)
   addAnnot=data.frame(sapply(1:length(re),function(x) re[[x]]$Analyte[matexVar[,x]]),stringsAsFactors=F)
   names(addAnnot)=paste("Analyte.",names(re),sep="")
   annot=cbind(annot,addAnnot)

@@ -119,7 +119,10 @@ loadAgilentData<-function(ifile,ofile=NULL,params=list()){
   l2=c("SNR","Height.Start","Height.End","RT.Start","RT.End")
   for(i in 1:length(l1)) names(allmat)[names(allmat)==l1[i]]=l2[i]
   
-  allmat=lapply(allmat,function(x){x[which(x<0)]=NA;x})
+  l2chk=names(allmat)
+  if(is.null(params$nozeroscheck)) l2chk=l2chk[!l2chk%in%params$nozeroscheck]
+  allmat[l2chk]=lapply(allmat[l2chk],function(x){x[which(x<=0)]=NA;x})
+  
   allmat=list(Method=params$AssayName,Sid=metainfos$Sid,Analyte=annot$Analyte,Annot=annot,Meta=metainfos,File=fileinfos,Data=allmat)
   class(allmat)=append(class(allmat),"metaboSet")
   if(!is.null(ofile)) save(file=ofile,allmat)
@@ -131,7 +134,7 @@ loadAgilentData<-function(ifile,ofile=NULL,params=list()){
 
 paramsParsing<-function(AssayName="myassay",FileCol="Data File",TimeCol="Acq. Date-Time",ordering=TRUE,
                         regTypes="^([blBLQCcSTDstda]+)_.*",NameClean=c("_GCMRM","_MRM","_DBAA"),
-                        checkNams=TRUE,Batch=NULL,AnnotDB=AnnotationDB){
+                        checkNams=TRUE,Batch=NULL,nozeroscheck=NULL,AnnotDB=AnnotationDB){
   
   list(AssayName="myassay",FileCol="Data File",TimeCol="Acq. Date-Time",ordering=TRUE,
        regTypes="^([blBLQCcSTDstda]+)_.*",NameClean=c("_GCMRM","_MRM","_DBAA"),

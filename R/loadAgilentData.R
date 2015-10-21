@@ -138,7 +138,7 @@ paramsParsing<-function(AssayName="myassay",FileCol="Data File",TimeCol="Acq. Da
   
   list(AssayName="myassay",FileCol="Data File",TimeCol="Acq. Date-Time",ordering=TRUE,
        regTypes="^([blBLQCcSTDstda]+)_.*",NameClean=c("_GCMRM","_MRM","_DBAA"),
-       checkNams=TRUE,Batch=NULL,AnnotDB=AnnotationDB)
+       checkNams=TRUE,Batch=NULL,nozeroscheck=NULL,AnnotDB=AnnotationDB)
 }
 
 

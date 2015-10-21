@@ -16,6 +16,7 @@ List of default values:
  \item{regTypes}{Regular expression to extract sample type}
  \item{NameClean}{Strings being replaced from the filename in addition to .d and .D}
  \item{checkNams}{Verify analyte names (default call of \code{\link{cleanMetaboNames}})}
+ \item{nozeroscheck}{Optional vector of data matrices for which <=0 are not replace by NA. Default=NULL: all matrices will be checked}
  \item{Batch}{Optional batch name for fileinfos}
  \item{AnnotDB}{Annotation DB}
 }

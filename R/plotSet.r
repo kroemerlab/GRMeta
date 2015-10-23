@@ -11,7 +11,7 @@ plot.metaboSet<-function(obj,outfile=NULL,
   ltyps=c(names(obj$Meta),names(obj$Data))
   l2keep=which(mgraphs[,1]%in%ltyps & (mgraphs[,2]%in%ltyps | is.na(mgraphs[,2])))
   if("Eic" %in% names(obj)) l2keep=sort(c(l2keep,which(mgraphs[,1]=="Eic")))
-  print(mgraphs)
+#  print(mgraphs)
   lgraphs=lgraphs[l2keep]
   mgraphs=na.omit(unique(as.vector(mgraphs[l2keep,])))
   
@@ -82,12 +82,12 @@ plot.metaboSet<-function(obj,outfile=NULL,
 
 # dots=list();analyte=obj$Analyte[1];lgraphs=list(c("RT~InjOrder"),c("Area~Height",log="yx"),c("Height~1"),c("Height~Sid",log="xy"));mfrow=c(2,2);deltaRT=0.05;linking=NULL;orderBPlots="sType";cexBP=0.5
 # obj$Meta$Grp=factor(obj$Meta$sType,levels=c("Sa","QC"))
-print(lgraphs)
+#print(lgraphs)
 dots<-list(...)
 dots=dots[names(dots)%in%names(par())]
 
 lparams=unique(unlist(lapply(lgraphs,function(x) strsplit(x[1],"[~\\|]")[[1]])))
-print(lparams)
+#print(lparams)
 #print(lparams)
 lparams1=unique(c(lparams[lparams%in%names(obj$Meta)],orderBPlots[orderBPlots%in%names(obj$Meta)]))
 lparams2=lparams[lparams%in%names(obj$Data)]
@@ -98,7 +98,7 @@ for(i in lparams2)
     eval(parse(text=paste("idf$",i,"=obj$Data[[i]][,analyte]",sep="")))
 
 idf$color=brewer.pal(9,"Set1")[-6][as.numeric(factor(idf$sType))]
-if(!is.null(colorCol) & !is.na(colorCol)) if(colorCol%in%names(obj$Meta)) idf$color=obj$Meta[,colorCol]
+if(!is.null(colorCol)) if(!is.na(colorCol)) if(colorCol%in%names(obj$Meta)) idf$color=obj$Meta[,colorCol]
 
 idf$color[is.na(idf$color)]="black"
 rownames(idf)=idf$Sid
@@ -141,11 +141,11 @@ for(iplot in 1:length(lgraphs)){
 
   whatx=strsplit(x,"~")[[1]][2]
   whaty=strsplit(x,"~")[[1]][1]
-  print(rbind(whatx,whaty))
+#  print(rbind(whatx,whaty))
   ########################
   #### y-axis
   if(!whaty%in%c(names(idf),"Eic")){plot.new();next}
-  print(whaty)
+#  print(whaty)
   ylim=NULL
   if(whaty=="Eic") ylim=c(0,Inf)
   if(whaty!="Eic"){
@@ -164,7 +164,7 @@ for(iplot in 1:length(lgraphs)){
   idf$Y=vy
   if(sum(!is.na(vy))<2){plot.new();next}
   }
-  print(ylim)
+#  print(ylim)
   ########################
   #### x-axis
   if(whaty!="Eic"){
@@ -194,7 +194,7 @@ for(iplot in 1:length(lgraphs)){
   }
   ########################
   par(dots)
-  print(c(whatx,whaty,logs))
+#  print(c(whatx,whaty,logs))
   lsoSa=1:nrow(idf)
   sortSample=orderBPlots[orderBPlots%in%names(idf)]
   if(!is.null(sortSample)){

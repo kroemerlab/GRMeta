@@ -220,9 +220,10 @@ for(iplot in 1:length(lgraphs)){
     if(sepx[2]%in%names(idf)) llsids=tapply(idf$Sid,idf[,sepx[2]],unique)
 
     ifeic=obj$Eic$File[analyte,]$EicFile
+    if(is.null(obj$Eic$Path)) ifeic=paste(obj$Eic$Path,ifeic,sep="")
     ieicpk=obj$Eic$File[analyte,]$EicPK
     ieic=obj$Eic$File[analyte,]$EicId
-    if(!file.exists(ifeic)){
+    if(!file.exists(ifeic) & !is.null(ieicpk) & !is.null(ieic)){
       for(i in names(llsids)){
         plot(0:1,0:1,axes=F,xlab="",ylab="",cex=0)
         text(.5,.5,i)

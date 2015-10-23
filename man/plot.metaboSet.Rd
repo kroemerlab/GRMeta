@@ -12,7 +12,7 @@
   \item{outfile}{PDF file: if not given results are graphed in the environment}
   \item{lgraphs}{List of size vectors for plotting in form of y~x. Optionally 2 second argments is for controlling the log scale}
   \item{mfrow}{Distribution of the plots on the figure}
-  \item{colorCol}{Column in obj$Meta to specify colors}
+  \item{colorCol}{Column in obj$Meta to specify colors to be used}
   \item{deltaRT}{Censoring around the RT median}
   \item{linking}{Linking points from the specified sample type when injection order is on the x-axis}
   \item{orderBPlots}{Ordering barplots, default is sType foollowed by injection order}

@@ -97,11 +97,10 @@ for(i in lparams2)
   if(sum(!is.na(obj$Data[[i]][,analyte]))>2)
     eval(parse(text=paste("idf$",i,"=obj$Data[[i]][,analyte]",sep="")))
 
+idf$color=brewer.pal(9,"Set1")[-6][as.numeric(factor(idf$sType))]
+if(!is.null(colorCol) & !is.na(colorCol)) idf$color=obj$Meta[,colorCol]
 
-if(colorCol%in%names(obj$Meta)){idf$color=obj$Meta[,colorCol]}else{
-  idf$color=brewer.pal(9,"Set1")[-6][as.numeric(factor(idf$sType))]
-  idf$color[is.na(idf$color)]="black"
-}
+idf$color[is.na(idf$color)]="black"
 rownames(idf)=idf$Sid
 #print(str(idf))
 if("InjOrder"%in%names(idf)) idf=idf[order(idf$InjOrder),]

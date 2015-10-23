@@ -223,7 +223,7 @@ for(iplot in 1:length(lgraphs)){
     if(is.null(obj$Eic$Path)) ifeic=paste(obj$Eic$Path,ifeic,sep="")
     ieicpk=obj$Eic$File[analyte,]$EicPK
     ieic=obj$Eic$File[analyte,]$EicId
-    if(!file.exists(ifeic) & !is.null(ieicpk) & !is.null(ieic)){
+    if(!file.exists(ifeic) | is.null(ieicpk) | is.na(ieicpk) | is.na(ieic)){
       for(i in names(llsids)){
         plot(0:1,0:1,axes=F,xlab="",ylab="",cex=0)
         text(.5,.5,i)
@@ -356,6 +356,7 @@ par(par.def)
     rtr=range(ceic[,whichrt])
     rtr=rtr+c(-.5,1)*0.1*diff(rtr)
     rtr[1]=max(0,rtr[1])
+    rtr=range(pretty(seq(rtr[1],rtr[2],length.out = 7)))
   }
   
   rtmat=ipkmat[,c("Samp","RTap","RTap.1","RTmi","RTma","HEap.1","HEap")]
@@ -393,8 +394,8 @@ par(par.def)
     segments(rtmat[lisamp,]$RTmi,-segh,rtmat[lisamp,]$RTmi,segh,col=rtmat[lisamp,]$cols,lwd=par()$lwd*2)
     
     legend("topleft",namsamp,bty="n",cex=par()$cex.main)
-    xaxt=axTicks(1)
-    xaxt=c(xaxt,max(xaxt)+rev(diff(xaxt))[1])
+    xaxt=axTicks(1) #pretty(seq(rtr[1],rtr[2],length.out = 7))
+   # xaxt=c(min(xaxt)-diff(xaxt)[1],xaxt,max(xaxt)+rev(diff(xaxt))[1])
     yaxt=axTicks(2)
     yaxt=c(yaxt,max(yaxt)+rev(diff(yaxt))[1])
     axis(1,at=xaxt,las=1)

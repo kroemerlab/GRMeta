@@ -21,6 +21,9 @@ David Enot \email{david.enot@gustaveroussy.fr}
 }
 \examples{
 
+#### best to increase the heap size before calling library(GRMeta)
+options(java.parameters = "-Xmx8000m")
+
 testfiles=list.files(system.file( package = "GRMeta"),pattern = "txt$",full.names = TRUE)
 
 mydata=loadAgilentData(ifile =testfiles[1])

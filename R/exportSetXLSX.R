@@ -48,13 +48,13 @@ exportSetXLSX<-function(obj,outfile,ldata=names(obj$Data),sortSample=c("sType","
   jgc()
   cat("FileInfos ")
   sheet <- createSheet(wb, sheetName = "FileInfos")
-  addDataFrame(toadd,sheet)
+  addDataFrame(toadd,sheet, col.names=FALSE, row.names=FALSE)
 
   toadd=indf(obj$Annot[lsoAna,which(names(obj$Annot)!="Analyte")],nround,characterNA[1],"Analyte")
   jgc()
   cat("VarInfos ")
   sheet <- createSheet(wb, sheetName = "VarInfos")
-  addDataFrame(toadd, sheet)
+  addDataFrame(toadd, sheet, col.names=FALSE, row.names=FALSE)
   
   for(i in ldata){
     if(transpose) m=round(t(obj$Data[[i]][lsoSa,lsoAna,drop=FALSE]),nround)
@@ -70,7 +70,7 @@ exportSetXLSX<-function(obj,outfile,ldata=names(obj$Data),sortSample=c("sType","
     cat(i," ",sep="")
     jgc()
     sheet <- createSheet(wb, sheetName = i)
-    addDataFrame(df,sheet)
+    addDataFrame(df,sheet, col.names=FALSE, row.names=FALSE)
   
    }
   saveWorkbook(wb, outfile) 

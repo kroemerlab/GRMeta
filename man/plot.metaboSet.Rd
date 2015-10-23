@@ -3,9 +3,9 @@
 \title{Plot analyte data from a metaboSet object}
 \description{Plot analytes matrices}
 \usage{
-\method{plot}{metaboSet}(obj,outfile=NULL,analyte=obj$Analyte[1],
+\method{plot}{metaboSet}(obj,outfile=NULL,
  lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1",log="y"),c("Height~Area",log="xy")),
-                         mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots=c("sType","Injorder"),cexBP=0.5,cexBX=0.8,...)
+                         mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots=c("sType","Injorder"),cexBP=0.5,cexBX=0.8,cexEL=0.4,...)
 }
 \arguments{
   \item{obj}{Experiment obj}
@@ -18,7 +18,8 @@
   \item{orderBPlots}{Ordering barplots, default is sType foollowed by injection order}
   \item{cexBP}{cex.axis value for labelling x-axis of the BarPlots}
   \item{cexBX}{cex.axis value for labelling x-axis of the BoXplots}
-  \item{\dots}{Arguments passed to \code{\link{par}} and \code{\link{pdf}}, excepted mfrow}
+  \item{cexEL}{cex for the Eic Legend}
+  \item{\dots}{Arguments 1) used to match analytes and 2) passed to \code{\link{par}} and \code{\link{pdf}}, excepted mfrow -}
 }
 \note{ For graphing, any parameter that is equal to RT or starting by RT. will be considered as a retention time
 }
@@ -54,9 +55,9 @@ plot(mydata,Analyte=mydata$Analyte[2],
     lgraphs=list(c("Area~sTypeFac",log="y")),
       mfrow=c(1,1))
 }
-#### Dump them all in a file
+#### Dump them all in a file:  by default all of them
 \dontrun{
-plot(mydata,outfile="DumpAll.pdf",Analyte=mydata$Analyte,cex.main=1,height=8,cexBP = 0.4)
+plot(mydata,outfile="DumpAll.pdf",cex.main=1,height=8,cexBP = 0.4)
 }
 
 

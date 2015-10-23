@@ -216,36 +216,43 @@ for(iplot in 1:length(lgraphs)){
 
   ################
   if(whaty=="Eic"){
+    
+    sepx=strsplit(whatx,"\\|")[[1]]
+    whichrt=sepx[1]
+    llsids=list(All=unique(idf$Sid))
+    if(sepx[2]%in%names(idf)) llsids=tapply(idf$Sid,idf[,sepx[2]],unique)
+
+    
     ifeic=obj$Eic$File[analyte,]$EicFile
     ieicpk=obj$Eic$File[analyte,]$EicPK
     ieic=obj$Eic$File[analyte,]$EicId
-    if(!file.exists(ifeic)){plot.new();next}
+    if(!file.exists(ifeic)){
+      for(i in names(llsids)){
+        plot(0:1,0:1,axes=F,xlab="",ylab="",cex=0)
+        text(.5,.5,i)
+        next
+      }
+    }
     cat("Found",ifeic)
     load(ifeic)
     cat(".\n")
+    
+    if(is.null(whichrt))  whichrt="rtcor"
+    if(whichrt%in%names(dfeic)) whichrt="rt"
+    
     ceic=dfeic[dfeic$Eic==ieic & dfeic$Samp%in%obj$Eic$Sample$Samp,]
     ceic$Sid=obj$Eic$Sample$Sid[match(ceic$Samp,obj$Eic$Sample$Samp)]
     ceic$cols=idf[ceic$Sid,]$color
+    
+    rtr=range(ceic[,whichrt])
+    rtr=rtr+c(-.5,1)*0.1*diff(rtr)
+    rtr[1]=max(0,rtr[1])
 
     ipkmat=eicpk[[ieic]]$Pks[[ieicpk]]
     ipkmat=ipkmat[rownames(ipkmat)%in%obj$Eic$Sample$Samp,]
     rownames(ipkmat)=obj$Eic$Sample$Sid[match(rownames(ipkmat),obj$Eic$Sample$Samp)]
     Mint=obj$Eic$File[analyte,]$Mint
-    
-    sepx=strsplit(whatx,"\\|")[[1]]
-    if(is.null(whatx))  whatx="rtcor"
-    if(!sepx[1]%in%names(dfeic)) sepx[1]="rt"
-#    print(names(idf))
-    llsids=list(All=unique(ceic$Sid))
-    if(sepx[2]%in%names(idf)) llsids=tapply(idf$Sid,idf[,sepx[2]],unique)
-#    print(llsids)
-    for(ilids in 1:length(llsids)){
-      iceic=ceic[which(ceic$Sid%in%llsids[[ilids]]),]
-      iipkmat=ipkmat[llsids[[ilids]],]
-      if(nrow(iipkmat)>0) .plotEIC(iceic,iipkmat,sepx[1],llsids[ilids],Mint=Mint,cexEL=cexEL)
-      else plot.new()
-    }
-    cat("Eic end")
+    .plotEIC(ceic,ipkmat,whichrt,llsids,Mint=Mint,rtr=rtr,cexEL=cexEL)
   } ### end of Eic
   
 }
@@ -333,6 +340,70 @@ par(par.def)
   points(vx,vy,col=idf$color,pch=16)
   if(!is.null(linking) & "InjOrder"==whatx)
     for(i in linking) lines(vx[which(idf$sType==i)],vy[which(idf$sType==i)],col=idf$color[which(idf$sType==i)][1])
+  
+}
+
+############################
+##
+.plotEIC<-function(ceic,ipkmat,whichrt,llsids=list(All=unique(ceic$Sid)),Mint=NA,rtr=NULL,cexEL=0.4){
+  
+  
+  alphadd<-function(hex.color.list,alpha=0.5) sprintf("%s%02X", hex.color.list, floor(alpha * 256))
+  
+  ceic$IsPk=ceic$IsPk2=ceic$IsPk3=FALSE
+  for(i in rownames(ipkmat)) ceic$IsPk[which(ceic$Sid==i & ceic[,whichrt]>=ipkmat[i,"RTmi"] & ceic[,whichrt]<=ipkmat[i,"RTma"])]=TRUE
+  for(i in rownames(ipkmat)) ceic$IsPk2[which(ceic$Sid==i & (ceic[,whichrt]<=ipkmat[i,"RTmi"]))]=TRUE
+  for(i in rownames(ipkmat)) ceic$IsPk3[which(ceic$Sid==i & (ceic[,whichrt]>=ipkmat[i,"RTma"]))]=TRUE
+  
+  if(is.null(rtr)){
+    rtr=range(ceic[,whichrt])
+    rtr=rtr+c(-.5,1)*0.1*diff(rtr)
+    rtr[1]=max(0,rtr[1])
+  }
+  
+  rtmat=ipkmat[,c("Samp","RTap","RTap.1","RTmi","RTma","HEap.1","HEap")]
+  cols=tapply(ceic$cols,ceic$Sid,unique)
+  rtmat$cols=cols[rownames(ipkmat)]
+  
+  for(namsamp in names(llsids)){
+    #   cat(namsamp,"\n")
+    lisamp=llsids[[namsamp]]
+    lisamp=lisamp[lisamp%in%unique(ceic$Sid)]# sample ids in ori file to considered in 
+    lisamp[order(rtmat[lisamp,"HEap.1"],na.last = FALSE)]
+    if(length(lisamp)==0){
+      plot(0:1,0:1,axes=F,xlab="",ylab="",cex=0)
+      text(.5,.5,namsamp)
+      next
+    }
+    rint=range(ceic$y[ceic$Sid%in%lisamp])*c(0,1.1)
+    plot(rtr,rint,xlab=paste("Retention time (",whichrt,")",sep=""),ylab="Intensity (cps)",cex=0,bty="l",axes=FALSE,xlim=rtr)
+    abline(h=Mint,lty=2,lwd=par()$lwd*2)
+    for(ik in lisamp){
+      points(ceic[,whichrt][ceic$Sid==ik & ceic$IsPk2],ceic$y[ceic$Sid==ik & ceic$IsPk2],col=alphadd(cols[ik],.4),typ="l")
+      points(ceic[,whichrt][ceic$Sid==ik & ceic$IsPk3],ceic$y[ceic$Sid==ik & ceic$IsPk3],col=alphadd(cols[ik],.4),typ="l")
+    }
+    for(ik in lisamp)
+      points(ceic[,whichrt][ceic$Sid==ik & ceic$IsPk],ceic$y[ceic$Sid==ik & ceic$IsPk],col=cols[ik],typ="l",lwd=par()$lwd*1.5)
+    
+    toprt=apply(rtmat[lisamp,c("RTmi","RTma")],1,function(x) sprintf("%.2f-%.2f",x[1],x[2]))
+    toprt[which(toprt=="NA-NA")]=""
+    legend("topright",paste(lisamp,toprt),pch=15,col=cols[lisamp],bty="n",cex=cexEL)
+    lma3=match(lisamp,rtmat$Samp)
+    points(rtmat[lisamp,]$RTap.1,rtmat[lisamp,]$HEap.1,col=rtmat[lisamp,]$cols,pch=17)
+    #      points(rtmat$RTap[lma3],rtmat$HEap[lma3],col=meta$cols[lma2],pch=16,cex=paramsP$cexpt)
+    segh=rint[2]/50
+    segments(rtmat[lisamp,]$RTma,-segh,rtmat[lisamp,]$RTma,segh,col=rtmat[lisamp,]$cols,lwd=par()$lwd*2)
+    segments(rtmat[lisamp,]$RTmi,-segh,rtmat[lisamp,]$RTmi,segh,col=rtmat[lisamp,]$cols,lwd=par()$lwd*2)
+    
+    legend("topleft",namsamp,bty="n",cex=par()$cex.main)
+    xaxt=axTicks(1)
+    xaxt=c(xaxt,max(xaxt)+rev(diff(xaxt))[1])
+    yaxt=axTicks(2)
+    yaxt=c(yaxt,max(yaxt)+rev(diff(yaxt))[1])
+    axis(1,at=xaxt,las=1)
+    axis(2,at=yaxt,las=2,pos=min(xaxt))
+  } 
+  
   
 }
 

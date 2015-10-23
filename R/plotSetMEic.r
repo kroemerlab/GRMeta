@@ -88,5 +88,5 @@ dev.off()
 }
 cat("\n")
 } ## end of for ifeic
-  par(par.def)
+  on.exit(par(par.def))
 }

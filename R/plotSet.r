@@ -4,7 +4,8 @@
 
 plot.metaboSet<-function(obj,outfile=NULL,
                          lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1",log="y"),c("Height~Area",log="xy")),
-                         mfrow=c(2,2),colorCol=NULL,deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,cexBX=.8,cexEL=0.4,...){
+                         mfrow=c(2,2),colorCol=NULL,deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,cexBX=.8,cexEL=0.4,cexPT=1.2,...){
+#  .plotOneAnalyte(obj,analyte = i,lgraphs=lgraphs,mfrow=mfrow,colorCol=colorCol,deltaRT=deltaRT,linking=linking,orderBPlots=orderBPlots,cexBP=cexBP,cexBX=cexBX,cexEL=cexEL,... )
   
   mgraphs=t(sapply(lgraphs,function(x) strsplit(x[1],"~")[[1]][1:2]))
   mgraphs[grep("^[0-9]$",mgraphs[,2]),2]=NA
@@ -48,7 +49,8 @@ plot.metaboSet<-function(obj,outfile=NULL,
     lanalytes=lanalytes[1]
   }
   for(i in unique(lanalytes))
-    .plotOneAnalyte(obj,analyte = i,lgraphs=lgraphs,mfrow=mfrow,colorCol=colorCol,deltaRT=deltaRT,linking=linking,orderBPlots=orderBPlots,cexBP=cexBP,cexBX=cexBX,... )
+    .plotOneAnalyte(obj,analyte = i,lgraphs=lgraphs,mfrow=mfrow,colorCol=colorCol,deltaRT=deltaRT,linking=linking,orderBPlots=orderBPlots,
+                    cexBP=cexBP,cexBX=cexBX,cexEL=cexEL,cexPT=cexPT,... )
   
   if(!is.null(outfile)) dev.off()
   
@@ -78,7 +80,7 @@ plot.metaboSet<-function(obj,outfile=NULL,
 ################################
 .plotOneAnalyte<-function(obj,analyte=obj$Analyte[1],
                          lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1"),c("Height~Area",log="xy")),
-                         mfrow=c(2,2),colorCol=NULL,deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,cexBX=0.8,cexEL=0.4,...){
+                         mfrow=c(2,2),colorCol=NULL,deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,cexBX=0.8,cexEL=0.4,cexPT=1.2,...){
 
 # dots=list();analyte=obj$Analyte[1];lgraphs=list(c("RT~InjOrder"),c("Area~Height",log="yx"),c("Height~1"),c("Height~Sid",log="xy"));mfrow=c(2,2);deltaRT=0.05;linking=NULL;orderBPlots="sType";cexBP=0.5
 # obj$Meta$Grp=factor(obj$Meta$sType,levels=c("Sa","QC"))
@@ -106,6 +108,7 @@ rownames(idf)=idf$Sid
 if("InjOrder"%in%names(idf)) idf=idf[order(idf$InjOrder),]
 
 par.def=par(no.readonly = TRUE)
+#print(par.def)
 ###############
 # Set RT/InjOrder/MZ
 medRT0=injlim=NULL
@@ -192,6 +195,7 @@ for(iplot in 1:length(lgraphs)){
   }
   ########################
   par(dots)
+#  print(dots)
   lsoSa=1:nrow(idf)
   sortSample=orderBPlots[orderBPlots%in%names(idf)]
   if(!is.null(sortSample)){
@@ -201,9 +205,9 @@ for(iplot in 1:length(lgraphs)){
   
   if(!is.null(whatx)){
     if(is.numeric(idf$X))
-      .plotXY(idf,whatx,whaty,logs,xlim,ylim,analyte,linking,medRT0,deltaRT)
+      .plotXY(idf,whatx,whaty,logs,xlim,ylim,analyte,linking,medRT0,deltaRT,cexPT)
     if(is.character(idf$X))
-      .plotLinP(idf[lsoSa,],whaty,logs=gsub("x","",logs),xlim,ylim,analyte,cexBP)
+      .plotLinP(idf[lsoSa,],whaty,logs=gsub("x","",logs),xlim,ylim,analyte,cexBP,cexPT)
     if(is.factor(idf$X))
       .plotBoxP(idf[lsoSa,],whaty,logs=gsub("x","",logs),xlim,ylim,analyte,cexBX)
 
@@ -254,8 +258,7 @@ for(iplot in 1:length(lgraphs)){
   
 }
 
-par(par.def)
-
+on.exit(par(par.def))
 }
 
 #######################################################################
@@ -268,13 +271,13 @@ par(par.def)
   for(i in 1:nrow(re)) axis(1,at=re[i,1],labels = idf$Sid[i],cex.axis=cexBP,las=2,tick=F,pos=ylim[1])
 }
 
-.plotLinP<-function(idf,whaty,logs="",xlim,ylim,analyte,cexBP){
+.plotLinP<-function(idf,whaty,logs="",xlim,ylim,analyte,cexBP,cexPT=1.2){
   l=which(!is.na(idf$X))
   ylim2=which(ylim>min(idf$Y[l]) & ylim<max(idf$Y[l]))
   ylim2=max(min(ylim2)-1,1):min(max(ylim2)+1,length(ylim))
   
   re=plot(1:length(idf$X),idf$Y,axes=F,xlab="",ylab=whaty,bty="n",log=logs,ylim=range(ylim[ylim2]),xlim=range(xlim),main=analyte,col="grey20",type="l")
-  points(1:length(idf$X),idf$Y,col=idf$color,pch=16)
+  points(1:length(idf$X),idf$Y,col=idf$color,pch=16,cex=cexPT)
   axis(2,at=ylim[ylim2],las=2)
   for(i in 1:nrow(idf)) axis(1,at=i,labels = idf$X[i],cex.axis=cexBP,las=2,tick=F,pos=min(ylim[ylim2]))
 }
@@ -294,14 +297,14 @@ par(par.def)
 
 
 ##### whatx is numeric
-.plotXY<-function(idf,whatx,whaty,logs="",xlim,ylim,analyte,linking=NULL,medRT0=NULL,deltaRT=NULL){
+.plotXY<-function(idf,whatx,whaty,logs="",xlim,ylim,analyte,linking=NULL,medRT0=NULL,deltaRT=NULL,cexPT=1.2){
   
   vx=idf$X
   vy=idf$Y
   
   plot(range(xlim),range(ylim),cex=0,axes=F,xlab=whatx,ylab=whaty,bty="n",log=logs,xlim=range(xlim),ylim=range(ylim),main=analyte)
-  if(whatx=="RT" | grepl("^RT\\.",whatx)) abline(v=medRT0+c(-.5,0,.5)*deltaRT,lty=c(2,1,2),lwd=par()$lwd*2)
-  if(whaty=="RT" | grepl("^RT\\.",whaty)) abline(h=medRT0+c(-.5,0,.5)*deltaRT,lty=c(2,1,2),lwd=par()$lwd*2)
+  if(whatx=="RT" | grepl("^RT\\.",whatx)) abline(v=medRT0+c(-.5,0,.5)*deltaRT,lty=c(2,1,2),lwd=par("lwd")*2)
+  if(whaty=="RT" | grepl("^RT\\.",whaty)) abline(h=medRT0+c(-.5,0,.5)*deltaRT,lty=c(2,1,2),lwd=par("lwd")*2)
   if(whatx=="InjOrder") abline(v=xlim,col="grey")
   if(whaty=="InjOrder") abline(h=ylim,col="grey")
   axis(1,at=xlim)
@@ -334,7 +337,7 @@ par(par.def)
   lines(pr$x,pr$fitl,col="grey30",lty=2)
   lines(pr$x,pr$fitu,col="grey30",lty=2)
   }
-  points(vx,vy,col=idf$color,pch=16)
+  points(vx,vy,col=idf$color,pch=16,cex=cexPT)
   if(!is.null(linking) & "InjOrder"==whatx)
     for(i in linking) lines(vx[which(idf$sType==i)],vy[which(idf$sType==i)],col=idf$color[which(idf$sType==i)][1])
   
@@ -375,13 +378,13 @@ par(par.def)
     }
     rint=range(ceic$y[ceic$Sid%in%lisamp])*c(0,1.1)
     plot(rtr,rint,xlab=paste("Retention time (",whichrt,")",sep=""),ylab="Intensity (cps)",cex=0,bty="l",axes=FALSE,xlim=rtr)
-    abline(h=Mint,lty=2,lwd=par()$lwd*2)
+    abline(h=Mint,lty=2,lwd=par("lwd")*2)
     for(ik in lisamp){
       points(ceic[,whichrt][ceic$Sid==ik & ceic$IsPk2],ceic$y[ceic$Sid==ik & ceic$IsPk2],col=alphadd(cols[ik],.4),typ="l")
       points(ceic[,whichrt][ceic$Sid==ik & ceic$IsPk3],ceic$y[ceic$Sid==ik & ceic$IsPk3],col=alphadd(cols[ik],.4),typ="l")
     }
     for(ik in lisamp)
-      points(ceic[,whichrt][ceic$Sid==ik & ceic$IsPk],ceic$y[ceic$Sid==ik & ceic$IsPk],col=cols[ik],typ="l",lwd=par()$lwd*1.5)
+      points(ceic[,whichrt][ceic$Sid==ik & ceic$IsPk],ceic$y[ceic$Sid==ik & ceic$IsPk],col=cols[ik],typ="l",lwd=par("lwd")*1.5)
     
     toprt=apply(rtmat[lisamp,c("RTmi","RTma")],1,function(x) sprintf("%.2f-%.2f",x[1],x[2]))
     toprt[which(toprt=="NA-NA")]=""
@@ -390,10 +393,10 @@ par(par.def)
     points(rtmat[lisamp,]$RTap.1,rtmat[lisamp,]$HEap.1,col=rtmat[lisamp,]$cols,pch=17)
     #      points(rtmat$RTap[lma3],rtmat$HEap[lma3],col=meta$cols[lma2],pch=16,cex=paramsP$cexpt)
     segh=rint[2]/50
-    segments(rtmat[lisamp,]$RTma,-segh,rtmat[lisamp,]$RTma,segh,col=rtmat[lisamp,]$cols,lwd=par()$lwd*2)
-    segments(rtmat[lisamp,]$RTmi,-segh,rtmat[lisamp,]$RTmi,segh,col=rtmat[lisamp,]$cols,lwd=par()$lwd*2)
+    segments(rtmat[lisamp,]$RTma,-segh,rtmat[lisamp,]$RTma,segh,col=rtmat[lisamp,]$cols,lwd=par("lwd")*2)
+    segments(rtmat[lisamp,]$RTmi,-segh,rtmat[lisamp,]$RTmi,segh,col=rtmat[lisamp,]$cols,lwd=par("lwd")*2)
     
-    legend("topleft",namsamp,bty="n",cex=par()$cex.main)
+    legend("topleft",namsamp,bty="n",cex=par("cex.main"))
     xaxt=axTicks(1) #pretty(seq(rtr[1],rtr[2],length.out = 7))
    # xaxt=c(min(xaxt)-diff(xaxt)[1],xaxt,max(xaxt)+rev(diff(xaxt))[1])
     yaxt=axTicks(2)

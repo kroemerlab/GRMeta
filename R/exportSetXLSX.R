@@ -60,10 +60,8 @@ exportSetXLSX<-function(obj,outfile,ldata=names(obj$Data),sortSample=c("sType","
     if(transpose) m=round(t(obj$Data[[i]][lsoSa,lsoAna,drop=FALSE]),nround)
     if(!transpose) m=round(obj$Data[[i]][lsoSa,lsoAna,drop=FALSE],nround)
     m=apply(m,2,as.character)
-#    print(str(m))
     if(transpose) df=cbind("Analyte"=obj$Analyte[lsoAna],m)
     if(!transpose) df=cbind("Sid"=obj$Sid[lsoSa],m)
-    #   print(names(df))
     df=rbind(colnames(df),df)
     df[is.na(df)]=characterNA[2]
     

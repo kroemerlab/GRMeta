@@ -141,11 +141,9 @@ for(iplot in 1:length(lgraphs)){
 
   whatx=strsplit(x,"~")[[1]][2]
   whaty=strsplit(x,"~")[[1]][1]
-#  print(rbind(whatx,whaty))
   ########################
   #### y-axis
   if(!whaty%in%c(names(idf),"Eic")){plot.new();next}
-#  print(whaty)
   ylim=NULL
   if(whaty=="Eic") ylim=c(0,Inf)
   if(whaty!="Eic"){
@@ -194,7 +192,6 @@ for(iplot in 1:length(lgraphs)){
   }
   ########################
   par(dots)
-#  print(c(whatx,whaty,logs))
   lsoSa=1:nrow(idf)
   sortSample=orderBPlots[orderBPlots%in%names(idf)]
   if(!is.null(sortSample)){
@@ -222,7 +219,6 @@ for(iplot in 1:length(lgraphs)){
     llsids=list(All=unique(idf$Sid))
     if(sepx[2]%in%names(idf)) llsids=tapply(idf$Sid,idf[,sepx[2]],unique)
 
-    
     ifeic=obj$Eic$File[analyte,]$EicFile
     ieicpk=obj$Eic$File[analyte,]$EicPK
     ieic=obj$Eic$File[analyte,]$EicId

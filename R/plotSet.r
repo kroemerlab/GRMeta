@@ -1,11 +1,17 @@
+
+
+ ### Color Id
+
 plot.metaboSet<-function(obj,outfile=NULL,
                          lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1",log="y"),c("Height~Area",log="xy")),
-                         mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,cexBX=.8,...){
+                         mfrow=c(2,2),colorCol=NULL,deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,cexBX=.8,cexEL=0.4,...){
   
   mgraphs=t(sapply(lgraphs,function(x) strsplit(x[1],"~")[[1]][1:2]))
   mgraphs[grep("^[0-9]$",mgraphs[,2]),2]=NA
   ltyps=c(names(obj$Meta),names(obj$Data))
   l2keep=which(mgraphs[,1]%in%ltyps & (mgraphs[,2]%in%ltyps | is.na(mgraphs[,2])))
+  if("Eic" %in% names(obj)) l2keep=sort(c(l2keep,which(mgraphs[,1]=="Eic")))
+  print(mgraphs)
   lgraphs=lgraphs[l2keep]
   mgraphs=na.omit(unique(as.vector(mgraphs[l2keep,])))
   
@@ -42,7 +48,7 @@ plot.metaboSet<-function(obj,outfile=NULL,
     lanalytes=lanalytes[1]
   }
   for(i in unique(lanalytes))
-    .plotOneAnalyte(obj,analyte = i,lgraphs=lgraphs,mfrow=mfrow,deltaRT=deltaRT,linking=linking,orderBPlots=orderBPlots,cexBP=cexBP,cexBX=cexBX,... )
+    .plotOneAnalyte(obj,analyte = i,lgraphs=lgraphs,mfrow=mfrow,colorCol=colorCol,deltaRT=deltaRT,linking=linking,orderBPlots=orderBPlots,cexBP=cexBP,cexBX=cexBX,... )
   
   if(!is.null(outfile)) dev.off()
   
@@ -72,15 +78,16 @@ plot.metaboSet<-function(obj,outfile=NULL,
 ################################
 .plotOneAnalyte<-function(obj,analyte=obj$Analyte[1],
                          lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1"),c("Height~Area",log="xy")),
-                         mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,cexBX=0.8,...){
+                         mfrow=c(2,2),colorCol=NULL,deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,cexBX=0.8,cexEL=0.4,...){
 
 # dots=list();analyte=obj$Analyte[1];lgraphs=list(c("RT~InjOrder"),c("Area~Height",log="yx"),c("Height~1"),c("Height~Sid",log="xy"));mfrow=c(2,2);deltaRT=0.05;linking=NULL;orderBPlots="sType";cexBP=0.5
 # obj$Meta$Grp=factor(obj$Meta$sType,levels=c("Sa","QC"))
-
+print(lgraphs)
 dots<-list(...)
 dots=dots[names(dots)%in%names(par())]
 
-lparams=unique(unlist(lapply(lgraphs,function(x) strsplit(x[1],"~")[[1]])))
+lparams=unique(unlist(lapply(lgraphs,function(x) strsplit(x[1],"[~\\|]")[[1]])))
+print(lparams)
 #print(lparams)
 lparams1=unique(c(lparams[lparams%in%names(obj$Meta)],orderBPlots[orderBPlots%in%names(obj$Meta)]))
 lparams2=lparams[lparams%in%names(obj$Data)]
@@ -90,10 +97,12 @@ for(i in lparams2)
   if(sum(!is.na(obj$Data[[i]][,analyte]))>2)
     eval(parse(text=paste("idf$",i,"=obj$Data[[i]][,analyte]",sep="")))
 
-if(!is.null(obj$Meta$Color)){idf$color=obj$Meta$Color}else{
+
+if(!is.null(obj$Meta[,colorCol])){idf$color=obj$Meta[,colorCol]}else{
   idf$color=brewer.pal(9,"Set1")[-6][as.numeric(factor(idf$sType))]
   idf$color[is.na(idf$color)]="black"
 }
+rownames(idf)=idf$Sid
 #print(str(idf))
 if("InjOrder"%in%names(idf)) idf=idf[order(idf$InjOrder),]
 
@@ -133,12 +142,15 @@ for(iplot in 1:length(lgraphs)){
 
   whatx=strsplit(x,"~")[[1]][2]
   whaty=strsplit(x,"~")[[1]][1]
-  
+  print(rbind(whatx,whaty))
+  ########################
   #### y-axis
-  if(!whaty%in%names(idf)){plot.new();next}
+  if(!whaty%in%c(names(idf),"Eic")){plot.new();next}
+  print(whaty)
   ylim=NULL
-  vy=idf[,whaty]
- # print(whaty)
+  if(whaty=="Eic") ylim=c(0,Inf)
+  if(whaty!="Eic"){
+    vy=idf[,whaty]
   if(whaty=="RT" | grepl("^RT\\.",whaty)){
     rtlims=.getrtlim(idf,whaty,deltaRT);rtlim=rtlims$rtlim;medRT0=rtlims$medRT0;medRT=rtlims$medRT;
     ylim=rtlim;vy[which(vy>=max(rtlim))]=max(rtlim);vy[which(vy<=min(rtlim))]=min(rtlim)
@@ -152,14 +164,17 @@ for(iplot in 1:length(lgraphs)){
   }
   idf$Y=vy
   if(sum(!is.na(vy))<2){plot.new();next}
-#  print(ylim)
+  }
+  print(ylim)
+  ########################
   #### x-axis
+  if(whaty!="Eic"){
   if(is.na(whatx) | !whatx%in%names(idf)){
     whatx=NULL
     logs=gsub("x","",logs)
   }
-  xlim=vx=NULL  
-  if(!is.null(whatx)){
+  xlim=vx=NULL
+  if(!is.null(whatx) & whaty!="Eic"){
     vx=idf[,whatx]
     if(whatx=="RT" | grepl("^RT\\.",whatx)){
       rtlims=.getrtlim(idf,whatx,deltaRT);rtlim=rtlims$rtlim;medRT0=rtlims$medRT0;medRT=rtlims$medRT;
@@ -177,9 +192,10 @@ for(iplot in 1:length(lgraphs)){
     idf$X=vx
     if(!is.null(whatx)) if(sum(!is.na(idf[,whatx]))<2){plot.new();next}
   }
+  }
   ########################
   par(dots)
-#  print(c(whatx,whaty,logs))
+  print(c(whatx,whaty,logs))
   lsoSa=1:nrow(idf)
   sortSample=orderBPlots[orderBPlots%in%names(idf)]
   if(!is.null(sortSample)){
@@ -196,10 +212,43 @@ for(iplot in 1:length(lgraphs)){
       .plotBoxP(idf[lsoSa,],whaty,logs=gsub("x","",logs),xlim,ylim,analyte,cexBX)
 
   }  
-  if(is.null(whatx))
+  if(is.null(whatx) & whaty!="Eic")
     .plotBarP(idf[lsoSa,],whaty,gsub("x","",logs),ylim,analyte,cexBP)
 
+  ################
+  if(whaty=="Eic"){
+    ifeic=obj$Eic$File[analyte,]$EicFile
+    ieicpk=obj$Eic$File[analyte,]$EicPK
+    ieic=obj$Eic$File[analyte,]$EicId
+    if(!file.exists(ifeic)){plot.new();next}
+    cat("Found",ifeic)
+    load(ifeic)
+    cat(".\n")
+    ceic=dfeic[dfeic$Eic==ieic & dfeic$Samp%in%obj$Eic$Sample$Samp,]
+    ceic$Sid=obj$Eic$Sample$Sid[match(ceic$Samp,obj$Eic$Sample$Samp)]
+    ceic$cols=idf[ceic$Sid,]$color
 
+    ipkmat=eicpk[[ieic]]$Pks[[ieicpk]]
+    ipkmat=ipkmat[rownames(ipkmat)%in%obj$Eic$Sample$Samp,]
+    rownames(ipkmat)=obj$Eic$Sample$Sid[match(rownames(ipkmat),obj$Eic$Sample$Samp)]
+    Mint=obj$Eic$File[analyte,]$Mint
+    
+    sepx=strsplit(whatx,"\\|")[[1]]
+    if(is.null(whatx))  whatx="rtcor"
+    if(!sepx[1]%in%names(dfeic)) sepx[1]="rt"
+#    print(names(idf))
+    llsids=list(All=unique(ceic$Sid))
+    if(sepx[2]%in%names(idf)) llsids=tapply(idf$Sid,idf[,sepx[2]],unique)
+#    print(llsids)
+    for(ilids in 1:length(llsids)){
+      iceic=ceic[which(ceic$Sid%in%llsids[[ilids]]),]
+      iipkmat=ipkmat[llsids[[ilids]],]
+      if(nrow(iipkmat)>0) .plotEIC(iceic,iipkmat,sepx[1],llsids[ilids],Mint=Mint,cexEL=cexEL)
+      else plot.new()
+    }
+    cat("Eic end")
+  } ### end of Eic
+  
 }
 
 par(par.def)

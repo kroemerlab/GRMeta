@@ -98,7 +98,7 @@ for(i in lparams2)
     eval(parse(text=paste("idf$",i,"=obj$Data[[i]][,analyte]",sep="")))
 
 
-if(!is.null(obj$Meta[,colorCol])){idf$color=obj$Meta[,colorCol]}else{
+if(colorCol%in%names(obj$Meta)){idf$color=obj$Meta[,colorCol]}else{
   idf$color=brewer.pal(9,"Set1")[-6][as.numeric(factor(idf$sType))]
   idf$color[is.na(idf$color)]="black"
 }

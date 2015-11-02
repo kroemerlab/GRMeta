@@ -1,5 +1,5 @@
 
-plotSetMEic<-function(obj,WhichRT="rtcor",groupCol=NULL,colorCol=NULL,addfile="./",endfile="-Eic",cexEL=0.6,...){
+plotSetMEic<-function(obj,WhichRT="rtcor",groupCol=NULL,colorCol=NULL,addfile="./",endfile="-Eic",repDots="-",cexEL=0.6,...){
 
   
   dots<-list(...)
@@ -79,7 +79,7 @@ ipkmat=ipkmat[rownames(ipkmat)%in%obj$Eic$Sample$Samp,]
 rownames(ipkmat)=obj$Eic$Sample$Sid[match(rownames(ipkmat),obj$Eic$Sample$Samp)]
 Mint=obj$Eic$File[analyte,]$Mint
 
-outfile=paste(addfile,gsub("\\.","_",analyte),endfile,".pdf",sep="")
+outfile=paste(addfile,gsub("\\.",repDots,analyte),endfile,".pdf",sep="")
 pdf(file=outfile,width=width,height=height)
 par(dots)
 .plotEIC(ceic,ipkmat,whichrt,llsids,Mint=Mint,rtr=rtr,cexEL=cexEL)

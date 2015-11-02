@@ -5,7 +5,7 @@
 \usage{
 \method{plot}{metaboSet}(obj,outfile=NULL,
  lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1",log="y"),c("Height~Area",log="xy")),
-                         mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots=c("sType","Injorder"),cexBP=0.5,cexBX=0.8,cexEL=0.4,cexPT=1.2,...)
+                         mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots=c("sType","Injorder"),cexBP=0.5,cexBX=0.8,cexEL=0.4,cexPT=1.5,...)
 }
 \arguments{
   \item{obj}{Experiment obj}

@@ -3,7 +3,7 @@
 \title{Plot series of Eics}
 \description{Plot series of Eics}
 \usage{
-plotSetMEic(obj,WhichRT="rtcor",groupCol=NULL,colorCol=NULL,addfile="./",endfile="-Eic",cexEL=0.6,....)
+plotSetMEic(obj,WhichRT="rtcor",groupCol=NULL,colorCol=NULL,addfile="./",endfile="-Eic",repDots="-",cexEL=0.6,....)
 }
 \arguments{
   \item{obj}{Experiment obj}
@@ -13,6 +13,7 @@ plotSetMEic(obj,WhichRT="rtcor",groupCol=NULL,colorCol=NULL,addfile="./",endfile
   \item{addfile}{What to add before the filename}
   \item{endfile}{What to add to the end of the file name}
   \item{cexEL}{cex for the Eic Legend}
+  \item{repDots}{Replacing dots}
   \item{\dots}{Arguments 1) used to match analytes from obj$Eic$File and 2) passed to \code{\link{par}} and \code{\link{pdf}} including mfrow}
 }
 \note{ Experimental}

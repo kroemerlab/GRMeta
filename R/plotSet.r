@@ -1,12 +1,7 @@
-
-
- ### Color Id
-
 plot.metaboSet<-function(obj,outfile=NULL,
                          lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1",log="y"),c("Height~Area",log="xy")),
-                         mfrow=c(2,2),colorCol=NULL,deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,cexBX=.8,cexEL=0.4,cexPT=1.2,...){
-#  .plotOneAnalyte(obj,analyte = i,lgraphs=lgraphs,mfrow=mfrow,colorCol=colorCol,deltaRT=deltaRT,linking=linking,orderBPlots=orderBPlots,cexBP=cexBP,cexBX=cexBX,cexEL=cexEL,... )
-  
+                         mfrow=c(2,2),colorCol=NULL,deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,cexBX=.8,cexEL=0.4,cexPT=1.5,...){
+
   mgraphs=t(sapply(lgraphs,function(x) strsplit(x[1],"~")[[1]][1:2]))
   mgraphs[grep("^[0-9]$",mgraphs[,2]),2]=NA
   ltyps=c(names(obj$Meta),names(obj$Data))
@@ -146,7 +141,10 @@ for(iplot in 1:length(lgraphs)){
   whaty=strsplit(x,"~")[[1]][1]
   ########################
   #### y-axis
-  if(!whaty%in%c(names(idf),"Eic")){plot.new();next}
+  if(!whaty%in%c(names(idf),"Eic")){
+    plot(0:1,0:1,axes=F,xlab="",ylab="",cex=0)
+    text(.5,.5,lgraphs[[iplot]][1])
+    next}
   ylim=NULL
   if(whaty=="Eic") ylim=c(0,Inf)
   if(whaty!="Eic"){
@@ -163,7 +161,11 @@ for(iplot in 1:length(lgraphs)){
     } else ylim=pretty(seq(min(vy,na.rm=TRUE),max(vy,na.rm=TRUE),length.out = 7))
   }
   idf$Y=vy
-  if(sum(!is.na(vy))<2){plot.new();next}
+  if(sum(!is.na(vy))<2){
+    plot(0:1,0:1,axes=F,xlab="",ylab="",cex=0)
+    text(.5,.5,lgraphs[[iplot]][1])
+    next
+    }
   }
 #  print(ylim)
   ########################
@@ -190,7 +192,10 @@ for(iplot in 1:length(lgraphs)){
       } else xlim=pretty(seq(min(vx),max(vx),length.out = 7))
     }
     idf$X=vx
-    if(!is.null(whatx)) if(sum(!is.na(idf[,whatx]))<2){plot.new();next}
+    if(!is.null(whatx)) if(sum(!is.na(idf[,whatx]))<2){
+      plot(0:1,0:1,axes=F,xlab="",ylab="",cex=0)
+      text(.5,.5,lgraphs[[iplot]][1])
+      next}
   }
   }
   ########################

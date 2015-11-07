@@ -17,26 +17,15 @@ mergeSet<-function(...){
     i=names(which(table(lmethods)>1))[1]
     lred=names(which(lmethods==i))
     j=paste(lred,collapse = "")
-    cmd=paste(paste(lred,"=re[['",lred,"']]",sep=""),collapse=";")
-    eval(parse(text=cmd))
           print(lred)
-    cmd=paste("re[[lred[1]]]=.mergeDataBatch(",paste(lred,collapse=","),")",sep="")
-    print(cmd)
-    eval(parse(text=cmd))
-    cmd=paste("rm(list='",paste(lred,collapse="','"),"')",sep="")
-    eval(parse(text=cmd))
+    re[[lred[1]]]=.mergeDataBatch(re[lred])
     re=re[which(!names(re)%in%lred[-1])]
     lmethods=sapply(re,function(x) x$Method)
   }
   #  print(str(re))
   if(length(re)==1) return(invisible(re[[1]]))
   lred=names(re)
-  cmd=paste(paste(lred,"=re[['",lred,"']]",sep=""),collapse=";")
-  eval(parse(text=cmd))
-  cmd=paste("res=.mergeDataMethods(",paste(lred,collapse=","),")",sep="")
-  eval(parse(text=cmd))
-  cmd=paste("rm(list='",paste(lred,collapse="','"),"')",sep="")
-  eval(parse(text=cmd))
+  res=.mergeDataMethods(re[lred])
   return(invisible(res))  
 }
 ######################################################
@@ -74,13 +63,15 @@ mergeSet<-function(...){
 }
 #################################################################
 
-.mergeDataBatch<-function(...){
+.mergeDataBatch<-function(re){
   
-  re <- list(...)
-  nams=as.character(as.list( match.call() ))[-1]
-  tokeep=sapply(unique(nams),function(x) which(nams==x)[1])
-  re=re[tokeep]
-  names(re)=nams[tokeep]
+  ## take a list a input -> better than names
+#   
+#   re <- list(...)
+#   nams=as.character(as.list( match.call() ))[-1]
+#   tokeep=sapply(unique(nams),function(x) which(nams==x)[1])
+#   re=re[tokeep]
+#   names(re)=nams[tokeep]
   if(length(re)==1) return(re)
   
   cat("************************************\nMerging:", names(re),"\n************************************\n")
@@ -163,13 +154,14 @@ mergeSet<-function(...){
 
 
 #####################################################################################################
-.mergeDataMethods<-function(...){
+.mergeDataMethods<-function(re){
   
-  re <- list(...)
-  nams=as.character(as.list( match.call() ))[-1]
-  tokeep=sapply(unique(nams),function(x) which(nams==x)[1])
-  re=re[tokeep]
-  names(re)=nams[tokeep]
+  ## take a list a input -> better than names
+#  re <- list(...)
+ # nams=as.character(as.list( match.call() ))[-1]
+#  tokeep=sapply(unique(nams),function(x) which(nams==x)[1])
+#  re=re[tokeep]
+ # names(re)=nams[tokeep]
   if(length(re)==1) return(re)
   
   cat("************************************\nMerging:", names(re),"\n************************************\n")
@@ -210,7 +202,7 @@ mergeSet<-function(...){
   ##############
   cat("Check analytes:\n")
   lumet=unlist(lapply(re,function(x) x$Analyte))
-  lann=lapply(re,function(x) x$Annot[,grep("^[A-Za-z]+$",names(x$Annot))])
+  lann=lapply(re,function(x) x$Annot)#[,grep("^[A-Za-z]+$",names(x$Annot))])
   l2use=unique(unlist(lapply(lann,names)))
   l2usen=names(which(!sapply(lann,function(x) all(l2use%in%names(x)))))
   for(i in l2usen){

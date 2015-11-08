@@ -1,10 +1,15 @@
+.cvf <- function(x, n = 0) ifelse(sum(!is.na(x)) >= n, 100 * 
+                                   sd(x, na.rm = T)/mean(x, na.rm = T), NA)
+.cvrf <- function(x, n = 0) ifelse(sum(!is.na(x)) >= n, 100 * 
+                                    mad(x, na.rm = T)/median(x, na.rm = T), NA)
 
 corrSetQC<-function(obj,what,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[which(obj$Meta$sType=="QC")],
-                    nminQC=3,propNNA=0.5,lPcs=1:2,outfile=NULL,doplot=TRUE,complete="nothing",ipc=1,imod=4){
+                    nminQC=3,propNNA=0.5,lPcs=1:2,outfile=NULL,doplot=TRUE,Date2use="Date",complete="nothing",ipc=1,imod=4,verb=FALSE){
   
-  Samp2Corr=Samp2Corr[!is.na(obj$File[Samp2Corr,]$Date)]
+  if(!Date2use%in%names(obj$File)) stop("Date does not exist")
+  Samp2Corr=Samp2Corr[!is.na(obj$File[Samp2Corr,Date2use])]
   m=obj$Data[[what]][Samp2Corr,Var2Corr]
-  dts=obj$File[Samp2Corr,]$Date
+  dts=obj$File[Samp2Corr,Date2use]
   dtsn=as.numeric(dts)#-mean(as.numeric(dts),na.rm=T)
   names(dtsn)=names(dts)=Samp2Corr
   
@@ -15,11 +20,12 @@ corrSetQC<-function(obj,what,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[
   clqc=clqc[(rowSums(!is.na(m[clqc,curmat]))/length(curmat))>propNNA]
   cat("QC samples:",clqc,"\n")
   cat("Num. of variables:",length(curmat),"out of",ncol(m),"\n")
-  
   mqc=mqc2=log2(m[clqc,curmat])
   meqc=colMeans(mqc,na.rm=T)
   
-  if(any(is.na(mqc2))) mqc2=t(impute.knn(t(mqc2),k=max(3,length(clqc)-2)))
+  if(any(is.na(mqc2))) mqc2=t(impute.knn(t(mqc2),k=max(3,length(clqc)-2))$data)
+  print(str(mqc))
+  print(str(mqc2))
   mqc2=sweep(mqc2,2,meqc)
   pcqc=prcomp(mqc2)
   lPcs=lPcs[lPcs%in%(1:ncol(pcqc$rotation))]
@@ -31,6 +37,10 @@ corrSetQC<-function(obj,what,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[
     cat(".")
     ndf=data.frame(dts2=seq(min(dtsn),max(dtsn),length.out = 100)-de)
     ndfsa=data.frame(dts2=dtsn-de)
+    
+    ndfsa$dts2[ndfsa$dts2<min(ndf$dts2)]=min(ndf$dts2)
+    ndfsa$dts2[ndfsa$dts2>max(ndf$dts2)]=max(ndf$dts2)
+    
     lmm=lm(pcqc$x[,i]~dts2)
     ndf$pr1=predict(lmm,newdata=ndf,se=TRUE)$fit
     ndf$se1=predict(lmm,newdata=ndf,se=TRUE)$se.fit
@@ -49,7 +59,7 @@ corrSetQC<-function(obj,what,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[
     ndfsa$pr3=predict(lmm3,newdata=ndfsa,se=TRUE)$fit
     ndfsa$se3=predict(lmm3,newdata=ndfsa,se=TRUE)$se.fit
     ###
-    try(lmm4<-gam(pcqc$x[,i]~s(dts2)),TRUE)
+    lmm4<-try(gam(pcqc$x[,i]~s(dts2)),TRUE)
     if("try-error"%in%class(lmm4)) lmm4=gam(pcqc$x[,i]~dts2)
     ndf$pr4=predict(lmm4,newdata=ndf,se=TRUE)$fit
     ndf$se4=predict(lmm4,newdata=ndf,se=TRUE)$se.fit
@@ -66,42 +76,44 @@ corrSetQC<-function(obj,what,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[
   }
   cat("\n")
   
-  if(doplot | !is.null(outfile)) .incorrplot(pcqc,andf,andfsa,outfile=outfile)
-  
+  if(doplot | !is.null(outfile)) .incorrplot(pcqc,andf,andfsa,outfile=outfile,ipc=ipc)
+  if(is.null(complete)) return(invisible(pcqc))
   if(!is.null(ipc) & !is.null(imod)){
     cat("Using model ",imod," on PC",ipc," to correct ",what,"\n",sep="")
     m0=obj$Data[[what]]
     ml=ml2=mlc=mlc2=log2(obj$Data[[what]])
-    mlc[Samp2Corr,Var2Corr]=sweep(ml[Samp2Corr,Var2Corr],2,meqc[Var2Corr])
-    mlc2[Samp2Corr,Var2Corr]=mlc[Samp2Corr,Var2Corr]-andfsa[[as.character(ipc)]][Samp2Corr,paste("pr",imod,sep="")]%*%t(pcqc$r[Var2Corr,ipc,drop=F])
-    ml2[Samp2Corr,Var2Corr]=sweep(mlc2[Samp2Corr,Var2Corr],2,meqc[Var2Corr],"+")
+    mlc[Samp2Corr,curmat]=sweep(ml[Samp2Corr,curmat],2,meqc[curmat])
+    mlc2[Samp2Corr,curmat]=mlc[Samp2Corr,curmat]-
+      andfsa[[as.character(ipc)]][Samp2Corr,paste("pr",imod,sep="")]%*%t(pcqc$r[curmat,ipc,drop=F])
+    ml2[Samp2Corr,curmat]=sweep(mlc2[Samp2Corr,curmat],2,meqc[curmat],"+")
     ml2=2^ml2
-    
+    print(str(ml2))
     if(all(rownames(ml2)%in%Samp2Corr) & all(colnames(ml2)%in%Var2Corr)) cat("All samples and analytes from the original set were adjusted")
     if(any(!rownames(ml2)%in%Samp2Corr) | any(!colnames(ml2)%in%Var2Corr)){
       lsa=which(!rownames(ml2)%in%Samp2Corr)
+   #   print(lsa)
       lv=which((!colnames(ml2)%in%Var2Corr))
     if(complete=="NA"){
       cat("Adding NAs for:\n")
-      if(any((!rownames(ml2)%in%Samp2Corr))){ml2[lsa,]=NA;cat(" *Sid:",rownames(ml2)[lsa],"\n")}
-      if(any(!colnames(ml2)%in%Var2Corr)){ml2[lv,]=NA;cat(" *Analytes:",colnames(ml2)[lv],"\n")}
+      if(any((!rownames(ml2)%in%Samp2Corr))){ml2[lsa,]=NA;if(verb) cat(" *Sid:",rownames(ml2)[lsa],"\n")}
+      if(any(!colnames(ml2)%in%Var2Corr)){ml2[lv,]=NA;if(verb) cat(" *Analytes:",colnames(ml2)[lv],"\n")}
     }
     if(complete=="remove"){
       cat("Removing:\n")
-      if(any((!rownames(ml2)%in%Samp2Corr))){cat(" *Sid:",rownames(ml2)[lsa],"\n");ml2=ml2[-lsa,,drop=F]=NA;}
-      if(any(!colnames(ml2)%in%Var2Corr)){cat(" *Analytes:",colnames(ml2)[lv],"\n");ml2=ml2[,-lv,drop=F]}
+      if(any((!rownames(ml2)%in%Samp2Corr))){if(verb) cat(" *Sid:",rownames(ml2)[lsa],"\n");ml2=ml2[-lsa,,drop=F];}
+      if(any(!colnames(ml2)%in%Var2Corr)){if(verb) cat(" *Analytes:",colnames(ml2)[lv],"\n");ml2=ml2[,-lv,drop=F]}
     }
     if(complete=="nothing"){
         cat("Former data used for:\n")
-        if(any((!rownames(ml2)%in%Samp2Corr))){cat(" *Sid:",rownames(ml2)[lsa],"\n")}
-        if(any(!colnames(ml2)%in%Var2Corr)){cat(" *Analytes:",colnames(ml2)[lv],"\n")}
+        if(any((!rownames(ml2)%in%Samp2Corr))){if(verb) cat(" *Sid:",rownames(ml2)[lsa],"\n")}
+        if(any(!colnames(ml2)%in%Var2Corr)){if(verb) cat(" *Analytes:",colnames(ml2)[lv],"\n")}
     }
     }
     invisible(ml2)
   } else{invisible(pcqc)}
 }
 
-.incorrplot<-function(pcqc,andf,andfsa,outfile=NULL){
+.incorrplot<-function(pcqc,andf,andfsa,outfile=NULL,ipc=1){
   def.par <- par(no.readonly = TRUE) # save default, for resetting...
   
   sumpc=summary(pcqc)
@@ -116,7 +128,7 @@ corrSetQC<-function(obj,what,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[
     ndf=andf[[i]]
     ndfsa=andfsa[[i]]
     i=as.numeric(i)
-    main=paste("PC",i,"(",round(sumpc$importance[2,i]*100,1),"%)")
+    main=paste("PC",i,"(",round(sumpc$importance[2,i]*100,1),"%)",ifelse(i==ipc,"***",""))
     dts=ndfsa$dts;names(dts)=rownames(ndfsa)
     
     
@@ -130,7 +142,7 @@ corrSetQC<-function(obj,what,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[
     out=outlierTest(lm(pcqc$rotation[,i]~1),n.max = 50,cutoff = 0.1)
     cols=rep("grey30",length(curmat))
     if(any(out$signif)){
-      l=which(curmat==names(out$p))
+      l=which(curmat%in%names(out$p))
       cols[l]="red"
     }
     

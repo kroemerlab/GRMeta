@@ -130,13 +130,21 @@ if("InjOrder"%in%lparams){
 if(!is.null(mfrow)) par(mfrow=mfrow)
 for(iplot in 1:length(lgraphs)){
   
-  logs=""
+  logs="";vlines=hlines=NULL;
   x=lgraphs[[iplot]]
   if("log"%in%names(lgraphs[[iplot]])){
     logs=x["log"]
     x=x[!names(x)%in%"log"]
   }
-
+  if("h"%in%names(lgraphs[[iplot]])){
+    hlines=as.numeric(strsplit(x["h"],";")[[1]])
+    x=x[!names(x)%in%"h"]
+  }
+  if("v"%in%names(lgraphs[[iplot]])){
+    vlines=as.numeric(strsplit(x["v"],";")[[1]])
+    x=x[!names(x)%in%"v"]
+  }
+  
   whatx=strsplit(x,"~")[[1]][2]
   whaty=strsplit(x,"~")[[1]][1]
   ########################
@@ -210,11 +218,11 @@ for(iplot in 1:length(lgraphs)){
   
   if(!is.null(whatx)){
     if(is.numeric(idf$X))
-      .plotXY(idf,whatx,whaty,logs,xlim,ylim,analyte,linking,medRT0,deltaRT,cexPT)
+      .plotXY(idf,whatx,whaty,logs,xlim,ylim,analyte,linking,medRT0,deltaRT,cexPT,vlines=vlines,hlines=hlines)
     if(is.character(idf$X))
-      .plotLinP(idf[lsoSa,],whaty,logs=gsub("x","",logs),xlim,ylim,analyte,cexBP,cexPT)
+      .plotLinP(idf[lsoSa,],whaty,logs=gsub("x","",logs),xlim,ylim,analyte,cexBP,cexPT,vlines=vlines,hlines=hlines)
     if(is.factor(idf$X))
-      .plotBoxP(idf[lsoSa,],whaty,logs=gsub("x","",logs),xlim,ylim,analyte,cexBX)
+      .plotBoxP(idf[lsoSa,],whaty,logs=gsub("x","",logs),xlim,ylim,analyte,cexBX,vlines=vlines,hlines=hlines)
 
   }  
   if(is.null(whatx) & whaty!="Eic")
@@ -276,24 +284,28 @@ on.exit(par(par.def))
   for(i in 1:nrow(re)) axis(1,at=re[i,1],labels = idf$Sid[i],cex.axis=cexBP,las=2,tick=F,pos=ylim[1])
 }
 
-.plotLinP<-function(idf,whaty,logs="",xlim,ylim,analyte,cexBP,cexPT=1.2){
+.plotLinP<-function(idf,whaty,logs="",xlim,ylim,analyte,cexBP,cexPT=1.2,vlines=NULL,hlines=NULL){
   l=which(!is.na(idf$X))
   ylim2=which(ylim>min(idf$Y[l]) & ylim<max(idf$Y[l]))
   ylim2=max(min(ylim2)-1,1):min(max(ylim2)+1,length(ylim))
   
   re=plot(1:length(idf$X),idf$Y,axes=F,xlab="",ylab=whaty,bty="n",log=logs,ylim=range(ylim[ylim2]),xlim=range(xlim),main=analyte,col="grey20",type="l")
+  if(!is.null(hlines)) abline(h=hlines,lwd=par("lwd"),col="grey",lty=2)
+  if(!is.null(vlines)) abline(v=vlines,lwd=par("lwd"),col="grey",lty=2)
   points(1:length(idf$X),idf$Y,col=idf$color,pch=16,cex=cexPT)
   axis(2,at=ylim[ylim2],las=2)
   for(i in 1:nrow(idf)) axis(1,at=i,labels = idf$X[i],cex.axis=cexBP,las=2,tick=F,pos=min(ylim[ylim2]))
 }
 
-.plotBoxP<-function(idf,whaty,logs="",xlim,ylim,analyte,cexBX){
+.plotBoxP<-function(idf,whaty,logs="",xlim,ylim,analyte,cexBX,vlines=NULL,hlines=NULL){
 #  cat("Ylim: ",ylim)
   l=which(!is.na(idf$X))
   ylim2=which(ylim>min(idf$Y[l],na.rm=T) & ylim<max(idf$Y[l],na.rm=T))
   if(length(ylim2)<2) ylim2=1:length(ylim)
   ylim2=max(min(ylim2)-1,1):min(max(ylim2)+1,length(ylim))
   re=boxplot(Y~X,data=idf,axes=F,xlab="",ylab=whaty,bty="n",log=logs,ylim=range(ylim[ylim2]),xlim=range(xlim),main=analyte,cex=0)
+  if(!is.null(hlines)) abline(h=hlines,lwd=par("lwd"),col="grey",lty=2)
+  if(!is.null(vlines)) abline(v=vlines,lwd=par("lwd"),col="grey",lty=2)
   beeswarm(Y~X,data=idf,add=T,pwcol = idf$color,pch=16)
   axis(2,at=ylim[ylim2],las=2)
   labs=paste(re$names,"\n(",re$n,")",sep="")
@@ -302,12 +314,14 @@ on.exit(par(par.def))
 
 
 ##### whatx is numeric
-.plotXY<-function(idf,whatx,whaty,logs="",xlim,ylim,analyte,linking=NULL,medRT0=NULL,deltaRT=NULL,cexPT=1.2){
+.plotXY<-function(idf,whatx,whaty,logs="",xlim,ylim,analyte,linking=NULL,medRT0=NULL,deltaRT=NULL,cexPT=1.2,vlines=NULL,hlines=NULL){
   
   vx=idf$X
   vy=idf$Y
   
   plot(range(xlim),range(ylim),cex=0,axes=F,xlab=whatx,ylab=whaty,bty="n",log=logs,xlim=range(xlim),ylim=range(ylim),main=analyte)
+  if(!is.null(hlines)) abline(h=hlines,lwd=par("lwd"),col="grey",lty=2)
+  if(!is.null(vlines)) abline(v=vlines,lwd=par("lwd"),col="grey",lty=2)
   if(whatx=="RT" | grepl("^RT\\.",whatx)) abline(v=medRT0+c(-.5,0,.5)*deltaRT,lty=c(2,1,2),lwd=par("lwd")*2)
   if(whaty=="RT" | grepl("^RT\\.",whaty)) abline(h=medRT0+c(-.5,0,.5)*deltaRT,lty=c(2,1,2),lwd=par("lwd")*2)
   if(whatx=="InjOrder") abline(v=xlim,col="grey")

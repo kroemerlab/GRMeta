@@ -63,17 +63,8 @@ plot.metaboSet<-function(obj,outfile=NULL,
   llyt=as.character(lly)
   names(lly)=llyt
   
-  lly2=rep(c(1),31)*10^rep(-10:20,each=1)
-  lly2t=as.character(lly2)
-  names(lly2)=lly2t
-  
   helim=lly[sort(min(which(lly>min(v,na.rm=T))):max(which(lly<max(v,na.rm=T))))]
   helim=c(max(lly[lly<helim[1]]),helim,min(lly[lly>max(helim)]))
-#   if(length(helim)>8){
-#     helim=lly2[sort(min(which(lly2>min(v,na.rm=T))):max(which(lly2<max(v,na.rm=T))))]
-#     helim=c(max(lly2[lly2<helim[1]]),helim,min(lly2[lly2>max(helim)]))
-#   }
-#  print(helim)
   return(helim)
 }
 

@@ -54,7 +54,7 @@ plot.metaboSet<-function(obj,outfile=NULL,
 
 .infctlimlog=function(v){
   v=v[v>0]
-  lly=rep(c(1,2,5),31)*10^rep(-10:20,each=3)
+  lly=rep(c(1,2,3,5),31)*10^rep(-10:20,each=4)
   llyt=as.character(lly)
   names(lly)=llyt
   
@@ -64,10 +64,11 @@ plot.metaboSet<-function(obj,outfile=NULL,
   
   helim=lly[sort(min(which(lly>min(v,na.rm=T))):max(which(lly<max(v,na.rm=T))))]
   helim=c(max(lly[lly<helim[1]]),helim,min(lly[lly>max(helim)]))
-  if(length(helim)>7){
+  if(length(helim)>8){
     helim=lly2[sort(min(which(lly2>min(v,na.rm=T))):max(which(lly2<max(v,na.rm=T))))]
     helim=c(max(lly2[lly2<helim[1]]),helim,min(lly2[lly2>max(helim)]))
   }
+#  print(helim)
   return(helim)
 }
 
@@ -132,6 +133,7 @@ for(iplot in 1:length(lgraphs)){
   
   logs="";vlines=hlines=NULL;
   x=lgraphs[[iplot]]
+#  print(x)
   if("log"%in%names(lgraphs[[iplot]])){
     logs=x["log"]
     x=x[!names(x)%in%"log"]
@@ -145,6 +147,7 @@ for(iplot in 1:length(lgraphs)){
     x=x[!names(x)%in%"v"]
   }
   
+ # print(logs)
   whatx=strsplit(x,"~")[[1]][2]
   whaty=strsplit(x,"~")[[1]][1]
   ########################
@@ -175,7 +178,7 @@ for(iplot in 1:length(lgraphs)){
     next
     }
   }
-#  print(ylim)
+#  print(logs)
   ########################
   #### x-axis
   if(whaty!="Eic"){
@@ -279,35 +282,51 @@ on.exit(par(par.def))
 ##### whatx is null
 .plotBarP<-function(idf,whaty,logs="",ylim,analyte,cexBP){
   
+  l=which(!is.na(idf$Y))
+  if(length(l)<nrow(idf)){
+    if(grepl("y",logs)) ylim=.infctlimlog(idf$Y[l])
+    if(grepl("y",logs)) ylim=pretty(seq(min(idf$Y[l]),max(idf$Y[l]),length=7))
+  }
+  
   re=barplot(idf$Y,axes=F,ylab=whaty,bty="n",log=logs,ylim=range(ylim),main=analyte,col=idf$color,xpd=FALSE)
   axis(2,at=ylim,las=2)
   for(i in 1:nrow(re)) axis(1,at=re[i,1],labels = idf$Sid[i],cex.axis=cexBP,las=2,tick=F,pos=ylim[1])
 }
 
 .plotLinP<-function(idf,whaty,logs="",xlim,ylim,analyte,cexBP,cexPT=1.2,vlines=NULL,hlines=NULL){
-  l=which(!is.na(idf$X))
-  ylim2=which(ylim>min(idf$Y[l]) & ylim<max(idf$Y[l]))
-  ylim2=max(min(ylim2)-1,1):min(max(ylim2)+1,length(ylim))
+  l=which(!is.na(idf$X) & !is.na(idf$Y))
+  if(length(l)<nrow(idf)){
+    if(grepl("y",logs)) ylim=.infctlimlog(idf$Y[l])
+    if(grepl("y",logs)) ylim=pretty(seq(min(idf$Y[l]),max(idf$Y[l]),length=7))
+  }
   
-  re=plot(1:length(idf$X),idf$Y,axes=F,xlab="",ylab=whaty,bty="n",log=logs,ylim=range(ylim[ylim2]),xlim=range(xlim),main=analyte,col="grey20",type="l")
+  re=plot(1:length(idf$X),idf$Y,axes=F,xlab="",ylab=whaty,bty="n",log=logs,ylim=range(ylim),xlim=range(xlim),main=analyte,col="grey20",type="l")
   if(!is.null(hlines)) abline(h=hlines,lwd=par("lwd"),col="grey",lty=2)
   if(!is.null(vlines)) abline(v=vlines,lwd=par("lwd"),col="grey",lty=2)
   points(1:length(idf$X),idf$Y,col=idf$color,pch=16,cex=cexPT)
-  axis(2,at=ylim[ylim2],las=2)
-  for(i in 1:nrow(idf)) axis(1,at=i,labels = idf$X[i],cex.axis=cexBP,las=2,tick=F,pos=min(ylim[ylim2]))
+  axis(2,at=ylim,las=2)
+  for(i in 1:nrow(idf)) axis(1,at=i,labels = idf$X[i],cex.axis=cexBP,las=2,tick=F,pos=min(ylim))
 }
 
 .plotBoxP<-function(idf,whaty,logs="",xlim,ylim,analyte,cexBX,vlines=NULL,hlines=NULL){
-#  cat("Ylim: ",ylim)
-  l=which(!is.na(idf$X))
-  ylim2=which(ylim>min(idf$Y[l],na.rm=T) & ylim<max(idf$Y[l],na.rm=T))
-  if(length(ylim2)<2) ylim2=1:length(ylim)
-  ylim2=max(min(ylim2)-1,1):min(max(ylim2)+1,length(ylim))
-  re=boxplot(Y~X,data=idf,axes=F,xlab="",ylab=whaty,bty="n",log=logs,ylim=range(ylim[ylim2]),xlim=range(xlim),main=analyte,cex=0)
+# cat("Ylim: ",ylim)
+ # print(idf)
+#   #print(r)
+#   ylim2=which(ylim>min(idf$Y[l],na.rm=T) & ylim<max(idf$Y[l],na.rm=T))
+#   if(length(ylim2)<2) ylim2=1:length(ylim)
+#   print(ylim2)
+#   ylim2=max(which.min(ylim2),1):min(which.max(ylim2)+1,length(ylim))
+#   print(ylim2)
+  l=which(!is.na(idf$X) & !is.na(idf$Y))
+  if(length(l)<nrow(idf)){
+    if(logs=="y") ylim=.infctlimlog(idf$Y[l])
+    if(logs!="y") ylim=pretty(seq(min(idf$Y[l]),max(idf$Y[l]),length=7))
+  }
+  re=boxplot(Y~X,data=idf,axes=F,xlab="",ylab=whaty,bty="n",log=logs,ylim=range(ylim),xlim=range(xlim),main=analyte,cex=0)
   if(!is.null(hlines)) abline(h=hlines,lwd=par("lwd"),col="grey",lty=2)
   if(!is.null(vlines)) abline(v=vlines,lwd=par("lwd"),col="grey",lty=2)
   beeswarm(Y~X,data=idf,add=T,pwcol = idf$color,pch=16)
-  axis(2,at=ylim[ylim2],las=2)
+  axis(2,at=ylim,las=2)
   labs=paste(re$names,"\n(",re$n,")",sep="")
   for(i in 1:length(labs)) axis(1,at=i,labels =labs[i],tick=F,cex.axis=cexBX)
 }
@@ -319,6 +338,7 @@ on.exit(par(par.def))
   vx=idf$X
   vy=idf$Y
   
+
   plot(range(xlim),range(ylim),cex=0,axes=F,xlab=whatx,ylab=whaty,bty="n",log=logs,xlim=range(xlim),ylim=range(ylim),main=analyte)
   if(!is.null(hlines)) abline(h=hlines,lwd=par("lwd"),col="grey",lty=2)
   if(!is.null(vlines)) abline(v=vlines,lwd=par("lwd"),col="grey",lty=2)

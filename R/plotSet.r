@@ -282,10 +282,11 @@ on.exit(par(par.def))
 ##### whatx is null
 .plotBarP<-function(idf,whaty,logs="",ylim,analyte,cexBP){
   
+#  print(idf)
   l=which(!is.na(idf$Y))
   if(length(l)<nrow(idf)){
     if(grepl("y",logs)) ylim=.infctlimlog(idf$Y[l])
-    if(grepl("y",logs)) ylim=pretty(seq(min(idf$Y[l]),max(idf$Y[l]),length=7))
+    if(!grepl("y",logs)) ylim=pretty(seq(min(idf$Y[l]),max(idf$Y[l]),length=7))
   }
   
   re=barplot(idf$Y,axes=F,ylab=whaty,bty="n",log=logs,ylim=range(ylim),main=analyte,col=idf$color,xpd=FALSE)
@@ -297,7 +298,7 @@ on.exit(par(par.def))
   l=which(!is.na(idf$X) & !is.na(idf$Y))
   if(length(l)<nrow(idf)){
     if(grepl("y",logs)) ylim=.infctlimlog(idf$Y[l])
-    if(grepl("y",logs)) ylim=pretty(seq(min(idf$Y[l]),max(idf$Y[l]),length=7))
+    if(!grepl("y",logs)) ylim=pretty(seq(min(idf$Y[l]),max(idf$Y[l]),length=7))
   }
   
   re=plot(1:length(idf$X),idf$Y,axes=F,xlab="",ylab=whaty,bty="n",log=logs,ylim=range(ylim),xlim=range(xlim),main=analyte,col="grey20",type="l")
@@ -319,8 +320,8 @@ on.exit(par(par.def))
 #   print(ylim2)
   l=which(!is.na(idf$X) & !is.na(idf$Y))
   if(length(l)<nrow(idf)){
-    if(logs=="y") ylim=.infctlimlog(idf$Y[l])
-    if(logs!="y") ylim=pretty(seq(min(idf$Y[l]),max(idf$Y[l]),length=7))
+    if(grepl("y",logs)) ylim=.infctlimlog(idf$Y[l])
+    if(!grepl("y",logs)) ylim=pretty(seq(min(idf$Y[l]),max(idf$Y[l]),length=7))
   }
   re=boxplot(Y~X,data=idf,axes=F,xlab="",ylab=whaty,bty="n",log=logs,ylim=range(ylim),xlim=range(xlim),main=analyte,cex=0)
   if(!is.null(hlines)) abline(h=hlines,lwd=par("lwd"),col="grey",lty=2)

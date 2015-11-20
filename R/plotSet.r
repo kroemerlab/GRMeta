@@ -53,7 +53,7 @@ plot.metaboSet<-function(obj,outfile=NULL,
 
 
 .infctlimlog=function(v){
-  v=v[v>0]
+  v=na.omit(v[v>0])
   rat=max(v,na.rm=T)/min(v,na.rm = T)
   
   lly=rep(c(1,2,3,5),31)*10^rep(-10:20,each=4)
@@ -62,7 +62,7 @@ plot.metaboSet<-function(obj,outfile=NULL,
   if(rat>2000)    lly=rep(c(1),31)*10^rep(-10:20,each=1)
   llyt=as.character(lly)
   names(lly)=llyt
-  
+  #print(v)
   helim=lly[sort(min(which(lly>min(v,na.rm=T))):max(which(lly<max(v,na.rm=T))))]
   helim=c(max(lly[lly<helim[1]]),helim,min(lly[lly>max(helim)]))
   return(helim)

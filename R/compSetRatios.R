@@ -37,7 +37,10 @@ compSetRatios<-function(obj,l2add=names(obj$Data),lpairs=RatiosGR,conv2set=FALSE
   Data=list()
   for(i in l2add[l2add%in%names(obj$Data)]){
     mat=obj$Data[[i]]
-    Data[[i]]=do.call("cbind",lapply(rownames(ratstats),function(x) mat[,ratstats[x,]$AnalyteNum]/mat[,ratstats[x,]$AnalyteDen]))
+    if(grepl("^Log",i))
+      Data[[i]]=do.call("cbind",lapply(rownames(ratstats),function(x) mat[,ratstats[x,]$AnalyteNum]-mat[,ratstats[x,]$AnalyteDen]))
+    if(!grepl("^Log",i))
+      Data[[i]]=do.call("cbind",lapply(rownames(ratstats),function(x) mat[,ratstats[x,]$AnalyteNum]/mat[,ratstats[x,]$AnalyteDen]))
     colnames(Data[[i]])=rownames(ratstats)
   }
   

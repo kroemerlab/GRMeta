@@ -42,7 +42,9 @@ deleteEntries<-function(obj,...){
         anaori=obj$Analyte
         obj$Analyte=obj$Analyte[l2keep]
         obj$Annot=obj$Annot[l2keep,]
+       # print(table(table(l2keep)))
         obj$Data=lapply(obj$Data,function(x) x[,l2keep,drop=F])
+        print("OKK")
         
         if(!is.null(obj$Eic)) obj$Eic$File=obj$Eic$File[l2keep,]
         

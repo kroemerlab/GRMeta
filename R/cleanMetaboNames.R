@@ -1,13 +1,13 @@
 
 cleanMetaboNames<-function(metnam,RegExpr=NULL,Syno=NULL){
 
-  if(is.na(RegExpr)){
+  if(any(is.na(RegExpr))){
     file=list.files(system.file(package = "GRMeta"),pattern = "dictRegExpr.rda$",full.names = TRUE)
   load(file)
   RegExpr=dictRegExpr
   }
   
-  if(is.na(Syno)){
+  if(any(is.na(Syno))){
     file=list.files(system.file(package = "GRMeta"),pattern = "dictSyno.rda$",full.names = TRUE)
     load(file)
     Syno=dictSyno

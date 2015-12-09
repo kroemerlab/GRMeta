@@ -8,8 +8,7 @@ loadMavenData<-function(ifile,ofile=NULL,params=list()){
   
   
   require(XML)
-  params=list()
-  paramsvals <- GRMeta:::paramsParsing()
+  paramsvals <-paramsParsing()
   if (!missing(params)) paramsvals[names(params)] <- params
   params=paramsvals
   

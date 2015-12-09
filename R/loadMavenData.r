@@ -14,11 +14,11 @@ loadMavenData<-function(ifile,ofile=NULL,params=list()){
   params=paramsvals
   
   
-  data <- xmlRoot(xmlTreeParse(ifile))
+  dat <- xmlRoot(xmlTreeParse(ifile))
   
   #####################
   # samples
-  sampids= t(xmlSApply(data[["samples"]],xmlAttrs))
+  sampids= t(xmlSApply(dat[["samples"]],xmlAttrs))
   
   filenam=sampids[,"filename"]
   nams=gsub("\\.[dD]$","",sampids[,"name"])
@@ -45,16 +45,16 @@ loadMavenData<-function(ifile,ofile=NULL,params=list()){
   if(!is.null(params$Batch)) fileinfos$Batch=params$Batch
   
   #####################
-  pkids= t(xmlSApply(data[["PeakGroups"]],xmlAttrs))
+  pkids= t(xmlSApply(dat[["PeakGroups"]],xmlAttrs))
   
   #################
-  ## Make data
-  m0=matrix(NA,nrow=length(snames),ncol=nrow(pkids),dimnames=list(unname(sampids[,"name"]),unname(pkids[,1])))
+  ## Make dat
+  m0=matrix(NA,nrow=nrow(sampids),ncol=nrow(pkids),dimnames=list(unname(sampids[,"name"]),unname(pkids[,1])))
   lnames=c( "rt","rtmin", "rtmax","medianMz","mzmin","mzmax","peakArea" , "peakIntensity")
   lnames2=c( "RT","RT.min", "RT.max","MZ","MZ.min","MZ.max","Area" , "Height")
   allmat=lapply(lnames,function(x) m0)
   names(allmat)=lnames
-  lgrps=xmlChildren(data[["PeakGroups"]])
+  lgrps=xmlChildren(dat[["PeakGroups"]])
   
   for(k in 1:length(lgrps)){
     cat(".")

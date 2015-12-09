@@ -58,7 +58,7 @@ loadMavenData<-function(ifile,ofile=NULL,params=list()){
   for(k in 1:length(lgrps)){
     cat(".")
     igrp=xmlAttrs(lgrps[[k]])["groupId"]
-    mgrp=sapply(lgrps[[k]],xmlAttrs)
+    mgrp=xmlSApply(lgrps[[k]],xmlAttrs)
     for(i in rownames(mgrp)[rownames(mgrp)%in%lnames]) allmat[[i]][mgrp["sample",],igrp]=as.numeric(mgrp[i,])
   }
   names(allmat)=lnames2

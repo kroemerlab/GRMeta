@@ -1,4 +1,4 @@
-deleteEntries<-function(obj,...){
+deleteEntries<-function(obj,...,verbose=TRUE){
   
   if(!inherits(obj, "metaboSet")) stop("This is not a metaboSet object")
   
@@ -31,8 +31,14 @@ deleteEntries<-function(obj,...){
 
         if(!is.null(obj$Eic)) obj$Eic$Sample=obj$Eic$Sample[l2keep,]
 
-        if(any(!sidori%in%obj$Sid)) cat("Samples removed based on ",argname,":\n",sidori[!sidori%in%obj$Sid],"\n",sep=" ")
-        if(any(what%in%obj$Sid)) cat("Samples not excluded based on ",argname,":\n",what[what%in%obj$Sid],"\n",sep=" ")
+        if(any(!sidori%in%obj$Sid)){
+          if(verbose) cat("Samples removed based on ",argname,":\n",sidori[!sidori%in%obj$Sid],"\n",sep=" ")
+          if(!verbose) cat("Samples removed based on ",argname,":\n",length(sidori[!sidori%in%obj$Sid]),"\n",sep=" ")
+        }
+        if(any(what%in%obj$Sid)){
+          if(verbose) cat("Samples not excluded based on ",argname,":\n",what[what%in%obj$Sid],"\n",sep=" ")
+          if(!verbose) cat("Samples not excluded based on ",argname,":\n",length(what[what%in%obj$Sid]),"\n",sep=" ")
+        }
       }
     }
     
@@ -48,8 +54,14 @@ deleteEntries<-function(obj,...){
         
         if(!is.null(obj$Eic)) obj$Eic$File=obj$Eic$File[l2keep,]
         
-        if(any(!anaori%in%obj$Analyte)) cat("Analytes removed based on ",argname,":\n",anaori[!anaori%in%obj$Analyte],"\n",sep=" ")
-        if(any(what%in%obj$Analyte)) cat("Analytes not excluded based on ",argname,":\n",what[what%in%obj$Analyte],"\n",sep=" ")
+        if(any(!anaori%in%obj$Analyte)){
+          if(verbose) cat("Analytes removed based on ",argname,":\n",anaori[!anaori%in%obj$Analyte],"\n",sep=" ")
+          if(!verbose) cat("Analytes removed based on ",argname,":\n",length(anaori[!anaori%in%obj$Analyte]),"\n",sep=" ")
+        }
+        if(any(what%in%obj$Analyte)){
+          if(verbose) cat("Analytes not excluded based on ",argname,":\n",what[what%in%obj$Analyte],"\n",sep=" ")
+          if(!verbose) cat("Analytes not excluded based on ",argname,":\n",length(what[what%in%obj$Analyte]),"\n",sep=" ")
+        }
       }
     }
   }

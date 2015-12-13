@@ -45,7 +45,7 @@ exportSetXLSX<-function(obj,outfile,ldata=names(obj$Data),transpose=FALSE,nround
   if(length(ldata)>0){
     for(i in ldata){
       if(transpose) m=round(t(obj$Data[[i]]),nround)
-      if(!transpose) m=round(obj$Data[[i]]],nround)
+      if(!transpose) m=round(obj$Data[[i]],nround)
       m=apply(m,2,as.character)
       if(transpose) df=cbind("Analyte"=obj$Analyte,m)
       if(!transpose) df=cbind("Sid"=obj$Sid,m)

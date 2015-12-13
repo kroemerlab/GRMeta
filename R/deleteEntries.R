@@ -33,11 +33,11 @@ deleteEntries<-function(obj,...,verbose=TRUE){
 
         if(any(!sidori%in%obj$Sid)){
           if(verbose) cat("Samples removed based on ",argname,":\n",sidori[!sidori%in%obj$Sid],"\n",sep=" ")
-          if(!verbose) cat("Samples removed based on ",argname,":\n",length(sidori[!sidori%in%obj$Sid]),"\n",sep=" ")
+          if(!verbose) cat("Samples removed based on ",argname,": ",length(sidori[!sidori%in%obj$Sid]),"\n",sep=" ")
         }
         if(any(what%in%obj$Sid)){
           if(verbose) cat("Samples not excluded based on ",argname,":\n",what[what%in%obj$Sid],"\n",sep=" ")
-          if(!verbose) cat("Samples not excluded based on ",argname,":\n",length(what[what%in%obj$Sid]),"\n",sep=" ")
+          if(!verbose) cat("Samples not excluded based on ",argname,": ",length(what[what%in%obj$Sid]),"\n",sep=" ")
         }
       }
     }
@@ -56,11 +56,11 @@ deleteEntries<-function(obj,...,verbose=TRUE){
         
         if(any(!anaori%in%obj$Analyte)){
           if(verbose) cat("Analytes removed based on ",argname,":\n",anaori[!anaori%in%obj$Analyte],"\n",sep=" ")
-          if(!verbose) cat("Analytes removed based on ",argname,":\n",length(anaori[!anaori%in%obj$Analyte]),"\n",sep=" ")
+          if(!verbose) cat("Analytes removed based on ",argname,": ",length(anaori[!anaori%in%obj$Analyte]),"\n",sep=" ")
         }
         if(any(what%in%obj$Analyte)){
           if(verbose) cat("Analytes not excluded based on ",argname,":\n",what[what%in%obj$Analyte],"\n",sep=" ")
-          if(!verbose) cat("Analytes not excluded based on ",argname,":\n",length(what[what%in%obj$Analyte]),"\n",sep=" ")
+          if(!verbose) cat("Analytes not excluded based on ",argname,": ",length(what[what%in%obj$Analyte]),"\n",sep=" ")
         }
       }
     }

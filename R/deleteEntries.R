@@ -32,12 +32,12 @@ deleteEntries<-function(obj,...,verbose=TRUE){
         if(!is.null(obj$Eic)) obj$Eic$Sample=obj$Eic$Sample[l2keep,]
 
         if(any(!sidori%in%obj$Sid)){
-          if(verbose) cat("Samples removed based on ",argname,":\n",sidori[!sidori%in%obj$Sid],"\n",sep=" ")
-          if(!verbose) cat("Samples removed based on ",argname,": ",length(sidori[!sidori%in%obj$Sid]),"\n",sep=" ")
+          if(verbose) cat("Samples removed based on",argname,":\n",sidori[!sidori%in%obj$Sid],"\n",sep=" ")
+          if(!verbose) cat("Samples removed based on",argname,": ",length(sidori[!sidori%in%obj$Sid]),"\n",sep=" ")
         }
         if(any(what%in%obj$Sid)){
-          if(verbose) cat("Samples not excluded based on ",argname,":\n",what[what%in%obj$Sid],"\n",sep=" ")
-          if(!verbose) cat("Samples not excluded based on ",argname,": ",length(what[what%in%obj$Sid]),"\n",sep=" ")
+          if(verbose) cat("Samples not excluded based on",argname,":\n",what[what%in%obj$Sid],"\n",sep=" ")
+          if(!verbose) cat("Samples not excluded based on",argname,": ",length(what[what%in%obj$Sid]),"\n",sep=" ")
         }
       }
     }
@@ -50,7 +50,7 @@ deleteEntries<-function(obj,...,verbose=TRUE){
         obj$Annot=obj$Annot[l2keep,]
        # print(table(table(l2keep)))
         obj$Data=lapply(obj$Data,function(x) x[,l2keep,drop=F])
-        print("OKK")
+        #print("OKK")
         
         if(!is.null(obj$Eic)) obj$Eic$File=obj$Eic$File[l2keep,]
         

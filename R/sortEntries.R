@@ -51,7 +51,7 @@ sortEntries<-function(obj,...){
     obj$Annot=obj$Annot[lso,]
     obj$Data=lapply(obj$Data,function(x) x[,lso,drop=F])
     if(!is.null(obj$Eic)) obj$Eic$File=obj$Eic$File[lso,]
-    cat("Sorting analytes based on",colnames(ssort),"\n",sep=" ")
+    cat("Sorting analytes based on",colnames(asort),"\n",sep=" ")
   }
   
   invisible(obj)

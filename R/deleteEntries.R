@@ -3,7 +3,7 @@ deleteEntries<-function(obj,...,verbose=TRUE){
   if(!inherits(obj, "metaboSet")) stop("This is not a metaboSet object")
   
   dots <- list(...)
-#  print(dots)
+  print(dots)
   errMsg=paste("Use any of the following for \n","samples:",
                paste(c(names(obj$Meta),names(obj$File)),collapse=" "),"\n","analytes:",
                paste(names(obj$Annot),collapse=" "),"\n",sep="")
@@ -27,7 +27,7 @@ deleteEntries<-function(obj,...,verbose=TRUE){
         obj$Sid=obj$Sid[l2keep]
         obj$Meta=obj$Meta[l2keep,]
         obj$File=obj$File[l2keep,]
-        obj$Data=lapply(obj$Data,function(x) x[l2keep,,drop=F])
+         obj$Data=lapply(obj$Data,function(x) x[l2keep,,drop=F])
 
         if(!is.null(obj$Eic)) obj$Eic$Sample=obj$Eic$Sample[l2keep,]
 
@@ -48,7 +48,10 @@ deleteEntries<-function(obj,...,verbose=TRUE){
         anaori=obj$Analyte
         obj$Analyte=obj$Analyte[l2keep]
         obj$Annot=obj$Annot[l2keep,]
-       # print(table(table(l2keep)))
+#         print(table(table(l2keep)))
+        #         print(sapply(obj$Data,dim))
+               print(max(l2keep))
+        
         obj$Data=lapply(obj$Data,function(x) x[,l2keep,drop=F])
         #print("OKK")
         

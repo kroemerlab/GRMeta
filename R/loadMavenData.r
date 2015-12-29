@@ -4,7 +4,7 @@
 # 
 # ifile="./exampleQTOF.mzPeaks.mzroll"
 
-loadMavenData<-function(ifile,ofile=NULL,params=list()){
+loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,params=list()){
   
   
   require(XML)
@@ -69,7 +69,8 @@ loadMavenData<-function(ifile,ofile=NULL,params=list()){
   rtmed=round(apply(allmat$RT,2,median,na.rm=T),4)
   mzmed=round(apply(allmat$MZ,2,median,na.rm=T),5)
   nm=gsub("@NA$","",paste(unname(pkids[,"compoundName"]),"@",sprintf("%.2f",rtmed),"-",params$AssayName,sep=""))
-  annot=data.frame(Analyte=nm,MetName=unname(pkids[,"compoundName"]),IsSTD=FALSE,RT=rtmed,MZ=mzmed,LevelAnnot=1,stringsAsFactors = F)
+  if(!is.null(stdData)) annot=data.frame(Analyte=nm,MetName=unname(pkids[,"compoundName"]),IsSTD=FALSE,RT=rtmed,DRT=NA,MZ=mzmed,DPPM=NA,LevelAnnot=1,stringsAsFactors = F)
+  if(is.null(stdData)) annot=data.frame(Analyte=nm,MetName=unname(pkids[,"compoundName"]),IsSTD=FALSE,RT=rtmed,MZ=mzmed,LevelAnnot=1,stringsAsFactors = F)
   newnam=oldnam=unname(pkids[,"compoundName"])
   
   if(params$checkNams){
@@ -93,6 +94,16 @@ loadMavenData<-function(ifile,ofile=NULL,params=list()){
     rownames(annot)=annot$Analyte
   }
   annot$Method=params$AssayName
+  
+  if(!is.null(stdData)){
+    for(imet in annot$MetName[which(annot$MetName%in%stdData$GName)]){
+      tmp=stdData[which(stdData$GName==imet),]
+      l=which(annot$MetName==imet)
+      annot$DRT[l]=round(annot$RT[l]-median(tmp$RT),3)
+      annot$DPPM[l]=round(10^6*(annot$MZ[l]-median(tmp$IP))/annot$MZ[l],2)
+    }
+  }
+  
   if(params$ordering){
     lso=order(metainfos$sType,fileinfos$Date)
     metainfos=metainfos[lso,]

@@ -19,13 +19,14 @@ David Enot \email{david.enot@gustaveroussy.fr}
   \code{\link{paramsParsing}}
 }
 \examples{
-#testfiles=list.files(system.file( package = "GRMeta"),pattern = "txt$",full.names = TRUE)
-#
-#mydata=loadMavenData(ifile =testfiles[1])
-#print(mydata)
-#
-#mydata=loadMavenData(ifile =testfiles[1],params = list(AssayName="lc"))
-#print(mydata)
+testfile=list.files(system.file( package = "GRMeta"),pattern = "roll$",full.names = TRUE)
+
+mydata=loadMavenData(ifile =testfile,params = list(AssayName="rp"))
+print(mydata)
+
+std=stdDB[stdDB$Method=="rppos",]
+mydata=loadMavenData(ifile =testfile,stdData=std,params = list(AssayName="rp"))
+print(mydata$Annot[1:10,1:7])
 
 }
 

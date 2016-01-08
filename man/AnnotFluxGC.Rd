@@ -4,12 +4,10 @@
 \name{AnnotFluxGC}
 \docType{data}
 \alias{AnnotFluxGC}
-\alias{AnnotFluxGC2}
 
 \title{Annotation data for GC fluxomics}
 \usage{
 data(AnnotFluxGC)
-data(AnnotFluxGC2)
 }
 
 \description{
@@ -19,10 +17,11 @@ data(AnnotFluxGC2)
 \value{
 Data frame:
  \item{GName}{Given name}
- \item{MF}{Molecular formula of derivatised molecule}
- \item{Mass}{Exact monoisotopic mass of derivatised molecule}
- \item{FragType}{Type of fragment on Q1}
- \item{Q1th}{Method Q1}
+ \item{MF}{Molecular formula of the precursor molecule}
+ \item{Mass}{Exact monoisotopic mass of the precursor molecule}
+ \item{Deriv}{Derivation procedure}
+ \item{FragType}{Type of precursor molecule from the original derivatised molecule}
+ \item{Q1th}{Expected Q1 from the method}
  \item{MFori}{Molecular formula of the original molecule}
  \item{Class}{Chemical class}
  \item{HMDB}{HMDB ids}

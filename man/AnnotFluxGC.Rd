@@ -4,10 +4,12 @@
 \name{AnnotFluxGC}
 \docType{data}
 \alias{AnnotFluxGC}
+\alias{AnnotFluxGC2}
 
 \title{Annotation data for GC fluxomics}
 \usage{
 data(AnnotFluxGC)
+data(AnnotFluxGC2)
 }
 
 \description{

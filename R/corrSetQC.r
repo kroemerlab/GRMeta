@@ -1,13 +1,12 @@
-.cvf <- function(x, n = 0) ifelse(sum(!is.na(x)) >= n, 100 * 
-                                   sd(x, na.rm = T)/mean(x, na.rm = T), NA)
-.cvrf <- function(x, n = 0) ifelse(sum(!is.na(x)) >= n, 100 * 
-                                    mad(x, na.rm = T)/median(x, na.rm = T), NA)
 
 corrSetQC<-function(obj,what,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[which(obj$Meta$sType=="QC")],
                     nminQC=3,propNNA=0.5,lPcs=1:2,outfile=NULL,doplot=TRUE,Date2use="Date",complete="nothing",ipc=1,imod=4,verb=FALSE){
   
   if(!Date2use%in%names(obj$File)) stop("Date does not exist")
-  Samp2Corr=Samp2Corr[!is.na(obj$File[Samp2Corr,Date2use])]
+  if(any(is.na(obj$File[Samp2Corr,Date2use]))) warning("Date unknown for several samples!")
+
+    Samp2Corr=Samp2Corr[!is.na(obj$File[Samp2Corr,Date2use])]
+  
   m=obj$Data[[what]][Samp2Corr,Var2Corr]
   dts=obj$File[Samp2Corr,Date2use]
   dtsn=as.numeric(dts)#-mean(as.numeric(dts),na.rm=T)
@@ -15,6 +14,8 @@ corrSetQC<-function(obj,what,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[
   
   
   clqc=lQC[lQC%in%Samp2Corr]
+  if(length(clqc)<nminQC) stop("Not enough QC with data available")
+    
   clqc=clqc[order(dts[clqc])]
   curmat=names(which(colSums(!is.na(m[clqc,]))>=nminQC))
   clqc=clqc[(rowSums(!is.na(m[clqc,curmat]))/length(curmat))>propNNA]

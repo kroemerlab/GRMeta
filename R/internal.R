@@ -1,9 +1,9 @@
 .onAttach <- 
   function(libname, pkgname) {
-    packageStartupMessage(" ****************************************************************************")
-    packageStartupMessage(" GRMeta: processing chemical data by David Enot <david.enot@gustaveroussy.fr>")
-    packageStartupMessage(" Last Source code available at https://github.com/tonedivad/GRMeta")
-    packageStartupMessage(" ****************************************************************************")
+    packageStartupMessage(" **********************************************************************")
+    packageStartupMessage(" GRMeta: chemical data processing at Gustave Roussy - David Enot - 2016")
+    packageStartupMessage(" Latest source code available at https://github.com/tonedivad/GRMeta")
+    packageStartupMessage(" **********************************************************************")
   }
 
 .cvf <- function(x, n = 0) ifelse(sum(!is.na(x)) >= n, 100 * 

@@ -11,13 +11,24 @@ mergeSet<-function(...){
   re=re[tokeep]
   names(re)=nams[tokeep]
   if(length(re)==1) return(invisible(re[[1]]))
-  
-  lmethods=sapply(re,function(x) x$Method)
+  lmethods0=lmethods=sapply(re,function(x) unique(x$Method))
+ # print(lmethods)
+  if(is.list(lmethods)){
+    if(any(table(unlist(lmethods))>1))  stop("Oups, merging of these objects not yet implemented!")
+    lmethods=sapply(lmethods,function(x) paste(sort(x),collapse=";"))
+    cat("Rebranding: ")
+      for(i in names(which(sapply(lmethods0,length)!=1))){
+        cat(i,"->",lmethods[i]," ",sep="")
+        re[[i]]$Method=lmethods[i]
+      }
+    cat("\n")
+ #   print(lmethods)
+  }
   while(any(table(lmethods)>1)){
     i=names(which(table(lmethods)>1))[1]
     lred=names(which(lmethods==i))
     j=paste(lred,collapse = "")
-          print(lred)
+ #         print(lred)
     re[[lred[1]]]=.mergeDataBatch(re[lred])
     re=re[which(!names(re)%in%lred[-1])]
     lmethods=sapply(re,function(x) x$Method)
@@ -25,7 +36,13 @@ mergeSet<-function(...){
   #  print(str(re))
   if(length(re)==1) return(invisible(re[[1]]))
   lred=names(re)
+ # print(lred)
   res=.mergeDataMethods(re[lred])
+  if(is.list(lmethods0)){
+    l2rem=res$Method[grep(";",res$Method)]
+    for(i in l2rem) names(res$File)=gsub(paste("\\.",i,"$",sep=""),"",names(res$File))
+    res$Method=unlist(strsplit(res$Method,";"))
+   }
   return(invisible(res))  
 }
 ######################################################
@@ -78,7 +95,7 @@ mergeSet<-function(...){
   lmethods=unique(sapply(re,function(x) x$Method))
   if(length(lmethods)>1) stop("Applicable to datasets from the same method\n")
   
-  cat("Creating batches:")
+  cat("-- Creating batches:")
   lbatch=c()
   for(i in names(re)){
     if(!is.null(re[[i]]$File$Batch)){
@@ -94,7 +111,7 @@ mergeSet<-function(...){
   }
   cat(lbatch,"\n")
   
-  cat("Updating sample ids\n")
+  cat("-- Updating sample ids\n")
   lusamp=unlist(lapply(re,function(x) x$Sid))
   lsamp2change=names(which(table(lusamp)>1))
   for(i in names(re)){
@@ -105,7 +122,7 @@ mergeSet<-function(...){
     }
   }
   
-  cat("Merging sample ids\n")
+  cat("-- Merging sample ids\n")
   metainfos=.joinDF(lapply(re,function(x) x$Meta),c("Sid","sType","InjOrder"))
   fileinfos=.joinDF(lapply(re,function(x) x$File),c( "File" ,"Date",  "Name",  "Sid", "Batch"))
   metainfos$InjOrder=order(order(fileinfos$Date,factor(fileinfos$Batch,levels=lbatch),metainfos$InjOrder))
@@ -130,7 +147,7 @@ mergeSet<-function(...){
   names(addAnnot)=paste("Analyte.",names(re),sep="")
   annot=cbind(annot,addAnnot)
   
-  cat("Merge analytes\n")
+  cat("-- Merge analytes\n")
   for(i in 1:length(re)) re[[i]]$Data=lapply(re[[i]]$Data,function(x) x[,matexVar[,i]])
   lumeas=unique(unlist(lapply(re,function(x) names(x$Data))))
   allmat=list()
@@ -166,17 +183,22 @@ mergeSet<-function(...){
   
   cat("************************************\nMerging:", names(re),"\n************************************\n")
   lmethods=sapply(re,function(x) x$Method)
-  if(max(table(lmethods))>1) stop("Applicable to datasets from different methods\n")
+  if(max(table(lmethods))>1) stop("Only applicable to datasets from different methods\n")
+#  if(is.list(lmethods))
   names(re)=lmethods
   
-  cat("Checking samples\n")
+  cat("-- Checking samples")
   lusamp=unique(unlist(lapply(re,function(x) x$Sid)))
   matexSa=sapply(re,function(x) match(lusamp,x$Sid))
   ##
   lnmatch=lapply(colnames(matexSa),function(x) lusamp[which(is.na(matexSa[,x]))])
   names(lnmatch)=colnames(matexSa)
-  if(any(is.na(matexSa))){cat("Missing samples in :\n");print(lnmatch[!sapply(lnmatch,is.null)])}
-  if(all(rowSums(is.na(matexSa))==0)) cat(sum(rowSums(is.na(matexSa))==0)," samples found everywhere\n")
+  if(any(is.na(matexSa))){
+     cat(", but some are missing in :\n")
+    lnmatch=lnmatch[sapply(lnmatch,length)>0]
+    for(i in names(lnmatch)) cat("  * ",i,": ",paste(lnmatch[[i]],collapse=" "),"\n",sep="")
+    }
+  if(all(rowSums(is.na(matexSa))==0)) cat(" and ", sum(rowSums(is.na(matexSa))==0)," found everywhere\n")
   ##
   meta=.joinDF2(lapply(re,function(x) x$Meta),c("Sid","sType"),matexSa)
   fileinfos=data.frame(Sid=lusamp,stringsAsFactors = FALSE)
@@ -200,14 +222,15 @@ mergeSet<-function(...){
   matexSa=sapply(re,function(x) match(lusamp,x$Sid))
   
   ##############
-  cat("Check analytes:\n")
+  cat("-- Check analytes: ")
   lumet=unlist(lapply(re,function(x) x$Analyte))
   lann=lapply(re,function(x) x$Annot)#[,grep("^[A-Za-z]+$",names(x$Annot))])
   l2use=unique(unlist(lapply(lann,names)))
   l2usen=names(which(!sapply(lann,function(x) all(l2use%in%names(x)))))
+  cat(paste(l2use,collapse=" "),"\n")
   for(i in l2usen){
     l2add=l2use[!l2use%in%names(lann[[i]])]
-    cat(" * adding",l2add,"to annotation of",i,"\n",sep=" ")
+    cat("  * add to ",i,": ",paste(l2add,collapse=" "),"\n",sep="")
     lann[[i]]=cbind(lann[[i]],data.frame(matrix(NA,nrow=nrow(lann[[i]]),ncol=length(l2add),dimnames=list(rownames(lann[[i]]),l2add))))
   }
   annot=do.call("rbind",lann)
@@ -215,15 +238,16 @@ mergeSet<-function(...){
   matexVar=sapply(re,function(x) match(lumet,x$Analyte))
   
   ##############
-  cat("Merge data: ")
+  cat("-- Merge data: ")
   #for(i in names(re)) re[[i]]$Data=lapply(re[[i]]$Data,function(x) x[,matexVar[,i]])
   lumeas=unique(unlist(lapply(re,function(x) names(x$Data))))
+  lnotfound=vector("list",length(re));names(lnotfound)=names(re)
   allmat=list()
   for(i in lumeas){
     cat(i," ",sep="")
     allmat[[i]]=matrix(NA,nrow=length(lusamp),ncol=length(lumet),dimnames=list(lusamp,lumet))
     for(j in names(re)){
-      if(is.null(re[[j]]$Data[[i]]))  cat("\n * not found in ",j,"\n",sep="")
+      if(is.null(re[[j]]$Data[[i]])) lnotfound[[j]]=c(lnotfound[[j]],i) # cat("\n * not found in ",j,"\n",sep="")
       if(!is.null(re[[j]]$Data[[i]])){
         # cat("    add ",i," from ",j,"\n",sep="")
         lrow=which(!is.na(matexSa[,j]))
@@ -233,6 +257,8 @@ mergeSet<-function(...){
     }
   }
   cat("\n")
+  lnotfound=lnotfound[sapply(lnotfound,length)!=0]
+  if(length(lnotfound)>0) for(i in names(lnotfound)) cat("  * not found in ",i,": ",paste(lnotfound[[i]],collapse=" "),"\n",sep="")
   
   allmat=lapply(allmat,function(x){dimnames(x)=list(meta$Sid,annot$Analyte);x})
   

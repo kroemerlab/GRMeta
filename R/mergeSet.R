@@ -91,7 +91,8 @@ mergeSet<-function(...){
 #   names(re)=nams[tokeep]
   if(length(re)==1) return(re)
   
-  cat("************************************\nMerging:", names(re),"\n************************************\n")
+  cat("***********************************\nMerging:", names(re),"\n***********************************\n")
+  cat("*********************Warning: merging done based on MetName for the moment**********************\n")
   lmethods=unique(sapply(re,function(x) x$Method))
   if(length(lmethods)>1) stop("Applicable to datasets from the same method\n")
   

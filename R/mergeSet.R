@@ -202,7 +202,6 @@ mergeSet<-function(...){
   if(all(rowSums(is.na(matexSa))==0)) cat(" and ", sum(rowSums(is.na(matexSa))==0)," found everywhere\n")
   ##
   meta=.joinDF2(lapply(re,function(x) x$Meta),c("Sid","sType"),matexSa)
-  print(meta[1:3,])
   fileinfos=data.frame(Sid=lusamp,stringsAsFactors = FALSE)
   rownames(fileinfos)=rownames(meta)=lusamp
   for(i in names(re)){

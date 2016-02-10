@@ -10,7 +10,7 @@ compSetRatios(obj, l2add = names(obj$Data), lpairs = RatiosGR, conv2set = FALSE)
 \arguments{
   \item{obj}{metaboSet object}
   \item{l2add}{List of matrices in obj for which the ratios are computed}
-  \item{lpairs}{List of pairs, only \code{\link{RatiosGR}} supported}
+  \item{lpairs}{List of pairs: if it loads \code{\link{RatiosGR}} supported}
   \item{conv2set}{Should the resulting calculation converted to metaboSet object}
 }
 \author{

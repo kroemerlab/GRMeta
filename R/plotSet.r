@@ -1,6 +1,7 @@
 plot.metaboSet<-function(obj,outfile=NULL,
                          lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1",log="y"),c("Height~Area",log="xy")),
-                         mfrow=c(2,2),colorCol=NULL,deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,cexBX=.8,cexEL=0.4,cexPT=1.5,...){
+                         mfrow=c(2,2),colorCol=NULL,deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,cexBX=.8,
+                         cexEL=0.4,cexPT=1.5,...){
 
   mgraphs=t(sapply(lgraphs,function(x) strsplit(x[1],"~")[[1]][1:2]))
   mgraphs[grep("^[0-9]$",mgraphs[,2]),2]=NA
@@ -247,6 +248,7 @@ for(iplot in 1:length(lgraphs)){
       }
     }
     cat("Found",ifeic)
+    dfeic<-eicpk<-NULL
     load(ifeic)
     cat(".\n")
     
@@ -266,6 +268,7 @@ for(iplot in 1:length(lgraphs)){
     rownames(ipkmat)=obj$Eic$Sample$Sid[match(rownames(ipkmat),obj$Eic$Sample$Samp)]
     Mint=obj$Eic$File[analyte,]$Mint
     .plotEIC(ceic,ipkmat,whichrt,llsids,Mint=Mint,rtr=rtr,cexEL=cexEL)
+    rm(list=c('dfeic','eicpk'))
   } ### end of Eic
   
 }

@@ -49,6 +49,7 @@ l2plots=obj$Eic$File$Analyte[obj$Eic$File$EicFile==ifeic]
 l2plots=l2plots[l2plots%in%lanalytes]
 if(!is.null(obj$Eic$Path)) ifeic=paste(obj$Eic$Path,ifeic,sep="")
 cat("Found",ifeic)
+dfeic<-eicpk<-NULL
 load(ifeic)
 cat(": ")
 
@@ -87,6 +88,8 @@ dev.off()
 
 }
 cat("\n")
+rm(list=c('dfeic','eicpk'))
+
 } ## end of for ifeic
   on.exit(par(par.def))
 }

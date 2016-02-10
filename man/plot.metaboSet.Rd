@@ -4,8 +4,9 @@
 \description{Plot analytes matrices}
 \usage{
 \method{plot}{metaboSet}(obj,outfile=NULL,
- lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1",log="y"),c("Height~Area",log="xy")),
-                         mfrow=c(2,2),deltaRT=0.05,linking="QC",orderBPlots=c("sType","Injorder"),cexBP=0.5,cexBX=0.8,cexEL=0.4,cexPT=1.5,...)
+                         lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1",log="y"),c("Height~Area",log="xy")),
+                         mfrow=c(2,2),colorCol=NULL,deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),
+                         cexBP=0.5,cexBX=.8,cexEL=0.4,cexPT=1.5,...)
 }
 \arguments{
   \item{obj}{Experiment obj}
@@ -20,7 +21,7 @@
   \item{cexBX}{cex.axis value for labelling x-axis of the BoXplots}
   \item{cexEL}{cex for the Eic Legend}
   \item{cexPT}{cex for the PoinTs}
-  \item{\dots}{Arguments 1) used to match analytes and 2) passed to \code{\link{par}} and \code{\link{pdf}}, excepted mfrow -}
+  \item{\dots}{Arguments 1) used to match analytes and 2) passed to \code{\link{par}} and \code{\link{pdf}}, excepted mfrow}
 }
 \note{ For graphing, any parameter that is equal to RT or starting by RT. will be considered as a retention time
 }
@@ -61,6 +62,6 @@ plot(mydata,Analyte=mydata$Analyte[2],
 plot(mydata,outfile="DumpAll.pdf",cex.main=1,height=8,cexBP = 0.4)
 }
 
-
 }
-\keyword{misc}
+
+\keyword{hplot}

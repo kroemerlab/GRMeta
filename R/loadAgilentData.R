@@ -135,17 +135,6 @@ loadAgilentData<-function(ifile,ofile=NULL,params=list()){
 }
 
 
-######
-
-paramsParsing<-function(AssayName="myassay",FileCol="Data File",TimeCol="Acq. Date-Time",ordering=TRUE,
-                        regTypes="^([blBLQCcSTDstda]+)_.*",NameClean=c("_GCMRM","_MRM","_DBAA"),
-                        checkNams=TRUE,Batch=NULL,nozeroscheck=NULL,AnnotDB=AnnotationDB){
-  
-  list(AssayName="myassay",FileCol="Data File",TimeCol="Acq. Date-Time",ordering=TRUE,
-       regTypes="^([blBLQCcSTDstda]+)_.*",NameClean=c("_GCMRM","_MRM","_DBAA"),
-       checkNams=TRUE,Batch=NULL,nozeroscheck=NULL,AnnotDB=AnnotationDB)
-}
-
 
 
 
@@ -267,18 +256,6 @@ paramsParsing<-function(AssayName="myassay",FileCol="Data File",TimeCol="Acq. Da
   class(allmat)=append(class(allmat),"metaboSet")
   if(!is.null(ofile)) save(file=ofile,allmat)
   invisible(allmat)
-}
-
-
-######
-
-paramsParsing<-function(AssayName="myassay",FileCol="Data File",TimeCol="Acq. Date-Time",ordering=TRUE,
-                        regTypes="^([blBLQCcSTDstda]+)_.*",NameClean=c("_GCMRM","_MRM","_DBAA"),
-                        checkNams=TRUE,Batch=NULL,nozeroscheck=NULL,AnnotDB=AnnotationDB){
-  
-  list(AssayName="myassay",FileCol="Data File",TimeCol="Acq. Date-Time",ordering=TRUE,
-       regTypes="^([blBLQCcSTDstda]+)_.*",NameClean=c("_GCMRM","_MRM","_DBAA"),
-       checkNams=TRUE,Batch=NULL,nozeroscheck=NULL,AnnotDB=AnnotationDB)
 }
 
 

@@ -1,4 +1,4 @@
-export(cleanMetaboNames,compSetSBR,compSetStats,compSetRatios,corrSetQC,
+export(cleanMetaboNames,compSetSBR,compSetStats,compSetRatios,corrSetQC,paramsParsing,
 loadAgilentData,loadMavenData,loadAgilentDataFlux,mapSetKegg,mergeSet,deleteEntries,sortEntries, exportSetXLSX,plotSetMEic)
 
 ### register S3 methods
@@ -6,4 +6,17 @@ S3method(plot, metaboSet)
 S3method(print, metaboSet)
 S3method(summary, metaboSet)
 S3method(update, metaboSet)
+
+## imported functions
+
+import(graphics)
+import(stats)
+import(chron)
+import(car)
+import(RColorBrewer)
+import(XML)
+import(beeswarm)
+import(impute)
+import(mgcv)
+import(xlsx)
 

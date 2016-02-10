@@ -1,13 +1,7 @@
-# 
-# library(XML)
-# library(GRMeta)
-# 
-# ifile="./exampleQTOF.mzPeaks.mzroll"
 
 loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,params=list()){
   
   
-  require(XML)
   paramsvals <-paramsParsing()
   if (!missing(params)) paramsvals[names(params)] <- params
   params=paramsvals

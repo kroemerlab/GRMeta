@@ -1,10 +1,11 @@
 
 exportSetXLSX<-function(obj,outfile,ldata=names(obj$Data),transpose=FALSE,nround=3,characterNA=c("-","NA")){
   
-  jgc <- function(){
-    .jcall("java/lang/System", method = "gc")
-  }   
-  
+#   .jgc <- function(){
+#     ## not sure if this is that utile: http://stackoverflow.com/questions/21937640
+#     .jcall("java/lang/System", method = "gc")
+#   }   
+#   
   if(!inherits(obj, "metaboSet")) stop("This is not a metaboSet object")
   
   ldata=ldata[which(ldata%in%names(obj$Data))]
@@ -25,19 +26,19 @@ exportSetXLSX<-function(obj,outfile,ldata=names(obj$Data),transpose=FALSE,nround
   wb <- createWorkbook()  
   cat("Exporting to ",outfile," :\n",sep="")
   toadd=indf(obj$Meta[,which(names(obj$Meta)!="Sid")],nround,characterNA[1],"Sid")
-  jgc()
+#  .jgc()
   cat("SampleInfos ")
   sheet <- createSheet(wb, sheetName = "SampleInfos")
   addDataFrame(toadd,sheet, col.names=FALSE, row.names=FALSE)
   
   toadd=indf(obj$File[,which(names(obj$File)!="Sid")],nround,characterNA[1],"Sid")
-  jgc()
+# .jgc()
   cat("FileInfos ")
   sheet <- createSheet(wb, sheetName = "FileInfos")
   addDataFrame(toadd,sheet, col.names=FALSE, row.names=FALSE)
   
   toadd=indf(obj$Annot[,which(names(obj$Annot)!="Analyte")],nround,characterNA[1],"Analyte")
-  jgc()
+#  .jgc()
   cat("VarInfos ")
   sheet <- createSheet(wb, sheetName = "VarInfos")
   addDataFrame(toadd, sheet, col.names=FALSE, row.names=FALSE)
@@ -53,7 +54,7 @@ exportSetXLSX<-function(obj,outfile,ldata=names(obj$Data),transpose=FALSE,nround
       df[is.na(df)]=characterNA[2]
       
       cat(i," ",sep="")
-      jgc()
+#      .jgc()
       sheet <- createSheet(wb, sheetName = i)
       addDataFrame(df,sheet, col.names=FALSE, row.names=FALSE)
       

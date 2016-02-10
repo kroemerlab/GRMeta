@@ -22,7 +22,7 @@ Data frame:
  \item{Mass}{Exact monoisotopic mass}
  \item{HMDB}{HMDB}
  \item{KEGG}{KEGG}
- \item{PC}{PC}"  
+ \item{PC}{PC}
 }
 
 

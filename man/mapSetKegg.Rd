@@ -3,11 +3,12 @@
 \title{Create KEGG map from object}
 \description{Create KEGG map from object}
 \usage{
-mapSetKegg(obj, cols = NULL, sizes = 4,mixcol="grey70", ftsize = 16, conv2pdf = FALSE)
+mapSetKegg(obj,outfile=NULL, cols=NULL,sizes=4,mixcol="grey70",ftsize=16,conv2pdf=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{obj}{metaboSet object}
+  \item{outfile}{File to save}
   \item{cols}{Colors used for each method in the object}
   \item{sizes}{Relative size for each node}
   \item{mixcol}{If null, mixing colors is done for entries in several methods}

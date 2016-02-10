@@ -1,6 +1,13 @@
 
 compSetRatios<-function(obj,l2add=names(obj$Data),lpairs=RatiosGR,conv2set=FALSE){
   
+#   if(is.null(lpairs)){
+#     RatiosGR<-NULL
+#     data("RatiosGR")
+#     lpairs=RatiosGR
+#     rm("RatiosGR")
+#   }
+  
   lnna=which(!is.na(obj$Annot$MetName))
   cmet=do.call("rbind",lapply(lnna,function(ix) data.frame(Id=obj$Annot$Analyte[ix],Typ=1,Ds=obj$Annot$Method[ix],lvA=obj$Annot$LevelAnnot[ix],
                                                            PutNam=strsplit(obj$Annot$MetName[ix],"[;/]")[[1]],stringsAsFactors=FALSE)))

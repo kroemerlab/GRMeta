@@ -1,7 +1,7 @@
 
 loadAgilentDataFlux<-function(ifile,ofile=NULL,params=list()){
 
-  paramsvals <- GRMeta:::paramsParsing()
+  paramsvals <- paramsParsing()
   if (!missing(params)) paramsvals[names(params)] <- params
   params=paramsvals
   
@@ -105,7 +105,7 @@ loadAgilentDataFlux<-function(ifile,ofile=NULL,params=list()){
   lnotfound=unique(vnam0[!vnam0%in%NewDB$GName])
   if(length(lnotfound)>0) cat("Not found in annotation database:\n",lnotfound,"\n",sep=" ")
   l2add=names(NewDB)[names(NewDB)!="GName"]
-      toadd=data.frame(sapply(l2add,function(i) sapply(annot$MetName,GRMeta:::.InDBMatchfct,i,NewDB)),stringsAsFactors = F)
+      toadd=data.frame(sapply(l2add,function(i) sapply(annot$MetName,.InDBMatchfct,i,NewDB)),stringsAsFactors = F)
       for(i in names(which(sapply(l2add,function(i) is.numeric(NewDB[,i]))))) toadd[,i]=as.numeric(toadd[,i])
       for(i in names(which(sapply(l2add,function(i) is.character(NewDB[,i]))))) toadd[,i]=as.character(toadd[,i])
       annot=cbind(annot,toadd)

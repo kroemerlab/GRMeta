@@ -3,7 +3,8 @@
 \title{Compute QC adjusted matrices}
 \description{Compute QC adjusted matrices}
 \usage{
-corrSetQC(obj,what, Samp2Corr = obj$Sid, Var2Corr = obj$Analyte, lQC = obj$Sid[which(obj$Meta$sType == "QC")], nminQC = 3, propNNA = 0.5, lPcs = 1:2, outfile = NULL, doplot = TRUE, complete = "nothing", ipc = 1, imod = 4)
+corrSetQC(obj,what,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[which(obj$Meta$sType=="QC")],
+                    nminQC=3,propNNA=0.5,lPcs=1:2,outfile=NULL,doplot=TRUE,Date2use="Date",complete="nothing",ipc=1,imod=4,verbose=FALSE)
 }
 \arguments{
   \item{obj}{metaboSet object}
@@ -16,19 +17,23 @@ corrSetQC(obj,what, Samp2Corr = obj$Sid, Var2Corr = obj$Analyte, lQC = obj$Sid[w
   \item{lPcs}{Vector of PCs to be investigated. Default: 1:2}
   \item{outfile}{Optional PDF file to dum p the plots}
   \item{doplot}{Do plots?}
+  \item{Date2use}{Column name in obj$File to be used in the calculation}
   \item{complete}{If any Sid not in Samp2Corr or Analyte in Var2Corr excluded or missing. 
   nothing:  former data are used in place of the new data, NA: new data replaced by NA, remove: corresponding rows/columns are excluded}
   \item{ipc}{PC used for adjusting}
   \item{imod}{Model  used for adjusting: 1, linear 2, quadratic 3, order 3 4, spline}
+  \item{verbose}{Expanded output}
+  
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+This is still a little bit too experimental
 }
 \value{Matrix if ipc and imod specified or the prcomp object}
 \author{
 David Enot \email{david.enot@gustaveroussy.fr}
 }
 \examples{
-## TO DO
+## TO DO !!!
 }
-\keyword{misc}
+
+\keyword{manip}

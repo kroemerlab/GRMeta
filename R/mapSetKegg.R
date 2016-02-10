@@ -7,6 +7,7 @@ mapSetKegg<-function(obj,outfile=NULL, cols=NULL,sizes=4,mixcol="grey70",ftsize=
   if(is.null(names(cols))) names(cols)=(obj$Method)
   if(is.null(names(sizes))) names(sizes)=(obj$Method)
   
+  keggids<-keggsvg<-NULL
   svgfile=list.files(system.file(package = "GRMeta"),pattern = "SVGstuff.rda$",full.names = TRUE)
   load(svgfile)
   
@@ -81,6 +82,7 @@ mapSetKegg<-function(obj,outfile=NULL, cols=NULL,sizes=4,mixcol="grey70",ftsize=
     if(conv2pdf) system(paste("inkscape -A ",gsub(".[sS][vV][gG]$",".pdf$",outfile)," ",outfile))
     
   }
+  rm('keggids')
   invisible(csvg2)
   
 }

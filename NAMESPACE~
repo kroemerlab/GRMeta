@@ -1,9 +1,0 @@
-export(cleanMetaboNames,compSetSBR,compSetStats,compSetRatios,corrSetQC,
-loadAgilentData,loadMAVENData,loadAgilentDataFlux,mapSetKegg,mergeSet,deleteEntries,sortEntries, exportSetXLSX,plotSetMEic)
-
-### register S3 methods
-S3method(plot, metaboSet)
-S3method(print, metaboSet)
-S3method(summary, metaboSet)
-S3method(update, metaboSet)
-

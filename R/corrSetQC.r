@@ -1,6 +1,6 @@
 
 corrSetQC<-function(obj,what,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[which(obj$Meta$sType=="QC")],
-                    nminQC=3,propNNA=0.5,lPcs=1:2,outfile=NULL,doplot=TRUE,Date2use="Date",complete="nothing",ipc=1,imod=4,verb=FALSE){
+                    nminQC=3,propNNA=0.5,lPcs=1:2,outfile=NULL,doplot=TRUE,Date2use="Date",complete="nothing",ipc=1,imod=4,verbose=FALSE){
   
   if(!Date2use%in%names(obj$File)) stop("Date does not exist")
   if(any(is.na(obj$File[Samp2Corr,Date2use]))) warning("Date unknown for several samples!")
@@ -96,18 +96,18 @@ corrSetQC<-function(obj,what,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[
       lv=which((!colnames(ml2)%in%Var2Corr))
     if(complete=="NA"){
       cat("Adding NAs for:\n")
-      if(any((!rownames(ml2)%in%Samp2Corr))){ml2[lsa,]=NA;if(verb) cat(" *Sid:",rownames(ml2)[lsa],"\n")}
-      if(any(!colnames(ml2)%in%Var2Corr)){ml2[lv,]=NA;if(verb) cat(" *Analytes:",colnames(ml2)[lv],"\n")}
+      if(any((!rownames(ml2)%in%Samp2Corr))){ml2[lsa,]=NA;if(verbose) cat(" *Sid:",rownames(ml2)[lsa],"\n")}
+      if(any(!colnames(ml2)%in%Var2Corr)){ml2[lv,]=NA;if(verbose) cat(" *Analytes:",colnames(ml2)[lv],"\n")}
     }
     if(complete=="remove"){
       cat("Removing:\n")
-      if(any((!rownames(ml2)%in%Samp2Corr))){if(verb) cat(" *Sid:",rownames(ml2)[lsa],"\n");ml2=ml2[-lsa,,drop=F];}
-      if(any(!colnames(ml2)%in%Var2Corr)){if(verb) cat(" *Analytes:",colnames(ml2)[lv],"\n");ml2=ml2[,-lv,drop=F]}
+      if(any((!rownames(ml2)%in%Samp2Corr))){if(verbose) cat(" *Sid:",rownames(ml2)[lsa],"\n");ml2=ml2[-lsa,,drop=F];}
+      if(any(!colnames(ml2)%in%Var2Corr)){if(verbose) cat(" *Analytes:",colnames(ml2)[lv],"\n");ml2=ml2[,-lv,drop=F]}
     }
     if(complete=="nothing"){
         cat("Former data used for:\n")
-        if(any((!rownames(ml2)%in%Samp2Corr))){if(verb) cat(" *Sid:",rownames(ml2)[lsa],"\n")}
-        if(any(!colnames(ml2)%in%Var2Corr)){if(verb) cat(" *Analytes:",colnames(ml2)[lv],"\n")}
+        if(any((!rownames(ml2)%in%Samp2Corr))){if(verbose) cat(" *Sid:",rownames(ml2)[lsa],"\n")}
+        if(any(!colnames(ml2)%in%Var2Corr)){if(verbose) cat(" *Analytes:",colnames(ml2)[lv],"\n")}
     }
     }
     invisible(ml2)

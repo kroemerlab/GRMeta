@@ -4,11 +4,12 @@
 \title{Remove entries from a metaboSet object}
 \description{Remove entries from a metaboSet object}
 \usage{
-deleteEntries(obj, ...)
+deleteEntries(obj, ...,verbose=TRUE)
 }
 \arguments{
   \item{obj}{metaboSet}
   \item{\dots}{see example}
+  \item{verbose}{Show deleted entries?}
 }
 \value{New metaboSet}
 \author{

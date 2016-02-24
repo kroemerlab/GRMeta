@@ -21,11 +21,15 @@ David Enot \email{david.enot@gustaveroussy.fr}
 \examples{
 testfile=list.files(system.file( package = "GRMeta"),pattern = "roll$",full.names = TRUE)
 
-mydata=loadMavenData(ifile =testfile,params = list(AssayName="rp"))
+mydata=loadMavenData(ifile =testfile[2],params = list(AssayName="prof"))
+print(mydata)
+
+
+mydata=loadMavenData(ifile =testfile[1],params = list(AssayName="annot"))
 print(mydata)
 
 std=stdDB[stdDB$Method=="rppos",]
-mydata=loadMavenData(ifile =testfile,stdData=std,params = list(AssayName="rp"))
+mydata=loadMavenData(ifile =testfile[1],stdData=std,params = list(AssayName="annot"))
 print(mydata$Annot[1:10,1:7])
 
 }

@@ -70,7 +70,7 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,params=list()){
   ##############
   # do annot here
   if("compoundName"%in%colnames(pkids)) {
-  nm=gsub("@NA$","",paste(unname(pkids[,"compoundName"]),"@",sprintf("%.2f",rtmed),"-",params$AssayName,sep=""))
+  nm=gsub("@NA$","",paste(unname(pkids[,"compoundName"]),"@",sprintf("%.3f",rtmed),"-",params$AssayName,sep=""))
   if(!is.null(stdData)) annot=data.frame(Analyte=nm,MetName=unname(pkids[,"compoundName"]),IsSTD=FALSE,
                                     RT=rtmed,DRT=NA,MZ=mzmed,DPPM=NA,LevelAnnot=1,Method=params$AssayName,stringsAsFactors = F)
   if(is.null(stdData)) annot=data.frame(Analyte=nm,MetName=unname(pkids[,"compoundName"]),IsSTD=FALSE,

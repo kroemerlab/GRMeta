@@ -69,7 +69,8 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,params=list()){
     for(i in l){
       li=which(oldnames==i)
       cat( " ",oldnames[li][1],sep="")
-      oldnames[li]=paste(gsub("(.*)@(.*)","\\1",oldnames[li]),"_D",1:length(li),gsub("(.*)@(.*)","@\\2",oldnames[li]),sep="")
+      oldnames[li]=paste(gsub("(.*)@(.*)","\\1",oldnames[li]),"_D",0:(length(li)-1),
+                         gsub("(.*)@(.*)","@\\2",oldnames[li]),sep="")
     }
     cat("\n")
     return(oldnames)

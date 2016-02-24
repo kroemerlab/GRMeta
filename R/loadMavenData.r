@@ -58,13 +58,27 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,params=list()){
   }
   names(allmat)=lnames2
   cat("\n")
+  
   #################
   ## Make annot
+  ## double check redundant analyte names
+  .rendups<-function(oldnames){
+    l=names(which(table(oldnames)>1))
+    if(length(l)==0) return(oldnames)
+    for(i in l){
+      li=which(oldnames==i)
+      cat( "   duplicated peak:",oldnames[li][1],sep="\n")
+      oldnames[li]=paste(gsub("(.*)@(.*)","\\1",oldnames[li]),"_D",1:length(li),gsub("(.*)@(.*)","@\\2",oldnames[li]),sep="")
+    }
+    return(oldnames)
+  } 
+  
   
   rtmed=round(apply(allmat$RT,2,median,na.rm=T),4)
   mzmed=round(apply(allmat$MZ,2,median,na.rm=T),5)
   if(!"compoundName"%in%colnames(pkids)){
     nm=sprintf("%.4f@%.3f-%s",mzmed,rtmed,params$AssayName)
+    nm=.rendups(nm)
     annot=data.frame(Analyte=nm,MetName=NA,IsSTD=FALSE,RT=rtmed,MZ=mzmed,LevelAnnot=4,Method=params$AssayName,stringsAsFactors = F)
   }
   
@@ -72,6 +86,7 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,params=list()){
   # do annot here
   if("compoundName"%in%colnames(pkids)) {
   nm=gsub("@NA$","",paste(unname(pkids[,"compoundName"]),"@",sprintf("%.3f",rtmed),"-",params$AssayName,sep=""))
+  nm=.rendups(nm)
   if(!is.null(stdData)) annot=data.frame(Analyte=nm,MetName=unname(pkids[,"compoundName"]),IsSTD=FALSE,
                                     RT=rtmed,DRT=NA,MZ=mzmed,DPPM=NA,LevelAnnot=1,Method=params$AssayName,stringsAsFactors = F)
   if(is.null(stdData)) annot=data.frame(Analyte=nm,MetName=unname(pkids[,"compoundName"]),IsSTD=FALSE,
@@ -81,7 +96,9 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,params=list()){
   if(params$checkNams){
     newnam=cleanMetaboNames(oldnam,RegExpr = NA,Syno = NA)$newnam
     annot$MetName=newnam
-    annot$Analyte=gsub("@NA$","",paste(newnam,"@",sprintf("%.3f",rtmed),"-",params$AssayName,sep=""))
+    nm=gsub("@NA$","",paste(newnam,"@",sprintf("%.3f",rtmed),"-",params$AssayName,sep=""))
+    nm=.rendups(nm)
+    annot$Analyte=nm
     annot$IsSTD[grep("_ISTD",newnam)]=TRUE
     annot$OriginalName=oldnam
     if(!is.null(params$AnnotDB)){
@@ -108,17 +125,8 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,params=list()){
   
   }
   
-  ##########################################
-  ## double check redundant analyte names
-  oldnames=annot$Analyte
-  l=names(which(table(oldnames)>1))
-  for(i in l){
-    li=which(oldnames==i)
-    cat( "duplicated:",oldnames[li][1],sep="\n")
-    oldnames[li]=paste(gsub("(.*)@(.*)","\\1",oldnames[li]),"_D",1:length(li),gsub("(.*)@(.*)","@\\2",oldnames[li]),sep="")
-  }
-  allmat=lapply(allmat,function(x){colnames(x)=oldnames;x})
-  rownames(annot)=annot$Analyte=oldnames
+  allmat=lapply(allmat,function(x){colnames(x)=annot$Analyte;x})
+  rownames(annot)=annot$Analyte
   
   
   if(params$ordering){

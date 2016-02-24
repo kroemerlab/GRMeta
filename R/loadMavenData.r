@@ -49,14 +49,15 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,params=list()){
   names(allmat)=lnames
   lgrps=xmlChildren(dat[["PeakGroups"]])
   
+  cat("Found:",length(lgrps),"peak groups ")
   for(k in 1:length(lgrps)){
-    cat(".")
+    if(k%%100==0) cat("x")
     igrp=xmlAttrs(lgrps[[k]])["groupId"]
     mgrp=xmlSApply(lgrps[[k]],xmlAttrs)
     for(i in rownames(mgrp)[rownames(mgrp)%in%lnames]) allmat[[i]][mgrp["sample",],igrp]=as.numeric(mgrp[i,])
   }
   names(allmat)=lnames2
-  
+  cat("\n")
   #################
   ## Make annot
   
@@ -80,7 +81,7 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,params=list()){
   if(params$checkNams){
     newnam=cleanMetaboNames(oldnam,RegExpr = NA,Syno = NA)$newnam
     annot$MetName=newnam
-    annot$Analyte=gsub("@NA$","",paste(newnam,"@",sprintf("%.2f",rtmed),"-",params$AssayName,sep=""))
+    annot$Analyte=gsub("@NA$","",paste(newnam,"@",sprintf("%.3f",rtmed),"-",params$AssayName,sep=""))
     annot$IsSTD[grep("_ISTD",newnam)]=TRUE
     annot$OriginalName=oldnam
     if(!is.null(params$AnnotDB)){
@@ -93,9 +94,7 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,params=list()){
       for(i in names(which(sapply(l2add,function(i) is.numeric(NewDB[,i]))))) toadd[,i]=as.numeric(toadd[,i])
       for(i in names(which(sapply(l2add,function(i) is.character(NewDB[,i]))))) toadd[,i]=as.character(toadd[,i])
       annot=cbind(annot,toadd)
-      allmat=lapply(allmat,function(x){colnames(x)=annot$Analyte;x})
     }
-    rownames(annot)=annot$Analyte
   }
   
   if(!is.null(stdData)){
@@ -108,6 +107,19 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,params=list()){
   }
   
   }
+  
+  ##########################################
+  ## double check redundant analyte names
+  oldnames=annot$Analyte
+  l=names(which(table(oldnames)>1))
+  for(i in l){
+    li=which(oldnames==i)
+    cat( "duplicated:",oldnames[li][1],sep="\n")
+    oldnames[li]=paste(gsub("(.*)@(.*)","\\1",oldnames[li]),"_D",1:length(li),gsub("(.*)@(.*)","@\\2",oldnames[li]),sep="")
+  }
+  allmat=lapply(allmat,function(x){colnames(x)=oldnames;x})
+  rownames(annot)=annot$Analyte=oldnames
+  
   
   if(params$ordering){
     lso=order(metainfos$sType,fileinfos$Date)

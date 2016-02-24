@@ -65,11 +65,13 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,params=list()){
   .rendups<-function(oldnames){
     l=names(which(table(oldnames)>1))
     if(length(l)==0) return(oldnames)
+    cat("  ! duplicated peaknames:")
     for(i in l){
       li=which(oldnames==i)
-      cat( "   duplicated peak:",oldnames[li][1],sep="\n")
+      cat( " ",oldnames[li][1],sep="")
       oldnames[li]=paste(gsub("(.*)@(.*)","\\1",oldnames[li]),"_D",1:length(li),gsub("(.*)@(.*)","@\\2",oldnames[li]),sep="")
     }
+    cat("\n")
     return(oldnames)
   } 
   

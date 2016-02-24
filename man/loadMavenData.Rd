@@ -21,16 +21,18 @@ David Enot \email{david.enot@gustaveroussy.fr}
 \examples{
 testfile=list.files(system.file( package = "GRMeta"),pattern = "roll$",full.names = TRUE)
 
+#### Profiling data
 mydata=loadMavenData(ifile =testfile[2],params = list(AssayName="prof"))
 print(mydata)
 
-
+#### Annotated data
 mydata=loadMavenData(ifile =testfile[1],params = list(AssayName="annot"))
-print(mydata)
+print(mydata$Annot[1:3,])
 
+#### Annotated data + checking standard database: DPPM and DRT are added
 std=stdDB[stdDB$Method=="rppos",]
 mydata=loadMavenData(ifile =testfile[1],stdData=std,params = list(AssayName="annot"))
-print(mydata$Annot[1:10,1:7])
+print(mydata$Annot[1:3,])
 
 }
 

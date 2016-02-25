@@ -3,12 +3,13 @@
 \title{Load MAVEN targetted data files}
 \description{Load MAVEN targetted data files}
 \usage{
-loadMavenData(ifile, ofile = NULL,stdData=NULL, params = list())
+loadMavenData(ifile, ofile = NULL,stdData=NULL,chktime=FALSE, params = list())
 }
 \arguments{
   \item{ifile}{mzPeaks.mzroll file from Maven}
   \item{ofile}{Optional .Rdata file to store the object}
   \item{stdData}{Optional dataframe to calculate DRT and DPPM - requires GName, RT, IP fields as in \code{\link{stdDB}} }
+  \item{chktime}{Add completion time from the original xml file}
   \item{params}{Parameters for loading/parsing and organising the data}
 }
 \value{Experiment data object}

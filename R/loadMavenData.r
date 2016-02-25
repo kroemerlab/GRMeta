@@ -25,7 +25,7 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,chktime=FALSE,params=list(
   
   filenam=sampids[,"filename"]
   dts=rep(NA,length(filenam))
-  if(chktime=TRUE)
+  if(chktime)
     for(i in which(file.exists(filenam))) dts[i]=.getcomptime(filenam[i])
   
   

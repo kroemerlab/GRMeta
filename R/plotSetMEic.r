@@ -65,7 +65,6 @@ ieic=obj$Eic$File[analyte,]$EicId
 whichrt=WhichRT
 if(is.null(whichrt))  whichrt="rtcor"
 if(!whichrt%in%names(dfeic)) whichrt="rt"
-
 ceic=dfeic[dfeic$Eic==ieic & dfeic$Samp%in%obj$Eic$Sample$Samp,]
 ceic$Sid=obj$Eic$Sample$Sid[match(ceic$Samp,obj$Eic$Sample$Samp)]
 ceic$cols=cols[ceic$Sid]
@@ -83,7 +82,7 @@ Mint=obj$Eic$File[analyte,]$Mint
 outfile=paste(addfile,gsub("\\.",repDots,analyte),endfile,".pdf",sep="")
 pdf(file=outfile,width=width,height=height)
 par(dots)
-.plotEIC(ceic,ipkmat,whichrt,llsids,Mint=Mint,rtr=rtr,cexEL=cexEL)
+GRMeta:::.plotEIC(ceic,ipkmat,whichrt,llsids,Mint=Mint,rtr=rtr,cexEL=cexEL)
 dev.off()
 
 }

@@ -21,7 +21,7 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,chktime=FALSE,params=list(
     chron(dts[1],dts[2],format=c(dates="Y-M-D",times="h:m:s"))
   }
 
-  sampids= t(xmlSApply(dat[["samples"]],xmlAttrs))
+  sampids=t(xmlSApply(dat[["samples"]],xmlAttrs))
   
   filenam=sampids[,"filename"]
   dts=rep(NA,length(filenam))

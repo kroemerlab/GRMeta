@@ -6,12 +6,14 @@ update.metaboSet<-function(obj,what="Sid",formerid=NULL,newid=NULL,exact=TRUE,sw
   if(length(formerid)!=length(newid) | is.null(formerid)) stop("former and new inputs are of different length")
   
   oldnames=newnames=obj[[what]]
-  if(exact & !swap) for(i in 1:length(formerid)) newnames[which(oldnames==formerid[i])]=newid[i]
-  if(!exact & !swap) for(i in 1:length(formerid)) newnames=gsub(formerid[i],newid[i],newnames)
+  if(!swap){
+    if(exact) for(i in 1:length(formerid)) newnames[which(oldnames==formerid[i])]=newid[i]
+  if(!exact) for(i in 1:length(formerid)) newnames=gsub(formerid[i],newid[i],newnames)
+  }
   if(swap) for(i in 1:length(formerid)){
     i1=which(oldnames==formerid[i])
     i2=which(oldnames==newid[i])
-    if(length(i1)>0 & length(i2)){
+    if(length(i1)==1 & length(i2)==1){
       newnames[i1]=newid[i]
       newnames[i2]=formerid[i]
     }
@@ -19,12 +21,12 @@ update.metaboSet<-function(obj,what="Sid",formerid=NULL,newid=NULL,exact=TRUE,sw
   if(any(table(newnames)>1)) stop(paste(c("duplicated names: ",names(which(table(newnames)>1))), collapse=" "))
   
   if(what=="Sid"){
-  obj$Sid=newnames
+    obj$Sid=newnames
   obj$Meta$Sid=rownames(obj$Meta)=newnames
   obj$File$Sid=rownames(obj$File)=newnames
   obj$Data=lapply(obj$Data,function(x){rownames(x)=newnames;x})
   
-  if(!is.null(obj$Eic)) obj$Eic$Sample$Sid=rownames(obj$Eic$Sample)=newnames
+  if(!is.null(obj$Eic)) if(!is.null(obj$Eic$Sample)) obj$Eic$Sample$Sid=rownames(obj$Eic$Sample)=newnames
   
   if(any(newnames!=oldnames)){
    cat("Samples with updated id:\n")

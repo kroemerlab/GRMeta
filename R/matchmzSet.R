@@ -11,12 +11,12 @@ matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
   if(is.null(ipdb)){
     data(IPDB)
     ipdb=IPDB
-    rm('IPDB')
+#    rm('IPDB')
   }
   if(is.null(annotdb)){
     data(AnnotationDB)
     annotdb=AnnotationDB
-    rm('AnnotationDB')
+#    rm('AnnotationDB')
   }
   
   lanalytes=Analyte[Analyte%in%obj$Analyte]
@@ -65,7 +65,7 @@ matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
   matchres=do.call("rbind",allr)
   if(nrow(matchres)==0) return(NULL)
   cat("\n")
-  print(matchres)
+
   ############
   matchres$IP=colnames(mmz)[matchres$IP]
   lanal=obj$Analyte[obj$Analyte%in%matchres$Analyte]

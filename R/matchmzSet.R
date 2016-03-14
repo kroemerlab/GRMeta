@@ -30,17 +30,18 @@ matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
   
   ######################
   if(!mass2use%in%names(annotdb)) stop(paste("Mass variable",mass2use,"not found in the annotation dataframe\n"))
-  annotdb=annotdb[!is.na(as.numeric(annotdb[,mass2use])),]
-  if(nrow(annotdb)==0) stop("nothing to match in the annotation dataframe\n")
+  lentries=which(!is.na(as.numeric(annotdb[,mass2use])))
+  if(length(lentries)<1) stop("nothing to match in the annotation dataframe\n")
+  annotdb=annotdb[lentries,]
   lmz=annotdb[,mass2use]
   
   
-  ladd=unique(which(lIP%in%ipdb$Id | lIP%in%ipdb$Name | lIP%in%ipdb$Set))
-  if(length(lIP)==0)
+  ladd=unique(which(ipdb$Id%in%lIP | ipdb$Name%in%lIP | ipdb$Set%in%lIP))
+  if(length(ladd)==0)
     stop(paste("IPs invalid - must be in :\n",
                "  *positive mode: ",paste(IPDB$Name[IPDB$Charge>0],collapse=" "),"\n",
                "  *negative mode: ",paste(IPDB$Name[IPDB$Charge<0],collapse=" "),"\n",sep=""))
-  
+  cat("Matching on: ",ipdb$Name[ladd],"\n",sep=" ")
   mmz=matrix(sapply(ladd,function(i) (ipdb[i,]$xM*lmz+ipdb[i,]$adMass)/abs(ipdb[i,]$Charge)),nrow=length(lmz))
   colnames(mmz)=ipdb$Name[ladd]
   
@@ -77,6 +78,7 @@ matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
       for(i in infos2add) matchres[,i]=annotdb[matchres$Entry,i]
     }
   }
+  matchres$Entry=lentries[matchres$Entry]
   ############
   iDPPM=matchres$DPPM
   if(!is.null(groupby)){
@@ -92,7 +94,7 @@ matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
       if(any(grepl(collsep,matchres$DPPM))) matchres$DPPMmed=iDPPM
     }
   }
-  
+  ############  
   matchres=matchres[order(factor(matchres$Analyte,levels=lanalytes),factor(matchres$IP,levels=colnames(mmz)),abs(iDPPM)),]
   rownames(matchres)=NULL
   return(matchres)

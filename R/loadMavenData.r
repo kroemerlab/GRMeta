@@ -12,7 +12,7 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,chktime=FALSE,params=list(
   #####################
   # samples
   .getcomptime<-function(ifile){
-    infile<-try(suppressMessages(readLines(ifile)),TRUE)
+    infile<-try(suppressWarnings(suppressMessages(readLines(ifile))),TRUE)
     if("try-error"%in%class(infile)) return(NA)
     dts=grep('completionTime',infile)
     if(length(dts)==0) return(NA)

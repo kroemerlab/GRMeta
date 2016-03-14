@@ -3,7 +3,7 @@
 
 matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
                    dppm=20,mz2use="MZ",mass2use="Mass",
-                   infos2add=NULL,groupby=NULL,chunk=200,collsep=";;"){
+                   annotinf2add=NULL,objinf2add=NULL,groupby=NULL,chunk=200,collsep=";;"){
   
   if(!inherits(obj, "metaboSet")) stop("This is not a metaboSet object!")
   if(is.null(Analyte)) Analyte=obj$Analyte
@@ -71,13 +71,21 @@ matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
   matchres$IP=colnames(mmz)[matchres$IP]
   lanal=obj$Analyte[obj$Analyte%in%matchres$Analyte]
   rownames(matchres)=NULL
-  if(!is.null(infos2add)){
-    infos2add=unique(c(infos2add[infos2add%in%names(annotdb)],groupby[groupby%in%names(annotdb)]))
-    if(length(infos2add)>0){
-      cat("* adding: ",infos2add,"\n",sep=" ")
-      for(i in infos2add) matchres[,i]=annotdb[matchres$Entry,i]
+  if(!is.null(annotinf2add)){
+    annotinf2add=unique(c(annotinf2add[annotinf2add%in%names(annotdb)],groupby[groupby%in%names(annotdb)]))
+    if(length(annotinf2add)>0){
+      cat("* adding from annotdb: ",annotinf2add,"\n",sep=" ")
+      for(i in annotinf2add) matchres[,i]=annotdb[matchres$Entry,i]
     }
   }
+  if(!is.null(objinf2add)){
+    objinf2add=unique(objinf2add[objinf2add%in%names(obj$Annot) & !objinf2add%in%names(matchres)])
+    if(length(annotinf2add)>0){
+      cat("* adding from obj: ",objinf2add,"\n",sep=" ")
+      for(i in objinf2add) matchres[,i]=obj$Annot[matchres$Analyte,i]
+    }
+  }
+  
   matchres$Entry=lentries[matchres$Entry]
   ############
   iDPPM=matchres$DPPM

@@ -4,6 +4,7 @@
 \alias{.GRdoksmooth}
 \alias{.GRipeaks}
 \alias{.GRmsPeakSimple}
+\alias{.GRconvEIC}
 \title{Undocumented functions}
 \description{
 
@@ -16,6 +17,8 @@
 \code{.GRipeaks}
 
 \code{.GRmsPeakSimple}
+
+\code{.GRconvEIC}
 
 These functions are currently undocumented.
 }

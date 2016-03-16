@@ -9,8 +9,8 @@
 }
 
 .GRmsExtrema<-function (x, span = 3){
-  index1 <- ipeaks(x, span = span, strict = FALSE)
-  index2 <- ipeaks(-x, span = span, strict = FALSE)
+  index1 <- .GRipeaks(x, span = span, strict = FALSE)
+  index2 <- .GRipeaks(-x, span = span, strict = FALSE)
   index.max <- index1 & !index2
   index.min <- index2 & !index1
   iz=max(min(which(x>0))-1,1)
@@ -62,7 +62,7 @@
 
 .GRmsPeakSimple<-function (x, y, noise.local = NULL, span = 3, snr.thresh = 2) {
   
-  index <- msExtrema(y, span = span)
+  index <- .GRmsExtrema(y, span = span)
   nvar <- length(x)
   
   index.min = index$index.min; index.max = index$index.max
@@ -115,3 +115,27 @@
   
 }
 
+.GRconvEIC<-function(tmp,whichrt="rt",delrt=0.005,bw=0.025,xnew=NULL){
+  if(is.null(xnew))
+    xnew=seq(floor(min(tmp[,whichrt]*10))/10,ceiling(max(tmp[,whichrt]*10))/10,delrt)
+  amat=NULL
+  amz=NULL
+  lsamp=sort(unique(tmp[,"samp"]))
+  for(k in lsamp){
+    l=which(tmp[,"samp"]==k)
+    xl=tmp[l,whichrt]
+    yl=tmp[l,"y"]
+    drt=quantile(diff(xl),c(.25,.50));drt=unique(drt[drt>0])[1]
+    if(is.na(drt)) drt=quantile(diff(xnew),.25)
+    padl=max(2,ceiling((min(xl)-min(xnew))/drt))
+    padr=max(2,floor((max(xnew)-max(xl))/drt)+1)
+    yl=c(rep(0,padl),yl,rep(0,padr))
+    xl=c(min(xl)-(padl:1)*drt,xl,(1:padr)*drt+max(xl))
+    kres=.GRdoksmooth(list(x=xl,y=yl,cons=NULL),bw)
+    amat=cbind(amat,approx(kres$x,kres$y,xnew)$y)
+  }
+  amat[is.na(amat)]=0
+  colnames(amat)=lsamp
+  rownames(amat)=xnew
+  return(list(amat,xnew))
+}

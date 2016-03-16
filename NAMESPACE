@@ -1,5 +1,6 @@
 export(cleanMetaboNames,compSetSBR,compSetStats,compSetRatios,corrSetQC,paramsParsing,
-loadAgilentData,loadMavenData,loadAgilentDataFlux,mapSetKegg,matchmzSet,mergeSet,deleteEntries,sortEntries, exportSetXLSX,plotSetMEic)
+loadAgilentData,loadMavenData,loadAgilentDataFlux,mapSetKegg,matchmzSet,mergeSet,deleteEntries,sortEntries, exportSetXLSX,plotSetMEic,
+.GRgetArea,.GRmsExtrema,.GRdoksmooth,.GRipeaks,.GRmsPeakSimple,.GRconvEIC)
 
 ### register S3 methods
 S3method(plot, metaboSet)
@@ -19,4 +20,6 @@ import(beeswarm)
 import(impute)
 import(mgcv)
 import(xlsx)
+import(KernSmooth)
+
 

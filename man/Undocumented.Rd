@@ -5,6 +5,9 @@
 \alias{.GRipeaks}
 \alias{.GRmsPeakSimple}
 \alias{.GRconvEIC}
+\alias{.GRparseSampEICCl}
+\alias{.GRgatherMultiEICCl}
+
 \title{Undocumented functions}
 \description{
 
@@ -19,6 +22,10 @@
 \code{.GRmsPeakSimple}
 
 \code{.GRconvEIC}
+
+\code{.GRparseSampEICCl}
+
+\code{.GRgatherMultiEICCl}
 
 These functions are currently undocumented.
 }

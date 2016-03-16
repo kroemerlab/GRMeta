@@ -1,5 +1,7 @@
 export(cleanMetaboNames,compSetSBR,compSetStats,compSetRatios,corrSetQC,paramsParsing,
 loadAgilentData,loadMavenData,loadAgilentDataFlux,mapSetKegg,matchmzSet,mergeSet,deleteEntries,sortEntries, exportSetXLSX,plotSetMEic,
+parseSampEIC,parseOneSampEIC,.GRparseSampEICCl,
+gatherMultiEICs,.GRgatherMultiEICCl,gatherOneEIC,
 .GRgetArea,.GRmsExtrema,.GRdoksmooth,.GRipeaks,.GRmsPeakSimple,.GRconvEIC)
 
 ### register S3 methods

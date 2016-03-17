@@ -1,4 +1,4 @@
-aggregCEF<-function(lfiles,minrt=-Inf,maxrt=Inf,maxmz=+Inf,minmz=-Inf,ncl=1,verbose=TRUE){
+aggregCEF<-function(lfiles,minrt=0,maxrt=Inf,maxmz=+Inf,minmz=1,ncl=1,verbose=TRUE){
   
   if(is.null(names(lfiles))) names(lfiles)=1:length(lfiles)
   lfiles=lfiles[file.exists(lfiles)]
@@ -58,7 +58,7 @@ aggregCEF<-function(lfiles,minrt=-Inf,maxrt=Inf,maxmz=+Inf,minmz=-Inf,ncl=1,verb
     rownames(dat2)=NULL
     dat2=data.frame(samp=NA,rbind(v,dat2),stringsAsFactors=FALSE)
     for(i in c("rt","x","y","v","z","niso")) dat2[,i]=as.numeric(gsub(",",".",dat2[,i]))
-    names(dat2)=c("samp", "mfid","mfid2","rt","mz","area","height","xM","ip","iso")
+    names(dat2)=c("samp", "mfid","mfid2","rt","mz","Area","Height","xM","ip","iso")
     return(dat2)
   }
   

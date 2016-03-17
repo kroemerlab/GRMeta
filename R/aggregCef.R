@@ -1,4 +1,4 @@
-aggregCEF<-function(lfiles,minrt=-Inf,maxrt=Inf,maxmz=+Inf,minmz=-Inf,ncl=1,verbose=FALSE){
+aggregCEF<-function(lfiles,minrt=-Inf,maxrt=Inf,maxmz=+Inf,minmz=-Inf,ncl=1,verbose=TRUE){
   
   if(is.null(names(lfiles))) names(lfiles)=1:length(lfiles)
   lfiles=lfiles[file.exists(lfiles)]

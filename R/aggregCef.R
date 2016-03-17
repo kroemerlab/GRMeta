@@ -21,7 +21,7 @@ aggregCEF<-function(lfiles,minrt=0,maxrt=Inf,maxmz=+Inf,minmz=1,ncl=1,verbose=TR
     sfInit(parallel=TRUE, cpus=ncl, type='SOCK',slaveOutfile='logAggregCef')
     sfLibrary(GRMeta)
     #if(local) 
-    sfExport( ".GRdoOneCef", local=TRUE )
+    #sfExport( ".GRdoOneCef", local=TRUE )
     acef=sfClusterApplyLB(lfiles,.GRdoOneCef,verbose=FALSE)
     sfStop()
   }  

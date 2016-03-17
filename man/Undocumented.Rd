@@ -7,6 +7,7 @@
 \alias{.GRconvEIC}
 \alias{.GRparseSampEICCl}
 \alias{.GRgatherMultiEICCl}
+\alias{.GRdoOneCef}
 
 \title{Undocumented functions}
 \description{
@@ -26,6 +27,8 @@
 \code{.GRparseSampEICCl}
 
 \code{.GRgatherMultiEICCl}
+
+\code{.GRdoOneCef}
 
 These functions are currently undocumented.
 }

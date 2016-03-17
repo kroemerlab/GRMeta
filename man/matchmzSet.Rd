@@ -6,10 +6,11 @@ Matching m/z to a database
 }
 \usage{
 matchmzSet(obj, Analyte = NULL, annotdb = NULL, ipdb = NULL, lIP = NULL, dppm = 20, mz2use = "MZ", mass2use = "Mass", 
-annotinf2add = c("Gname", "MF"),objinf2add = NULL, groupby =NULL, chunk = 200, collsep = ";;")
+annotinf2add = NULL,objinf2add = NULL, groupby =NULL, chunk = 200, collsep = ";;")
+
 }
 \arguments{
- \item{obj}{metaboSet}
+ \item{obj}{metaboSet or a data.frame}
   \item{Analyte}{Vector of analytes}
   \item{annotdb}{Dataframe containing the annotation infos}
   \item{ipdb}{Dataframe containing the IP definitions}

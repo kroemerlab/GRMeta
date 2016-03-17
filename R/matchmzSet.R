@@ -5,8 +5,19 @@ matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
                    dppm=20,mz2use="MZ",mass2use="Mass",
                    annotinf2add=NULL,objinf2add=NULL,groupby=NULL,chunk=200,collsep=";;"){
   
-  if(!inherits(obj, "metaboSet")) stop("This is not a metaboSet object!")
-  if(is.null(Analyte)) Analyte=obj$Analyte
+  if(inherits(obj, "metaboSet")){
+    cat("Matching from a metaboSet\n")
+    dfIn=obj$Annot
+    if(is.null(Analyte)) Analyte=obj$Analyte
+    lanalytes=Analyte[Analyte%in%obj$Analyte]
+  }else{
+    cat("Matching from a data.frame\n")
+    dfIn=obj
+    if(is.null(rownames(dfIn))) rownames(dfIn)=paste("Ana",1:nrow(dfIn),sep="")
+    if(any(duplicated(rownames(dfIn)))) rownames(dfIn)=paste("Ana",1:nrow(dfIn),sep="")
+    if(is.null(Analyte)) Analyte=rownames(dfIn)
+    lanalytes=Analyte[Analyte%in%rownames(dfIn)]
+  }
   
   if(is.null(ipdb)){
     data(IPDB)
@@ -19,11 +30,11 @@ matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
 #    rm('AnnotationDB')
   }
   
-  lanalytes=Analyte[Analyte%in%obj$Analyte]
+  
   if(length(lanalytes)==0) stop("No analyte found in the object\n")
   ######################
-  if(!mz2use%in%names(obj$Annot)) stop(paste("m/z variable",mz2use,"not found in the object\n"))
-  cmz=as.numeric(obj$Annot[lanalytes,mz2use])
+  if(!mz2use%in%names(dfIn)) stop(paste("m/z variable",mz2use,"not found in the object\n"))
+  cmz=as.numeric(dfIn[lanalytes,mz2use])
   names(cmz)=lanalytes
   cmz=cmz[!is.na(cmz)]
   if(length(cmz)==0) stop(paste("nothing to match in the m/z variable",mz2use,"\n"))
@@ -79,10 +90,10 @@ matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
     }
   }
   if(!is.null(objinf2add)){
-    objinf2add=unique(objinf2add[objinf2add%in%names(obj$Annot) & !objinf2add%in%names(matchres)])
+    objinf2add=unique(objinf2add[objinf2add%in%names(dfIn) & !objinf2add%in%names(matchres)])
     if(length(annotinf2add)>0){
       cat("* adding from obj: ",objinf2add,"\n",sep=" ")
-      for(i in objinf2add) matchres[,i]=obj$Annot[matchres$Analyte,i]
+      for(i in objinf2add) matchres[,i]=dfIn[matchres$Analyte,i]
     }
   }
   

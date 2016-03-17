@@ -10,14 +10,21 @@ matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
     dfIn=obj$Annot
     if(is.null(Analyte)) Analyte=obj$Analyte
     lanalytes=Analyte[Analyte%in%obj$Analyte]
-  }else{
+  }else if(inherits(obj,"data.frame")){
     cat("Matching from a data.frame\n")
     dfIn=obj
     if(is.null(rownames(dfIn))) rownames(dfIn)=paste("Ana",1:nrow(dfIn),sep="")
     if(any(duplicated(rownames(dfIn)))) rownames(dfIn)=paste("Ana",1:nrow(dfIn),sep="")
     if(is.null(Analyte)) Analyte=rownames(dfIn)
     lanalytes=Analyte[Analyte%in%rownames(dfIn)]
-  }
+  }else if(inherits(obj,"numeric") & is.null(dim(obj))){
+    cat("Matching from a vector\n")
+    if(is.null(names(obj))) names(obj)=paste("Ana",1:length(obj),sep="")
+    dfIn=data.frame(MZ=obj,stringsAsFactors=FALSE)
+    rownames(dfIn)=names(obj)
+    if(is.null(Analyte)) Analyte=rownames(dfIn)
+    lanalytes=Analyte[Analyte%in%rownames(dfIn)]
+  }else stop("Provide metaboSet, data.frame or a vector")
   
   if(is.null(ipdb)){
     data(IPDB)
@@ -80,7 +87,6 @@ matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
 
   ############
   matchres$IP=colnames(mmz)[matchres$IP]
-  lanal=obj$Analyte[obj$Analyte%in%matchres$Analyte]
   rownames(matchres)=NULL
   if(!is.null(annotinf2add)){
     annotinf2add=unique(c(annotinf2add[annotinf2add%in%names(annotdb)],groupby[groupby%in%names(annotdb)]))

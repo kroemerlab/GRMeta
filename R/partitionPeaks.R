@@ -1,4 +1,4 @@
-partitionPeaks<-function(cdat,err.ppm=10,err.rt=0.1,metaboSet=TRUE,fac=4,whichrt="rt",whichmz="mz",whichsamp="samp"){
+partitionPeaks<-function(cdat,err.ppm=10,err.rt=0.1,metaboSet=list(),fac=4,whichrt="rt",whichmz="mz",whichsamp="samp"){
   
   #### Rough splitting unlikely neighbours: set to err.ppm*fac and err.rt*fac*2
   system.time(lsp<-.GRgenpkl(cdat[,whichmz],cdat[,whichrt],err.ppm=err.ppm*fac,err.rt=err.rt*fac*2))
@@ -22,7 +22,7 @@ partitionPeaks<-function(cdat,err.ppm=10,err.rt=0.1,metaboSet=TRUE,fac=4,whichrt
   lso=order(mrt,mrz)
   lsp1=lsp1[lso]
   cat("Density based split: num. peaks=",nrow(cdat)," -> num. clusters:",length(lsp1),"\n",sep="")
-  if(!is.list(metaboSet) | is.null(metaboSet))  return(lsp1)
+  if(is.null(metaboSet))  return(lsp1)
   
   ##################
   ## conv2 metaboset

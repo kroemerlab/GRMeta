@@ -13,7 +13,7 @@ parseOneSampEIC<-function(mzfi,tabeic,outfile=NULL,npad=3,stepmz=1/1000,mzdata=F
     rts=header(aa)[,"retentionTime"]/60
     names(rts)=header(aa)[,1]
     pl <- mzR::peaks(aa)
-    close(aa)
+    mzR::close(aa)
     m=do.call("rbind",lapply(1:length(pl),function(x) cbind(Scan=rep(x,nrow(pl[[x]])),pl[[x]])))
     rm("pl")
     m=m[order(m[,2]),]
@@ -123,7 +123,7 @@ parseSampEIC<-function(matfile,tabeic,corrt=NULL,npad=3,stepmz=1/1000,verbose=TR
     return(invisible(re))
   }
   cat(" on ",ncl," processors\n",sep="")
-  sfInit(parallel=TRUE, cpus=ncl, type='SOCK',slaveOutfile='mylog')
+  sfInit(parallel=TRUE, cpus=ncl, type='SOCK',slaveOutfile='sampeic.log')
   #if(sfIsRunning()) sfStop()
   if(mzdata) sfLibrary(mzR)
   sfLibrary(GRMeta)

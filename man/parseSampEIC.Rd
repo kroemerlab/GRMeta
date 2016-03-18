@@ -8,7 +8,7 @@ Parse MS raw datafile to extract EICs
 Parse MS raw datafile to extract EICs
 }
 \usage{
-parseSampEIC(matfile, tabeic, corrt = NULL, npad = 3, stepmz = 1/1000, verbose = TRUE, ncl = 1, mzdata = FALSE, chunk = 200, local = FALSE)
+parseSampEIC(matfile, tabeic, corrt = NULL, npad = 3, stepmz = 1/1000, verbose = TRUE, ncl = 1, mzdata = FALSE, chunk = 200)
 }
 \arguments{
   \item{matfile}{Information data frame, columns: Sid, unique sample id, In:input file, Out=where to store}
@@ -20,7 +20,6 @@ parseSampEIC(matfile, tabeic, corrt = NULL, npad = 3, stepmz = 1/1000, verbose =
   \item{ncl}{num. of clusters - needs library(snowfall)}
   \item{mzdata}{is the input file a mzdata - needs library(mzR)}
   \item{chunk}{control the }
-  \item{local}{for debugging}
 }
 \details{
 blahbhla

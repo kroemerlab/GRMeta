@@ -123,7 +123,7 @@ parseSampEIC<-function(matfile,tabeic,corrt=NULL,npad=3,stepmz=1/1000,verbose=TR
     return(invisible(re))
   }
   cat(" on ",ncl," processors\n",sep="")
-  sfInit(parallel=TRUE, cpus=ncl, type='SOCK',slaveOutfile='sampeic.log')
+  sfInit(parallel=TRUE, cpus=ncl, type='SOCK',slaveOutfile=paste('SampEic',format(Sys.time(), "%y-%d-%b-%H:%M"),'.log',sep=""))
   #if(sfIsRunning()) sfStop()
   if(mzdata) sfLibrary(mzR)
   sfLibrary(GRMeta)

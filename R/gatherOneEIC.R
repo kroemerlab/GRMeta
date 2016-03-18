@@ -126,8 +126,7 @@ gatherMultiEICs<-function(matfile,tabeic,root="./",outfile=NA,ncl=1,nsplit=20,se
   require("snowfall")
   
   cat(" on ",ncl," processors\n",sep="")
-  if(sfIsRunning()) sfStop()
-  sfInit(parallel=TRUE, cpus=ncl, type="SOCK")
+  sfInit(parallel=TRUE, cpus=ncl, type='SOCK',slaveOutfile=paste('GathEic',format(Sys.time(), "%y-%d-%b-%H:%M"),'.log',sep=""))
   sfLibrary(GRMeta)
   #sfExport( "gatherOneEIC", local=TRUE )
   re=sfClusterApplyLB(llcode,.GRgatherMultiEICCl,tabeic=tabeic,sampfile=matfile,root=root)

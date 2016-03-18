@@ -62,12 +62,12 @@ matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
   cat("Matching on: ",ipdb$Name[ladd],"\n",sep=" ")
   mmz=matrix(sapply(ladd,function(i) (ipdb[i,]$xM*lmz+ipdb[i,]$adMass)/abs(ipdb[i,]$Charge)),nrow=length(lmz))
   colnames(mmz)=ipdb$Name[ladd]
-  
   ######################
+  if(length(cmz)<=chunk) lx=list(names(cmz)) else{
   ngrps=max(1,round(length(cmz)/chunk))
   lst=seq(1,length(cmz),length.out=ngrps+1)
   lx=suppressWarnings(split(names(cmz),1:ngrps))
-  
+  }
   allr=list()
   for(k in 1:length(lx)){
     cx=lx[[k]]
@@ -79,11 +79,11 @@ matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
       if(length(lmatch)>0) 
         allm[[i]]=data.frame(Analyte=cx[lmatch[,1]],IP=i,DPPM=round(mdppm[lmatch],3),Entry=lmatch[,2],stringsAsFactors=F)
     }
-    allr[[k]]=do.call("rbind",allm)
+    if(length(allm)>0)  allr[[k]]=do.call("rbind",allm)
   }
-  matchres=do.call("rbind",allr)
-  if(nrow(matchres)==0) return(NULL)
   cat("\n")
+  if(length(allr)==0) return(NULL)
+  matchres=do.call("rbind",allr)
 
   ############
   matchres$IP=colnames(mmz)[matchres$IP]

@@ -45,12 +45,12 @@ matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
   names(cmz)=lanalytes
   cmz=cmz[!is.na(cmz)]
   if(length(cmz)==0) stop(paste("nothing to match in the m/z variable",mz2use,"\n"))
-  
+
   ######################
   if(!mass2use%in%names(annotdb)) stop(paste("Mass variable",mass2use,"not found in the annotation dataframe\n"))
   lentries=which(!is.na(as.numeric(annotdb[,mass2use])))
   if(length(lentries)<1) stop("nothing to match in the annotation dataframe\n")
-  annotdb=annotdb[lentries,]
+  annotdb=annotdb[lentries,,drop=F]
   lmz=annotdb[,mass2use]
   
   

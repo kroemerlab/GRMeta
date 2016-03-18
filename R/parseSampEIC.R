@@ -96,7 +96,7 @@ parseOneSampEIC<-function(mzfi,tabeic,outfile=NULL,npad=3,stepmz=1/1000,mzdata=F
 
 
 #### wrapper for loadEICs
-parseSampEIC<-function(matfile,tabeic,corrt=NULL,npad=3,stepmz=1/1000,verbose=TRUE,ncl=1,mzdata=FALSE,chunk=200,local=FALSE){
+parseSampEIC<-function(matfile,tabeic,corrt=NULL,npad=3,stepmz=1/1000,verbose=TRUE,ncl=1,mzdata=FALSE,chunk=200){
   
   if(ncl!=1){
     require("snowfall")
@@ -126,8 +126,7 @@ parseSampEIC<-function(matfile,tabeic,corrt=NULL,npad=3,stepmz=1/1000,verbose=TR
   sfInit(parallel=TRUE, cpus=ncl, type='SOCK',slaveOutfile='mylog')
   #if(sfIsRunning()) sfStop()
   if(mzdata) sfLibrary(mzR)
-  if(!local) sfLibrary(GRMeta)
-  if(local) sfExport( "parseOneSampEIC", local=TRUE )
+  sfLibrary(GRMeta)
   re=sfClusterApplyLB(lsids,.GRparseSampEICCl,matfile=matfile,corrt=corrt,tabeic=tabeic,npad=npad,stepmz=stepmz,mzdata=mzdata,chunk=chunk)
   sfStop()
   d1=proc.time()[3]

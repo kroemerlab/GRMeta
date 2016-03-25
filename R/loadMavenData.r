@@ -1,3 +1,12 @@
+.GRgetcomptime<-function(ifile){
+  infile<-try(suppressWarnings(suppressMessages(readLines(ifile))),TRUE)
+  if("try-error"%in%class(infile)) return(NA)
+  dts=grep('completionTime',infile)
+  if(length(dts)==0) return(NA)
+  dts=infile[dts[1]]
+  dts=strsplit(gsub('\"','',regmatches(dts,regexpr('\"(.*)\"',dts))),"T")[[1]]
+  chron(dts[1],dts[2],format=c(dates="Y-M-D",times="h:m:s"))
+}
 
 loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,chktime=FALSE,params=list()){
   
@@ -11,22 +20,13 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,chktime=FALSE,params=list(
   
   #####################
   # samples
-  .getcomptime<-function(ifile){
-    infile<-try(suppressWarnings(suppressMessages(readLines(ifile))),TRUE)
-    if("try-error"%in%class(infile)) return(NA)
-    dts=grep('completionTime',infile)
-    if(length(dts)==0) return(NA)
-    dts=infile[dts[1]]
-    dts=strsplit(gsub('\"','',regmatches(dts,regexpr('\"(.*)\"',dts))),"T")[[1]]
-    chron(dts[1],dts[2],format=c(dates="Y-M-D",times="h:m:s"))
-  }
 
   sampids=t(xmlSApply(dat[["samples"]],xmlAttrs))
   
   filenam=sampids[,"filename"]
   dts=rep(NA,length(filenam))
   if(chktime)
-    for(i in which(file.exists(filenam))) dts[i]=.getcomptime(filenam[i])
+    for(i in which(file.exists(filenam))) dts[i]=.GRgetcomptime(filenam[i])
   
   
   nams=gsub("\\.[dD]$","",sampids[,"name"])

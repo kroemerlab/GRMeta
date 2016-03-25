@@ -8,7 +8,7 @@
 \alias{.GRparseSampEICCl}
 \alias{.GRgatherMultiEICCl}
 \alias{.GRdoOneCef}
-
+\alias{.GRgetcomptime}
 \title{Undocumented functions}
 \description{
 
@@ -29,6 +29,8 @@
 \code{.GRgatherMultiEICCl}
 
 \code{.GRdoOneCef}
+
+\code{.GRgetcomptime}
 
 These functions are currently undocumented.
 }

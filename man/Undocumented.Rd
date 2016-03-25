@@ -12,25 +12,25 @@
 \title{Undocumented functions}
 \description{
 
-\code{.GRgetArea}
+\code{.GRgetArea} integrate area
 
-\code{.GRmsExtrema}
-
-\code{.GRdoksmooth}
+\code{.GRmsExtrema} find extrema in chromatogram
 
 \code{.GRipeaks}
 
-\code{.GRmsPeakSimple}
+\code{.GRmsPeakSimple} basic peak finding
 
-\code{.GRconvEIC}
+\code{.GRconvEIC} align/smooth an EIC across samples
 
-\code{.GRparseSampEICCl}
+\code{.GRdoksmooth} in .GRconvEIC
 
-\code{.GRgatherMultiEICCl}
+\code{.GRparseSampEICCl} for parallel parseSampEIC
 
-\code{.GRdoOneCef}
+\code{.GRgatherMultiEICCl} for parallel gatherMultiEIC
 
-\code{.GRgetcomptime}
+\code{.GRdoOneCef} parse one .cef file
+
+\code{.GRgetcomptime} extract completion time in mzdata.xml file - few sec per file
 
 These functions are currently undocumented.
 }

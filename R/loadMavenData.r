@@ -1,9 +1,11 @@
 .GRgetcomptime<-function(ifile){
+  if(!file.exists(ifile)) return(NA)
   infile<-try(suppressWarnings(suppressMessages(readLines(ifile))),TRUE)
   if("try-error"%in%class(infile)) return(NA)
   dts=grep('completionTime',infile)
   if(length(dts)==0) return(NA)
   dts=infile[dts[1]]
+  rm(list="infile")
   dts=strsplit(gsub('\"','',regmatches(dts,regexpr('\"(.*)\"',dts))),"T")[[1]]
   chron(dts[1],dts[2],format=c(dates="Y-M-D",times="h:m:s"))
 }

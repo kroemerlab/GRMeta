@@ -17,6 +17,7 @@ matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
     if(any(duplicated(rownames(dfIn)))) rownames(dfIn)=paste("Ana",1:nrow(dfIn),sep="")
     if(is.null(Analyte)) Analyte=rownames(dfIn)
     lanalytes=Analyte[Analyte%in%rownames(dfIn)]
+  #  print(names(dfIn))
   }else if(inherits(obj,"numeric") & is.null(dim(obj))){
     cat("Matching from a vector\n")
     if(is.null(names(obj))) names(obj)=paste("Ana",1:length(obj),sep="")
@@ -97,7 +98,8 @@ matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
   }
   if(!is.null(objinf2add)){
     objinf2add=unique(objinf2add[objinf2add%in%names(dfIn) & !objinf2add%in%names(matchres)])
-    if(length(annotinf2add)>0){
+ #   print(objinf2add)
+    if(length(objinf2add)>0){
       cat("* adding from obj: ",objinf2add,"\n",sep=" ")
       for(i in objinf2add) matchres[,i]=dfIn[matchres$Analyte,i]
     }

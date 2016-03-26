@@ -20,7 +20,6 @@
 
 
 .GRmgetTIC<-function(lfiles,ncl=1,verbose=(ncl==1),mergeTIC=TRUE){
-  require(mzR)
   
   if(is.null(names(lfiles))) names(lfiles)=1:length(lfiles)
   lfiles=lfiles[file.exists(lfiles)]
@@ -34,6 +33,7 @@
   cat("Started at ",date(),sep="")
   
   if(ncl==1){
+    require(mzR)
     acef=list()
     cat(" on 1 processor\n",sep="")
     for(i in 1:length(lfiles)) acef[[i]]=.GRgetTIC(lfiles[i],verbose=verbose)
@@ -48,15 +48,16 @@
     acef=sfClusterApplyLB(lfiles,.GRgetTIC,verbose=FALSE)
     sfStop()
   }
-  names(acef)=names(unlist(sapply(acef,function(x) x[2])))
+  names(acef)=names(lfiles)[match(unlist(sapply(acef,function(x) x[2])),lfiles)]
   re=lapply(acef,function(x) x[[1]])
   if(mergeTIC){
   rscan=range(sapply(re,function(x) range(x[,1],na.rm=T)),na.rm=T)
-  lsc=min(rscan):max(rscan)
+  lsc=1:max(rscan)
   re=lapply(re,function(x) x[match(lsc,x[,1]),,drop=F])
   rt=sapply(re,function(x) x[,2,drop=F])
   inty=sapply(re,function(x) x[,3,drop=F])
   rownames(rt)=rownames(inty)=lsc
+  colnames(rt)=colnames(inty)=names(re)
   re=list(rt=rt,inty=inty)
   }
   d1=proc.time()[3]

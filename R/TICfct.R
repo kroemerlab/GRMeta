@@ -1,6 +1,9 @@
 .GRgetTIC<-function(mzfi,verbose=TRUE){
   require(mzR)
-  if(!file.exists(mzfi)) stop(paste(mzfi,"does not exist"))
+  if(!file.exists(mzfi)){
+    cat(paste(mzfi,"does not exist"))
+    return(list(matrix(c(1,NA,NA),ncol=3),mzfi))
+  }
   aa=openMSfile(mzfi,backend="Ramp",verb=T)
   rts=header(aa)[,"retentionTime"]/60
   names(rts)=header(aa)[,1]
@@ -49,10 +52,11 @@
   re=lapply(acef,function(x) x[[1]])
   if(mergeTIC){
   rscan=range(sapply(re,function(x) range(x[,1],na.rm=T)),na.rm=T)
-  acef=lapply(re,function(x) x[match(min(rscan):max(rscan),x[,1]),,drop=F])
-  rt=sapply(re,function(x) x[,2])
-  inty=sapply(re,function(x) x[,3])
-  rownames(rt)=rownames(inty)=min(rscan):max(rscan)
+  lsc=min(rscan):max(rscan)
+  re=lapply(re,function(x) x[match(lsc,x[,1]),,drop=F])
+  rt=sapply(re,function(x) x[,2,drop=F])
+  inty=sapply(re,function(x) x[,3,drop=F])
+  rownames(rt)=rownames(inty)=lsc
   re=list(rt=rt,inty=inty)
   }
   d1=proc.time()[3]

@@ -12,7 +12,7 @@
                   ": rt=",round(min(rts),2),"-",round(max(rts),2),"\n")
   tic=tapply(m[,3],m[,1],sum,na.rm=T)
   rm("m")
-  cbind(scan=as.numeric(names(tic)),rt=rts[as.numeric(names(tic))],tic=tic)
+  list(cbind(scan=as.numeric(names(tic)),rt=rts[as.numeric(names(tic))],tic=tic),mzfi)
 }
 
 
@@ -37,16 +37,16 @@
   }
   if(ncl>1){
     cat(" on ",ncl," processors\n",sep="")
-    sfInit(parallel=TRUE, cpus=ncl, type='SOCK',slaveOutfile='loggetT~IC')
+    sfInit(parallel=TRUE, cpus=ncl, type='SOCK',slaveOutfile='loggetTIC')
     sfLibrary(GRMeta)
     sfLibrary(mzR)
     #if(local) 
     #sfExport( ".GRdoOneCef", local=TRUE )
-    acef=sfClusterApplyLB(lfiles,.GRdoOneCef,verbose=FALSE)
+    acef=sfClusterApplyLB(lfiles,.GRgetTIC,verbose=FALSE)
     sfStop()
   }
-  names(acef)=names(lfiles)
-  re=acef
+  names(acef)=names(unlist(sapply(acef,function(x) x[2])))
+  re=lapply(acef,function(x) x[[1]])
   if(mergeTIC){
   rscan=range(sapply(acef,function(x) range(x[,1],na.rm=T)),na.rm=T)
   acef=lapply(acef,function(x) x[match(min(rscan):max(rscan),x[,1]),,drop=F])

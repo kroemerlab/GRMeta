@@ -3,14 +3,15 @@
 \title{Partition peak list}
 \description{Partition peak list}
 \usage{
-partitionPeaks(cdat, err.ppm = 10, err.rt = 0.1, metaboSet = list(), fac = 4, whichrt = "rt", whichmz = "mz", whichsamp = "samp")
+partitionPeaks(cdat, err.ppm = 10, err.rt = 0.1, metaboSet = list(),refine=TRUE, fac = 4, whichrt = "rt", whichmz = "mz", whichsamp = "samp")
 }
 \arguments{
   \item{cdat}{data}
   \item{err.ppm}{ppm on mass}
   \item{err.rt}{rt error}
   \item{metaboSet}{list with Method, Meta, File}
-  \item{fac}{speed up}
+  \item{refine}{refining step or loose split}
+  \item{fac}{multiply the err.ppm/err.rt by a factor the loose step - speed up}
   \item{whichrt}{rt colname}
   \item{whichmz}{mz col name}
   \item{whichsamp}{sample name col}

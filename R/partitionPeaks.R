@@ -1,41 +1,44 @@
-partitionPeaks<-function(cdat,err.ppm=10,err.rt=0.1,metaboSet=list(),fac=4,whichrt="rt",whichmz="mz",whichsamp="samp"){
+partitionPeaks<-function(cdat,err.ppm=10,err.rt=0.1,metaboSet=list(),refine=TRUE,fac=4,whichrt="rt",whichmz="mz",whichsamp="samp"){
   
   #### Rough splitting unlikely neighbours: set to err.ppm*fac and err.rt*fac*2
-  system.time(lsp<-.GRgenpkl(cdat[,whichmz],cdat[,whichrt],err.ppm=err.ppm*fac,err.rt=err.rt*fac*2))
+  system.time(lsp<-.GRgenpkl(cdat[,whichmz],cdat[,whichrt],err.ppm=err.ppm*fac,err.rt=err.rt*fac))
   cat("Loose split: num. peaks:",nrow(cdat)," -> num. clusters: ",length(lsp),"\n",sep="")
 
   ##### Density based split on both rt and ppm
-  system.time(lsp1<-lapply(lsp,function(x) 
+ if(refine){
+   cat("Refining step....\n")
+   system.time(lsp1<-lapply(lsp,function(x) 
     .GRsplitBoth(cdat[x,whichmz],cdat[x,whichrt],x,bwrt=err.rt,bwppm=err.ppm)))
   lsp1=unlist(lsp1,FALSE)
   lsp1=lapply(lsp1,function(x) x[order(cdat[x,whichsamp],cdat[x,whichsamp])])
-  
-  mrt=round(sapply(lsp1,function(x) median(cdat[x,whichrt])),1)
-  mrz=sapply(lsp1,function(x) median(cdat[x,whichmz]))
+  lsp=lsp1
+  cat("Density based split: num. peaks=",nrow(cdat)," -> num. clusters:",length(lsp),"\n",sep="")
+ }
+  mrt=round(sapply(lsp,function(x) median(cdat[x,whichrt])),1)
+  mrz=sapply(lsp,function(x) median(cdat[x,whichmz]))
   ana=sprintf("%.4f@%.2f",mrz,mrt)
   if(any(table(ana)>1)){
     l=which(ana%in%names(which(table(ana)>1)))
     ana[l]=sprintf("%.5f@%.3f",mrz,mrt)[l]
   }
-  names(lsp1)=ana
+  names(lsp)=ana
 
   lso=order(mrt,mrz)
-  lsp1=lsp1[lso]
-  cat("Density based split: num. peaks=",nrow(cdat)," -> num. clusters:",length(lsp1),"\n",sep="")
-  if(is.null(metaboSet))  return(lsp1)
+  lsp=lsp[lso]
+  if(length(metaboSet)==0)  return(lsp)
   
   ##################
   ## conv2 metaboset
   # metaboSet=list(assay="cef",Meta=NULL,File=NULL)
   ## do annot
-  mrt=sapply(lsp1,function(x) median(cdat[x,whichrt]))
-  mrz=sapply(lsp1,function(x) median(cdat[x,whichmz]))
+  mrt=sapply(lsp,function(x) median(cdat[x,whichrt]))
+  mrz=sapply(lsp,function(x) median(cdat[x,whichmz]))
   ana=sprintf("%.4f@%.2f-%s",mrz,mrt,metaboSet$Method)
   if(any(table(ana)>1)){
     l=which(ana%in%names(which(table(ana)>1)))
     ana[l]=sprintf("%.5f@%.3f-%s",mrz,mrt,metaboSet$Method)[l]
   }
-  names(lsp1)=ana
+  names(lsp)=ana
  
    Annot=data.frame(Analyte=ana,MetName=NA,IsSTD=FALSE,LevelAnnot=4,Method=metaboSet$Method,
                     MZ=mrz,RT=mrt,stringsAsFactors=FALSE)
@@ -51,16 +54,16 @@ partitionPeaks<-function(cdat,err.ppm=10,err.rt=0.1,metaboSet=list(),fac=4,which
   if(!is.null(metaboSet$File))
     if(all(lsids%in%metaboSet$File$Sid)) File=metaboSet$File[lsids,]
   ## 
-  mrt=sapply(lsp1,function(x) tapply(cdat[x,whichrt],cdat[x,whichsamp],median,na.rm=T)[lsids])
-  mmz=sapply(lsp1,function(x) tapply(cdat[x,whichmz],cdat[x,whichsamp],median,na.rm=T)[lsids])
-  dimnames(mrt)=dimnames(mmz)=list(lsids,names(lsp1))
+  mrt=sapply(lsp,function(x) tapply(cdat[x,whichrt],cdat[x,whichsamp],median,na.rm=T)[lsids])
+  mmz=sapply(lsp,function(x) tapply(cdat[x,whichmz],cdat[x,whichsamp],median,na.rm=T)[lsids])
+  dimnames(mrt)=dimnames(mmz)=list(lsids,names(lsp))
   Data=list(RT=mrt,MZ=mmz)
 
   lvars=names(cdat)[sapply(cdat, class)%in%c("numeric","integer")]
   lvars=lvars[!lvars%in%c(whichrt,whichmz)]
   for(i in lvars){
-    m=sapply(lsp1,function(x) tapply(cdat[x,i],cdat[x,whichsamp],sum,na.rm=T)[lsids])
-    dimnames(m)=list(lsids,names(lsp1))
+    m=sapply(lsp,function(x) tapply(cdat[x,i],cdat[x,whichsamp],sum,na.rm=T)[lsids])
+    dimnames(m)=list(lsids,names(lsp))
     Data[[i]]=m
   }
 

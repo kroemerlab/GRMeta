@@ -3,7 +3,7 @@
 
 matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
                    dppm=20,mz2use="MZ",mass2use="Mass",
-                   annotinf2add=NULL,objinf2add=NULL,groupby=NULL,chunk=200,collsep=";;"){
+                   annotinf2add=NULL,objinf2add=NULL,groupby=NULL,chunk=200,ncl=1,collsep=";;"){
   
   if(inherits(obj, "metaboSet")){
     cat("Matching from a metaboSet\n")
@@ -69,11 +69,10 @@ matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
   lst=seq(1,length(cmz),length.out=ngrps+1)
   lx=suppressWarnings(split(names(cmz),1:ngrps))
   }
-  allr=list()
   ### parallel? lx/mmz/cmz/dppm
-  for(k in 1:length(lx)){
-    cx=lx[[k]]
-    cat(ifelse(k%%10==0,"X","."))
+  
+  .infctMZM<-function(cx,mmz,cmz,dppm){
+    
     allm=list()
     for(i in 1:ncol(mmz)){
       mdppm=sweep(outer(cmz[cx],mmz[,i],"-"),1,cmz[cx],"/")*10^6
@@ -81,8 +80,37 @@ matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
       if(length(lmatch)>0) 
         allm[[i]]=data.frame(Analyte=cx[lmatch[,1]],IP=i,DPPM=round(mdppm[lmatch],3),Entry=lmatch[,2],stringsAsFactors=F)
     }
-    if(length(allm)>0)  allr[[k]]=do.call("rbind",allm)
+    if(length(allm)>0) return(do.call("rbind",allm))
+    return(NULL)
+    
   }
+  
+
+  d0=proc.time()[3]
+  cat("Started at ",date(),sep="")
+  
+  if(ncl==1 | length(lx)==1){
+    cat(" on 1 processor\n",sep="")
+    allr=list()
+    for(k in 1:length(lx)){
+      cx=lx[[k]]
+      cat(ifelse(k%%10==0,"X","."))
+      allr[[k]]=.infctMZM(cx,mmz,cmz,dppm)
+    }
+  }
+  if(ncl>1 & length(lx)>1){
+    require("snowfall")
+    ncl=max(1,min(ncl,parallel:::detectCores()))
+    cat(" on ",ncl," processors\n",sep="")
+    sfInit(parallel=TRUE, cpus=ncl, type='SOCK',slaveOutfile='loggetTIC')
+    sfExport( ".infctMZM", local=TRUE )
+    allr=sfClusterApplyLB(lx,.infctMZM,mmz,cmz,dppm)
+    sfStop()
+  }
+  d1=proc.time()[3]
+  cat("\nCompleted at ",date()," -> took ",round(d1-d0,1)," secs \n",sep="")
+  
+  allr=allr[which(!sapply(allr,is.null))]
   cat("\n")
   if(length(allr)==0) return(NULL)
   matchres=do.call("rbind",allr)

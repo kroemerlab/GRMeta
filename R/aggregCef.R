@@ -49,7 +49,7 @@ aggregCEF<-function(lfiles,minrt=0,maxrt=Inf,maxmz=+Inf,minmz=1,ncl=1,verbose=TR
     lpks=xmlChildren(xmlChildren(ient)$Spectrum)$MSPeaks
     mod=xmlAttrs(xmlChildren(xmlChildren(ient)$Spectrum)$MSDetails)
     dat2=t(xmlSApply(lpks,function(i) xmlAttrs(i)[c("rt","x","y","v","z","s")]))
-    m <- gregexpr("\\+([1-9]+)$",dat2[,"s"])
+    m <- gregexpr("\\+([0-9]+)$",dat2[,"s"])
     lma=regmatches(dat2[,"s"], m)
     niso=suppressWarnings(as.numeric(gsub("\\+","",lma)))
     niso[is.na(niso)]=0
@@ -58,7 +58,10 @@ aggregCEF<-function(lfiles,minrt=0,maxrt=Inf,maxmz=+Inf,minmz=1,ncl=1,verbose=TR
     rownames(dat2)=NULL
     dat2=data.frame(samp=NA,rbind(v,dat2),stringsAsFactors=FALSE)
     for(i in c("rt","x","y","v","z","niso")) dat2[,i]=as.numeric(gsub(",",".",dat2[,i]))
-    names(dat2)=c("samp", "mfid","mfid2","rt","mz","Area","Height","xM","ip","iso")
+    names(dat2)=c("samp", "mfid","mfid2","rt","mz","Area","Height","z","ip","iso")
+    dat2$xM=1
+    dat2$xM[which(dat2$ip=="M")]=0
+    dat2$xM[grep("^[0-9]+M",dat2$ip)]=as.numeric(gsub("^([0-9]+)M.*","\\1",dat2$ip[grep("^[0-9]+M",dat2$ip)]))
     return(dat2)
   }
   

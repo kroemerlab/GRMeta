@@ -48,10 +48,10 @@
   names(acef)=names(unlist(sapply(acef,function(x) x[2])))
   re=lapply(acef,function(x) x[[1]])
   if(mergeTIC){
-  rscan=range(sapply(acef,function(x) range(x[,1],na.rm=T)),na.rm=T)
-  acef=lapply(acef,function(x) x[match(min(rscan):max(rscan),x[,1]),,drop=F])
-  rt=sapply(acef,function(x) x[,2])
-  inty=sapply(acef,function(x) x[,3])
+  rscan=range(sapply(re,function(x) range(x[,1],na.rm=T)),na.rm=T)
+  acef=lapply(re,function(x) x[match(min(rscan):max(rscan),x[,1]),,drop=F])
+  rt=sapply(re,function(x) x[,2])
+  inty=sapply(re,function(x) x[,3])
   rownames(rt)=rownames(inty)=min(rscan):max(rscan)
   re=list(rt=rt,inty=inty)
   }

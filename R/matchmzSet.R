@@ -70,6 +70,7 @@ matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
   lx=suppressWarnings(split(names(cmz),1:ngrps))
   }
   allr=list()
+  ### parallel? lx/mmz/cmz/dppm
   for(k in 1:length(lx)){
     cx=lx[[k]]
     cat(ifelse(k%%10==0,"X","."))

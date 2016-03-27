@@ -82,3 +82,63 @@
 .GRcodadw<-function(x) sum(diff(x)^2)/sum((x)^2)
 
 
+.GRestimBl<-function(tabeic,direic=".",blSid,minScan=11,quantBl=0.5,ncl=1){
+  
+  .infctBlfct<-function(ifile,blSid=NULL,minScan=11,quantBl=0.5){
+    load(ifile)
+    dfeic=dfeic[dfeic$samp%in%blSid,]
+    leics=attr(dfeic,"eic")[,"Id"]
+    matbl=matrix(NA,nrow=length(leics),ncol=length(blSid),dimnames=list(leics,blSid))
+    if(nrow(dfeic)==0) return(matbl)
+    eicbl=paste(dfeic$samp,dfeic$eic)
+    l2use=names(which(table(eicbl)>=minScan))
+    if(length(l2use)==0) return(matbl)
+    dfeic=dfeic[which(eicbl%in%l2use & dfeic$y>0 & !is.na(dfeic$y)),]
+    if(nrow(dfeic)==0) return(matbl)
+    blsamp=tapply(1:nrow(dfeic),dfeic$samp,function(x) tapply(dfeic$y[x],dfeic$eic[x],quantile,quantBl))
+    for(i in names(blsamp)) matbl[names(blsamp[[i]]),i]=blsamp[[i]]
+    rm(list=c("dfeic"))
+    return(matbl)
+  }
+  
+  
+  fileeics=paste(direic,unique(tabeic$GrpEic),"-isoSet.rda",sep="")
+  names(fileeics)=unique(tabeic$GrpEic)
+  fileeics=fileeics[file.exists(fileeics)]
+  if(length(fileeics)==0) stop('No file found!')
+  
+  d0=proc.time()[3]
+  cat("Started at ",date(),sep="")
+  
+  if(ncl==1 | length(fileeics)==1){
+    cat(" on 1 processor\n",sep="")
+    allr=list()
+    for(k in 1:length(fileeics)){
+      cx=fileeics[k]
+      cat(ifelse(k%%10==0,"X","."))
+      allr[[k]]=.infctBlfct(cx,blSid,minScan,quantBl)
+    }
+  }
+  if(ncl>1 & length(fileeics)>1){
+    require("snowfall")
+    ncl=max(1,min(ncl,parallel:::detectCores()))
+    cat(" on ",ncl," processors\n",sep="")
+    sfInit(parallel=TRUE, cpus=ncl, type='SOCK',slaveOutfile='loggetTIC')
+    sfExport( ".infctBlfct", local=TRUE )
+    allr=sfClusterApplyLB(fileeics,.infctBlfct,blSid,minScan,quantBl)
+    sfStop()
+  }
+  d1=proc.time()[3]
+  cat("\nCompleted at ",date()," -> took ",round(d1-d0,1)," secs \n",sep="")
+  
+  allr=allr[which(!sapply(allr,is.null))]
+  cat("\n")
+  if(length(allr)==0) return(NULL)
+  blres=do.call("rbind",allr)
+  blres=blres[rownames(blres)%in%tabeic$Id,,drop=F]
+  blres=blres[match(tabeic$Id,rownames(blres)),,drop=F]
+  rownames(blres)=tabeic$Id
+  return(blres)
+}
+
+

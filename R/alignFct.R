@@ -60,3 +60,25 @@
   corrrt=do.call("cbind",corM)
   return(list(AddRT=addrt,CorrRT=corrrt,IntGrid=intgrid))
 }
+
+
+.GRfiltreScan<-function(csc,idx=rep(1,length(csc)),alpha=5:10,perc=0.7){
+  
+  cmpmiss<-function(i) sum(i)/length(i)
+  
+  alpha=alpha[alpha<=min(max(alpha),length(csc))]
+  isFeat=rep(FALSE,length(csc))
+  for(add in alpha){
+    z <- embed(csc,add)
+    lrep=rowSums(z)/add
+    l=which(lrep >=perc)
+    l=l[which(idx[l]==idx[l+add-1])]
+    for(i in 0:(add-1)) isFeat[l+i]=TRUE
+  }
+  return(isFeat)
+}
+
+.GRcodadw2<-function(x,lag=1) sum(diff(diff(x),lag=lag)^2)/sum(diff(x)^2)
+.GRcodadw<-function(x) sum(diff(x)^2)/sum((x)^2)
+
+

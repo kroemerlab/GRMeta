@@ -3,7 +3,7 @@ loadAgilentData,loadMavenData,loadAgilentDataFlux,mapSetKegg,matchmzSet,mergeSet
 parseSampEIC,parseOneSampEIC,.GRparseSampEICCl,
 gatherMultiEICs,.GRgatherMultiEICCl,gatherOneEIC,
 .GRgetArea,.GRmsExtrema,.GRdoksmooth,.GRipeaks,.GRmsPeakSimple,.GRconvEIC,
-aggregCEF,.GRdoOneCef,.GRgetcomptime,.GRmgetTIC,.GRgetTIC,.GRcompVals,.GRcompTICaddRT,.GRfiltreScan,.GRcodadw,.GRcodadw2,.GRestimBl,
+aggregCEF,.GRdoOneCef,.GRgetcomptime,.GRmgetTIC,.GRgetTIC,.GRcompVals,.GRcompTICaddRT,.GRfiltreScan,.GRcodadw,.GRcodadw2,.GRestimBl,.GRcompEICst,
 partitionPeaks,.GRfindturnpoint,.GRsplitOne,.GRsplitBoth,.GRsplist,.GRcompdppm,.GRgenpkl)
 
 ### register S3 methods

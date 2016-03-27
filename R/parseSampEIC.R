@@ -45,18 +45,25 @@ parseOneSampEIC<-function(mzfi,tabeic,outfile=NULL,npad=3,stepmz=1/1000,mzdata=F
                     ceiling((itab[,'mzmax']*(1+itab[,'shppm']*10^-6)+2*stepmz)/stepmz))
     l=which(lcode>=min(rtmzrange) & lcode<=max(rtmzrange))
     v=lcode[l]
-    mred=m[l,]
+    mred=m[l,,drop=F]
+ #   print(dim(mred))
 #    system.time(rangmz<-apply(rtmzrange,1,function(x) xcms:::findRange(v,x[1],x[2])))
     #ucode=apply(t(rangmz),1,function(x) x[1]:x[2])
     system.time(ucode<-apply(rtmzrange,1,function(x) which(v>=x[1] & v <=x[2])))
-     mred=mred[unlist(ucode),]
-    mred=cbind(mred,eic=unlist(lapply(1:length(ucode),function(x) rep(x,length(ucode[[x]])))))
-    mred=mred[which((mred[,whichrt]+itab[mred[,5],"shrt"]-itab[mred[,5],"rtmin"]+padrt)>=0),,drop=FALSE]
+     mred=mred[unlist(ucode),,drop=F]
+ #    print(c(3,dim(mred)))
+     if(nrow(mred)>0){
+     mred=cbind(mred,eic=unlist(lapply(1:length(ucode),function(x) rep(x,length(ucode[[x]])))))
+#     print(dim(mred))
+     mred=mred[which((mred[,whichrt]+itab[mred[,5],"shrt"]-itab[mred[,5],"rtmin"]+padrt)>=0),,drop=FALSE]
     mred=mred[which((mred[,whichrt]+itab[mred[,5],"shrt"]-itab[mred[,5],"rtmax"]-padrt)<=0),,drop=FALSE]
+#    print(dim(mred))
     mred=mred[which((mred[,whichmz]*(1+itab[mred[,5],"shppm"]*10^-6)-itab[mred[,5],"mzmin"])>=0),,drop=FALSE]
     mred=mred[which((mred[,whichmz]*(1+itab[mred[,5],"shppm"]*10^-6)-itab[mred[,5],"mzmax"])<=0),,drop=FALSE]
     mred[,"eic"]=lins[mred[,"eic"]]
-    amred[[ilins]]=mred
+     } else{mred=matrix(nrow=0,ncol=5);colnames(mred)=c(colnames(m),'eic')}
+#     print(c(5,dim(mred)))
+     amred[[ilins]]=mred
     rm(list="mred")
   }
   rm(list=c("m",'lcode','llcode'))
@@ -116,7 +123,7 @@ parseSampEIC<-function(matfile,tabeic,corrt=NULL,npad=3,stepmz=1/1000,verbose=TR
       if(!is.null(corrt)) if(ix%in%rownames(corrt))
         tmpeic$shrt=tmpeic$shrt+approx(as.numeric(colnames(corrt)),corrt[ix,],tmpeic$rtap)$y
       
-      re[[ix]]=parseOneSampEIC(matfile[ix,]$In,outfile=matfile[ix,]$Out,tabeic=tmpeic,npad=npad,stepmz=stepmz,mzdata=mzdata,chunk=chunk,verbose=verbose,serial=FALSE)
+      re[[ix]]=parseOneSampEIC(matfile[ix,]$In,outfile=matfile[ix,]$Out,tabeic=tmpeic,npad=npad,stepmz=stepmz,mzdata=mzdata,chunk=chunk,verbose=verbose,serial=TRUE)
     }
     d1=proc.time()[3]
     cat("\nCompleted at ",date()," -> took ",round(d1-d0,1)," secs - ",round((d1-d0)/length(lsids),1)," secs per file\n",sep="")

@@ -255,17 +255,75 @@
   
 }
 
+.GRgroupPks<-function(apks,tabres){
+ 
+  inloc=inlocr=inlocl=rep(0,nrow(apks))
+  lseg=sort(unique(tabres[tabres[,4]!=0,2]))
+  lseg=lseg[lseg>0]
+  lsegsc=lapply(lseg,function(x) which(tabres[,2]==x))
+  for(ij in lseg) inloc[apks$tick.loc%in%which(tabres[,2]==ij)]=ij
+  for(ij in lseg) inlocl[apks$tick.left%in%which(tabres[,2]==ij)]=ij
+  for(ij in lseg) inlocr[apks$tick.right%in%which(tabres[,2]==ij)]=ij
+  toadd=cbind(pkreg=inloc,lefreg=inlocl,rireg=inlocr)
+  ### remove all zeros alone in their cluster
+  allz=apply(toadd,1,function(x) all(x==0))*1
+  scl=paste(apks$samp,apks$cl)
+  tab=table(scl,factor(allz,levels=0:1))
+  l2rm=which(scl%in%names(which(tab[,1]==0 & tab[,2]>0)))
+  if(length(l2rm)){toadd=toadd[-l2rm,,drop=F];apks=apks[-l2rm,,drop=F]}
+  if(nrow(apks)==0) return(NULL)
+  ### chk if all agree
+  ndif=apply(toadd,1,function(x) length(unique(x[x>0])))
+  ndif[which(ndif>1)]=NA
+  ndif[which(ndif==1)]=apply(toadd[which(ndif==1),,drop=F],1,function(x) unique(x[x>0]))
+  if(length(ndif)>1) if(any(ndif==0,na.rm=T)) for(mergezer in 1:2){
+    ### all zeros before
+    if(any(ndif[-length(ndif)]==0,na.rm=T)){
+      lzer=which(ndif[-length(ndif)]==0)
+      lzer=lzer[which(apks$samp[lzer+1]==apks$samp[lzer] & apks$cl[lzer+1]==apks$cl[lzer] & ndif[lzer+1]>0)]
+      if(length(lzer)>0) ndif[lzer]=ndif[lzer+1]
+    }
+    ### all zeros after
+   if(any(ndif[-1]==0,na.rm=T)){
+      lzer=which(ndif[-1]==0)+1
+      lzer=lzer[which(apks$samp[lzer-1]==apks$samp[lzer] & apks$cl[lzer-1]==apks$cl[lzer] & ndif[lzer-1]>0)]
+      if(length(lzer)>0) ndif[lzer]=ndif[lzer-1]
+    }
+  }
+  ### chk if only in the sample/cluster NA
+  if(any(is.na(ndif))){
+    scl=paste(apks$samp,apks$cl)
+    lna=which(is.na(ndif))
+    l=which(scl%in%scl[lna])
+    if(!all(is.na(ndif[l]))){
+    tab=table(scl[l],ndif[l])
+    tab=tab[rowSums(tab>0)==1,,drop=F]
+    if(nrow(tab)>0) for(i in rownames(tab)) ndif[which(scl%in%i)]=unique(na.omit(ndif[which(scl%in%i)]))
+    }
+  }  
+  
+  ### check maximum overlap
+  if(any(is.na(ndif))){
+    for(i in which(is.na(ndif))){
+    llpk=apks$tick.left[i]:apks$tick.right[i]
+    maxov=which.max(sapply(lsegsc,function(x) length(intersect(x,llpk))/length(llpk)))
+    if(maxov%in%toadd[i,]) ndif[i]=maxov
+    }
+  }
+  return(cbind(apks,toadd,Pk=ndif))
+}
+
+
 #####################################################################
 ###
-.GRgroupPks<-function(apks,lpks=NULL,lseg=rep(1,length(lpks))){
+.oGRgroupPks<-function(apks,lpks=NULL,lseg=rep(1,length(lpks))){
   
   
-  regs=apks[,c("pkreg","lefreg","rireg")]
-  apks0=apks[rowSums(regs==0)==3,,drop=F]
-  apks=apks[rowSums(regs==0)<3,,drop=F]
+  apks0=apks
+  apks=apks[(apks$pkreg+apks$lefreg+apks$rireg)>0,,drop=F]
   if(nrow(apks)==0) return(NULL)
-  regs=regs[rowSums(regs==0)<3,,drop=F]
-  lregs=unique(as.vector(regs))
+  regs=apks[,c("pkreg","lefreg","rireg"),drop=F]
+  lregs=unique(as.vector(as.matrix(regs)))
   lregs=lregs[lregs>0]
   uregs=as.character(regs[,"pkreg"])
   l1=which(uregs==0 & (regs[,"rireg"]==0 | regs[,"lefreg"]==regs[,"rireg"]))

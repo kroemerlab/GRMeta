@@ -15,12 +15,20 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
   if(ncol(cm)>1) tabres=cbind(rt=lrt,.GRcompSeg(cm,cmz,eicParams,ivMint=ivMint))
   if(ncol(cm)==1) tabres=cbind(rt=lrt,.GRcompSegOne(cm,cmz,eicParams,ivMint=ivMint))
   
+  if(all(tabres[,4]==0 | tabres[,2]==0)){
+    cat("No master peaks in ",ieic,"\n")
+    return(NULL)
+  }
   ###########################
   apks=lapply(colnames(m),function(x) 
     .GRmsPeakSimple3(m[,x],span=eicParams$nspan,noise=mz[,x],snr.thresh=1.1))
   l=which(sapply(apks,nrow)>0)
   apks=do.call("rbind",lapply(l,function(x) data.frame(samp=colnames(m)[x],apks[[x]],stringsAsFactors=F)))
   rownames(apks)=NULL
+  if(nrow(apks)==0){
+    cat("No peaks in sample",ieic,"\n")
+    return(NULL)
+  }
   
   finalpks=.GRgroupPks(apks,tabres)
   if(is.null(finalpks$Pk)) cat("No peaks in ",ieic,"\n")

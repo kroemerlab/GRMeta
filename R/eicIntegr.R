@@ -167,7 +167,7 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
 ####################
 
 
-integrOneEicGrp<-function(tabeic,lSamp=NULL,eicParams,save=TRUE,whichrt="rtcor",whichmz="mzcor"){
+integrOneEicGrp<-function(tabeic,lSamp=NULL,eicParams,whichrt="rtcor",whichmz="mzcor",save=TRUE,verbose=TRUE){
   
   ieicgrp=tabeic$GrpEic[1]
   tabeic=tabeic[tabeic$GrpEic==ieicgrp,]
@@ -182,14 +182,20 @@ integrOneEicGrp<-function(tabeic,lSamp=NULL,eicParams,save=TRUE,whichrt="rtcor",
   rownames(dfeic)=NULL
   eicdef=attr(dfeic,'eic')
   attr(dfeic,'eic')=eicdef=eicdef[eicdef$Id%in%dfeic$eic,]
-  
+  leics=unique(dfeic$eic)
+  if(verbose) cat("Found ",length(leics)," in ",ieicgrp,"\n",sep="")
   allre=list()
-  for(ieic in unique(dfeic$eic)){
-  #  print(ieic)
-    tmpeic=dfeic[dfeic$eic==ieic,]
+  for(ieic in leics){
+    itmpeic=dfeic[dfeic$eic==ieic,]
     ivMint=tabeic$Bl[tabeic$Id==ieic]
     ivMint=ifelse(is.null(ivMint),eicParams$Mint,ivMint)
-    allre[[ieic]]=integrOneEic(tmpeic,lSamp=lSamp,ivMint,eicParams,whichrt=whichrt,whichmz=whichmz)
+    if(nrow(itmpeic)>0){
+      if(verbose) cat(" * ",ieic,": ",sep="")
+      allre[[ieic]]=integrOneEic(itmpeic,lSamp=lSamp,ivMint=ivMint,eicParams=eicParams,
+                            whichrt=whichrt,whichmz=whichmz,verbose=verbose)
+      if(verbose) 
+      cat(ifelse(is.null(allre[[ieic]]),' 0 ',length(unique(allre[[ieic]]$SampStats$Pk)))," peaks\n",sep="")
+    }
   }
   
   allre=allre[which(!sapply(allre,is.null))]
@@ -201,17 +207,49 @@ integrOneEicGrp<-function(tabeic,lSamp=NULL,eicParams,save=TRUE,whichrt="rtcor",
   dfeic=dfeic[,names(dfeic)!="Pk"]
   
   sstats=do.call("rbind",lapply(allre,function(x) x$SampStats))
+  sstats$eic0=sstats$eic
   sstats$eic=paste(sstats$eic,sstats$Pk,sep="-")
-  sstats=sstats[,names(sstats)!="Pk"]
+
   rm(list=c("allre"))
+  ############## Combine
+  lsids=sort(unique(sstats$samp))
+  lsids1=lsids[lsids%in%lSamp]
+  lsids2=lsids[!lsids%in%lSamp]
   
+  leics=sort(unique(sstats$eic))
+  sstats=sstats[order(factor(sstats$eic,levels=leics),factor(sstats$samp,lsids)),,drop=F]
+  ldats=names(sstats)[!names(sstats)%in%c("samp","eic","eic0","Pk")]
+  alldat=vector('list',length(ldats));names(alldat)=ldats
+  allstats=alldat
+  convm=do.call("cbind",tapply(1:nrow(sstats),sstats$eic,function(x) x[match(lsids,sstats$samp[x])]))
+  rownames(convm)=lsids
+  lnna=which(!is.na(convm))
+  for(idat in ldats){
+    m=matrix(NA,nrow=length(lsids),ncol=length(leics),dimnames=dimnames(convm))
+    m[lnna]=sstats[convm[lnna],idat]
+    ist=rep(NA,length(leics))
+    if(length(lsids1)>0) ist=apply(m[lsids1,,drop=F],2,median,na.rm=T)[leics]
+    if(length(lsids2)>0 & any(is.na(ist))) ist[which(is.na(ist))]=apply(m[lsids1,which(is.na(ist)),drop=F],2,median,na.rm=T)
+    allstats[[idat]]=ist
+    alldat[[idat]]=m
+    
+  }
+  allstats=t(do.call("rbind",allstats))
+  allstats=data.frame(eic=rownames(allstats),allstats,stringsAsFactors=FALSE)
+  
+  eicstats=data.frame(PkId=rownames(allstats),eicori=as.vector(tapply(sstats$eic0,sstats$eic,unique)[allstats$eic]),
+   pkori=as.vector(tapply(sstats$Pk,sstats$eic,unique)[allstats$eic]),stringsAsFactors=FALSE)
+  eicstats=cbind(eicstats[,-2],tabeic[match(eicstats$eicori,tabeic$Id),])
+  rownames(eicstats)=eicstats$PkId
+  
+  rm('sstats')
   if(save){
     ofile=paste(ifelse(is.null(eicParams$dirEic),"./",eicParams$dirEic),
                 ieicgrp,
                 ifelse(is.null(eicParams$addEic),"./",eicParams$addEic),"-clean.rda",sep="")
-    save(file=ofile,dfeic,sstats)
+    save(file=ofile,dfeic,alldat,allstats,eicstats)
   }
   
-  invisible(list(Eic=dfeic,Stats=sstats))
+  invisible(list(Eic=dfeic,Dat=alldat,Stats=allstats,EicInfos=eicstats))
   
 }

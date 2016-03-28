@@ -76,7 +76,7 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
     finalpks$MZ[i]=tmp[iapex,whichmz]
     finalpks$MZ2[i]=weighted.median(tmp[,whichmz],tmp[,"y"])
   }
-  
+  if(max(finalpks$Pk)>1){
   ############################
   ## reorder based on RT/MZ
   RTs=round(tapply(finalpks$RT,finalpks$Pk,median),4)
@@ -113,6 +113,7 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
   lso=names(RTs)[order(RTs,MZs)]
   finalpks$Pk=(1:length(lso))[match(finalpks$Pk,lso)]
   
+}
     
   ###########################
   ## clean eic

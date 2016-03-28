@@ -2,7 +2,7 @@
   lesm=which(lrt>=le & lrt<=ri)
   linpk=which(tmp$InPk & !is.na(tmp[,whichmz]))
   iapex=linpk[which.max(tmp$y[linpk])]
-  MZs=c(tmp[iapex,whichmz],weighted.median(tmp[linpk,whichmz],tmp[linpk,"y"]))
+  MZs=c(tmp[iapex,whichmz],weighted.median(tmp[linpk,whichmz],tmp[linpk,whichmz]))
   names(MZs)=c("MZap","MZwm")
   Areas=rep(.GRgetArea(lrt[lesm],m[lesm,isamp]),2)
   if(sum(tmp$InPk)>2) Areas[1:2]=.GRgetArea(tmp[tmp$InPk,whichrt],tmp[tmp$InPk,"y"])
@@ -14,8 +14,7 @@
   HE=c(RT.ap=tmp[iapex,whichrt],HE.ap=tmp[iapex,"y"])
   Coda2=.GRcodadw2(tmp[tmp$InPk,'y'])
   Coda2[is.na(Coda2)]=3
-  NCons=ifelse(is.null(tmp$NCons),NA,sum(tmp$NCons & tmp$InPk))
-  reint=rbind(c(RT.le=le,RT.ri=ri,Areas,HE,HEsm,MZs,Coda=Coda2,NCons=NCons))
+  reint=rbind(c(RT.le=le,RT.ri=ri,Areas,HE,HEsm,MZs,Coda=Coda2))
   return(reint)
 }
 
@@ -51,68 +50,12 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
   }
   
   finalpks=.GRgroupPks(apks,tabres)
-  finalpks$IsNA=is.na(finalpks$Pk)
-  if(any(is.na(finalpks$Pk))){
-    l=which(is.na(finalpks$Pk))
-    finalpks$Pk[l]=max(finalpks$Pk,na.rm=T)+(1:length(l))
-  }
   if(verbose){
     if(is.null(finalpks$Pk)) cat("No peaks in ",ieic,"\n")
-    if(any(finalpks$IsNA)) cat("NAs in ",ieic,"\n")
+    if(any(is.na(finalpks$Pk))) cat("NAs in ",ieic,"\n")
   }
-  finalpks=finalpks[which(finalpks$Pk!=0),,drop=F]
+  finalpks=finalpks[which(finalpks$Pk>0),,drop=F]
   if(nrow(finalpks)==0) return(NULL)
-  
-  ###########################
-  ## get final pks stats
-  finalpks$MZ=finalpks$MZ2=finalpks$RT=NA
-  for(i in 1:nrow(finalpks)){
-    le=lrt[finalpks$tick.left[i]]
-    ri=lrt[finalpks$tick.right[i]]
-    isamp=finalpks$samp[i]
-    tmp=tmpeic[tmpeic[,whichrt]>=(le) & tmpeic[,whichrt]<=(ri) & tmpeic$samp==isamp,]
-    iapex=which.max(tmp$y)
-    finalpks$RT[i]=tmp[iapex,whichrt]
-    finalpks$MZ[i]=tmp[iapex,whichmz]
-    finalpks$MZ2[i]=weighted.median(tmp[,whichmz],tmp[,"y"])
-  }
-  
-  ############################
-  ## reorder based on RT/MZ
-  RTs=round(tapply(finalpks$RT,finalpks$Pk,median),4)
-  MZs=tapply(finalpks$MZ,finalpks$Pk,median)
-  lso=names(RTs)[order(RTs,MZs)]
-  finalpks$Pk=(1:length(lso))[match(finalpks$Pk,lso)]
-  
-  lcl=as.list(1:length(lso))
-  oRTs=sapply(lcl,function(x) median(finalpks$RT[finalpks$Pk%in%x]))
-  oMZs=sapply(lcl,function(x) median(finalpks$MZ[finalpks$Pk%in%x]))
-  itab=cbind(diff(oRTs),abs(.GRcompdppm(oMZs,F)))
-  
-  deltaRT=ifelse(is.null(eicParams$dRT),eicParams$nspan*eicParams$bw*3,eicParams$dRT)
-  deltaPPM=ifelse(is.null(eicParams$dPPM),11,eicParams$dPPM)
-  while(any((itab[,1]<deltaRT & itab[,2]<deltaPPM))){
-    l=which(itab[,1]<deltaRT & itab[,2]<deltaPPM)
-    l=l[which.min(itab[l,1])]
-    lcl[[l+1]]=unlist(lcl[l:(l+1)])
-    lcl=lcl[-l]
-    if(length(lcl)==1) break
-    oRTs=sapply(lcl,function(x) median(finalpks$RT[finalpks$Pk%in%x]))
-    oMZs=sapply(lcl,function(x) median(finalpks$MZ[finalpks$Pk%in%x]))
-    itab=cbind(diff(oRTs),abs(.GRcompdppm(oMZs,F)))
-  }
-  oldPk=finalpks$Pk
-  for(i in 1:length(lcl)) finalpks$Pk[oldPk%in%lcl[[i]]]=i
-  if(any(finalpks$IsNA)){
-    lpks2rm=unique(finalpks$Pk[finalpks$IsNA])
-    lpks2rm=lpks2rm[!lpks2rm%in%unique(finalpks$Pk[!finalpks$IsNA])]
-    if(length(lpks2rm)>0) finalpks=finalpks[!finalpks$Pk%in%lpks2rm,,drop=F]
-  }
-  RTs=round(tapply(finalpks$RT,finalpks$Pk,median),4)
-  MZs=tapply(finalpks$MZ,finalpks$Pk,median)
-  lso=names(RTs)[order(RTs,MZs)]
-  finalpks$Pk=(1:length(lso))[match(finalpks$Pk,lso)]
-  
     
   ###########################
   ## clean eic
@@ -123,19 +66,57 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
     ri=lrt[finalpks$tick.right[i]]
     isamp=finalpks$samp[i]
     tmp=tmpeic[tmpeic[,whichrt]>=(le-bws2/2) & tmpeic[,whichrt]<=(ri+bws2/2) & tmpeic$samp==isamp,]
-    tmp$NCons=.GRfiltreScan(tmp$y>=ivMint,alpha=eicParams$LSc,perc=eicParams$Perc)
     tmp$InPk=(tmp[,whichrt]>=le & tmp[,whichrt]<=ri)
     tmp$Pk=finalpks$Pk[i]
     neweic[[i]]=tmp
     ### lrt,le,ri,tmp,m
-    resint=.GRinfctInt(tmp,m,isamp,lrt,le,ri,whichrt,whichmz)
-    pkstats[[i]]=data.frame(samp=isamp,eic=ieic,Pk=finalpks$Pk[i],resint,stringsAsFactors=F)
+    .GRinfctInt(tmp,m,isamp,lrt,le,ri,whichrt,whichmz)
+    pkstats[[i]]=data.frame(samp=isamp,eic=ieic,Pk=finalpks$Pk[i],reint,stringsAsFactors=F)
     
   }
   neweic=do.call("rbind",neweic)
   pkstats=do.call("rbind",pkstats)
   if(length(unique(pkstats$Pk))==1) return(list(Eic=neweic,SampStats=pkstats,Eicstats=NULL))
   # neweic=allre[[ieic]]$Eic ; pkstats=allre[[ieic]]$SampStats
+  
+  ### reorder based on RT  
+  RTs=round(tapply(pkstats$RT.apsm,pkstats$Pk,median),4)
+  MZs=tapply(pkstats$MZap,pkstats$Pk,median)
+  lso=names(RTs)[order(RTs,MZs)]
+  neweic$Pk=(1:length(lso))[match(neweic$Pk,lso)]
+  pkstats$Pk=(1:length(lso))[match(pkstats$Pk,lso)]
+  
+  lcl=as.list(1:length(lso))
+  oRTs=sapply(lcl,function(x) median(pkstats$RT.apsm[pkstats$Pk%in%x]))
+  oMZs=sapply(lcl,function(x) median(pkstats$MZap[pkstats$Pk%in%x]))
+  itab=cbind(diff(oRTs),abs(.GRcompdppm(oMZs,F)))
+  
+  while(any((itab[,1]<0.2 & itab[,2]<10))){
+  l=which(itab[,1]<0.2 & itab[,2]<10)
+  l=l[which.min(itab[l,1])]
+  lcl[[l+1]]=unlist(lcl[l:(l+1)])
+  lcl=lcl[-l]
+  if(length(lcl)==1) break
+  oRTs=sapply(lcl,function(x) median(pkstats$RT.apsm[pkstats$Pk%in%x]))
+  oMZs=sapply(lcl,function(x) median(pkstats$MZap[pkstats$Pk%in%x]))
+  itab=cbind(diff(oRTs),abs(.GRcompdppm(oMZs,F)))
+  }
+  if(any(sapply(lcl,length)>1)){
+    neweic$Pk2=neweic$Pk
+    pkstats$Pk2=pkstats$Pk
+    for(i in 1:length(lcl)) pkstats$Pk2[pkstats$Pk%in%lcl[[i]]]=neweic$Pk2[neweic$Pk%in%lcl[[i]]]=i
+    
+    for(i in which((sapply(lcl,length)>1))){
+      l=which(neweic$Pk2==i)
+      linpk=tapply(l,neweic$samp[l],function(x) x[range(which(neweic$InPk[x]))])
+      linpk=unlist(lapply(linpk,function(x) x[1]:x[2]))
+      neweic$InPk[linpk]=TRUE
+
+      ltmps=tapply(l,neweic$samp[l],c)
+      
+    }
+    
+  }
   
   list(Eic=neweic,SampStats=pkstats,Eicstats=NULL)
 }

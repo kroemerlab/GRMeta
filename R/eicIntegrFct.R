@@ -261,9 +261,12 @@
   lseg=sort(unique(tabres[tabres[,4]!=0,2]))
   lseg=lseg[lseg>0]
   lsegsc=lapply(lseg,function(x) which(tabres[,2]==x))
-  for(ij in lseg) inloc[apks$tick.loc%in%which(tabres[,2]==ij)]=ij
-  for(ij in lseg) inlocl[apks$tick.left%in%which(tabres[,2]==ij)]=ij
-  for(ij in lseg) inlocr[apks$tick.right%in%which(tabres[,2]==ij)]=ij
+  lsegsc=lsegsc[order(sapply(lsegsc,median))]
+  for(ij in 1:length(lsegsc)){
+    inloc[apks$tick.loc%in%lsegsc[[ij]]]=ij
+    inlocl[apks$tick.left%in%lsegsc[[ij]]]=ij
+    inlocr[apks$tick.right%in%lsegsc[[ij]]]=ij
+  }
   toadd=cbind(pkreg=inloc,lefreg=inlocl,rireg=inlocr)
   ### remove all zeros alone in their cluster
   allz=apply(toadd,1,function(x) all(x==0))*1
@@ -306,8 +309,8 @@
   if(any(is.na(ndif))){
     for(i in which(is.na(ndif))){
     llpk=apks$tick.left[i]:apks$tick.right[i]
-    maxov=which.max(sapply(lsegsc,function(x) length(intersect(x,llpk))/length(llpk)))
-    if(maxov%in%toadd[i,]) ndif[i]=maxov
+    maxov=sapply(lsegsc,function(x) length(intersect(x,llpk))/length(llpk))
+    if(maxov[which.max(maxov)]>.24) ndif[i]=which.max(maxov) # else print(i)
     }
   }
   return(cbind(apks,toadd,Pk=ndif))

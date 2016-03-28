@@ -98,7 +98,7 @@
     Ncons=Coda2=HMax=list()
     for(isamp in unique(dfeic$samp)){
       idfeic=dfeic[which(dfeic$samp==isamp),]
-      re=.GRfiltreScan(idfeic$csc,idfeic$eic,eicParams$LSc,eicParams$Perc) 
+      re=.GRfiltreScan(idfeic$csc,idfeic$eic,alpha=eicParams$LSc,perc=eicParams$Perc) 
       Ncons[[isamp]]=tapply(re,idfeic$eic,sum)[leics]
       Coda2[[isamp]]=tapply(idfeic$y,idfeic$eic,.GRcodadw2)[leics]
       HMax[[isamp]]=tapply(idfeic$y,idfeic$eic,function(x) floor(max(x,na.rm=T)))[leics]

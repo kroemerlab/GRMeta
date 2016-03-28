@@ -174,7 +174,7 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
   
    lgrpeic=unique(tabeic$GrpEic)
    lfiles=paste(ifelse(is.null(eicParams$dirEic),"./",eicParams$dirEic),
-               ieicgrp,
+                lgrpeic,
                ifelse(is.null(eicParams$addEic),"./",eicParams$addEic),".rda",sep="")
    
    lgrpeic=lgrpeic[file.exists(lfiles)]
@@ -187,6 +187,7 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
      sfInit(parallel=TRUE, cpus=ncl, type='SOCK')
      sfExport( ".inGRintegrOneEicGrpCl", local=TRUE )
      sfLibrary(GRMeta)
+     sfLibrary(limma)
      allr=sfClusterApplyLB(lgrpeic,.inGRintegrOneEicGrpCl,tabeic,lSamp,eicParams,whichrt,whichmz)
      sfStop()
    d1=proc.time()[3]

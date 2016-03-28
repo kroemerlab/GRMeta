@@ -169,7 +169,10 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
  
   .inGRintegrOneEicGrpCl<-function(igrpeic,tabeic,lSamp,eicParams,whichrt,whichmz){
      itabeic=tabeic[tabeic$GrpEic==igrpeic,]
-     tt=integrOneEicGrp(itabeic,lSamp,eicParams,whichrt,whichmz,save=TRUE,verbose=FALSE)
+     tt=integrOneEicGrp(itabeic,lSamp,eicParams,whichrt,whichmz,save=TRUE,verbose=FALSE)$EicInfos
+     re=c(nrow(itabeic),nrow(tt))
+     rm(list=c("tt","itabeic"))
+     re
   }
   
    lgrpeic=unique(tabeic$GrpEic)
@@ -191,9 +194,12 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
      allr=sfClusterApplyLB(lgrpeic,.inGRintegrOneEicGrpCl,tabeic,lSamp,eicParams,whichrt,whichmz)
      sfStop()
    d1=proc.time()[3]
+   neics=do.call("rbind",allr)[,1]
+   npks=do.call("rbind",allr)[,2]
    cat("\nCompleted at ",date()," -> took ",round(d1-d0,1)," secs to process ",length(lgrpeic)," EIC groups\n",sep="")
+   cat(" * ",sum(neics)," EICs in all, ",round(mean(neics),3)," on av.\n")
+   cat(" * ",sum(npks)," peaks in all, ",round(mean(npks),3)," on av.\n")
    
-  
 }
   
 

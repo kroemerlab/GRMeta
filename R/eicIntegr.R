@@ -165,7 +165,36 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
 }
 
 ####################
-
+.GRintegrOneEicGrpCl<-function(tabeic,lSamp=NULL,eicParams,whichrt="rtcor",whichmz="mzcor",ncl=4){
+ 
+  .inGRintegrOneEicGrpCl<-function(igrpeic,tabeic,lSamp,eicParams,whichrt,whichmz){
+     itabeic=tabeic[tabeic$GrpEic==igrpeic,]
+     tt=integrOneEicGrp(itabeic,lSamp,eicParams,whichrt,whichmz,save=TRUE,verbose=FALSE)
+  }
+  
+   lgrpeic=unique(tabeic$GrpEic)
+   lfiles=paste(ifelse(is.null(eicParams$dirEic),"./",eicParams$dirEic),
+               ieicgrp,
+               ifelse(is.null(eicParams$addEic),"./",eicParams$addEic),".rda",sep="")
+   
+   lgrpeic=lgrpeic[file.exists(lfiles)]
+   tabeic=tabeic[tabeic$GrpEic%in%lgrpeic,]
+   d0=proc.time()[3]
+   cat("Started at ",date(),sep="")
+     require("snowfall")
+     ncl=max(1,min(ncl,parallel:::detectCores()))
+     cat(" on ",ncl," processors\n",sep="")
+     sfInit(parallel=TRUE, cpus=ncl, type='SOCK')
+     sfExport( ".inGRintegrOneEicGrpCl", local=TRUE )
+     sfLibrary(GRMeta)
+     allr=sfClusterApplyLB(lgrpeic,.inGRintegrOneEicGrpCl,tabeic,lSamp,eicParams,whichrt,whichmz)
+     sfStop()
+   d1=proc.time()[3]
+   cat("\nCompleted at ",date()," -> took ",round(d1-d0,1)," secs to process ",length(lgrpeic)," EIC groups\n",sep="")
+   
+  
+}
+  
 
 integrOneEicGrp<-function(tabeic,lSamp=NULL,eicParams,whichrt="rtcor",whichmz="mzcor",save=TRUE,verbose=TRUE){
   

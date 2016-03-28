@@ -21,7 +21,7 @@
 
 integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichmz="mzcor",verbose=TRUE){
   
-
+  
   ieic=tmpeic$eic[1]
   m=.GRconvEIC(tmpeic,whichrt=whichrt,bw=eicParams$nsmo1*eicParams$bw,delrt=eicParams$bw/2)
   lrt=m[[2]];m=m[[1]]
@@ -62,6 +62,19 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
   }
   finalpks=finalpks[which(finalpks$Pk!=0),,drop=F]
   if(nrow(finalpks)==0) return(NULL)
+  finalpks0=finalpks
+  ###########################
+  ## reduce final list
+  scl=paste(finalpks0$samp,finalpks0$Pk,sep=";;")
+  finalpks=data.frame(samp=tapply(finalpks0$samp,scl,unique),
+                      tick.loc=tapply(1:nrow(finalpks0),scl,function(x) finalpks0$tick.loc[x][which.max(finalpks0$SNR[x])]),
+                      tick.left=tapply(finalpks0$tick.left,scl,min),
+                      tick.right=tapply(finalpks0$tick.right,scl,max),
+                      SNR=tapply(finalpks0$SNR,scl,max),
+                      IsNA=tapply(finalpks0$IsNA,scl,all),
+  Pk=tapply(finalpks0$Pk,scl,unique),stringsAsFactors=FALSE)
+  for(i in names(finalpks)) finalpks[,i]=as.vector(finalpks[,i])
+  
   
   ###########################
   ## get final pks stats
@@ -77,44 +90,54 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
     finalpks$MZ2[i]=weighted.median(tmp[,whichmz],tmp[,"y"])
   }
   if(max(finalpks$Pk)>1){
-  ############################
-  ## reorder based on RT/MZ
-  RTs=round(tapply(finalpks$RT,finalpks$Pk,median),4)
-  MZs=tapply(finalpks$MZ,finalpks$Pk,median)
-  lso=names(RTs)[order(RTs,MZs)]
-  finalpks$Pk=(1:length(lso))[match(finalpks$Pk,lso)]
-  
-  lcl=as.list(1:length(lso))
-  oRTs=sapply(lcl,function(x) median(finalpks$RT[finalpks$Pk%in%x]))
-  oMZs=sapply(lcl,function(x) median(finalpks$MZ[finalpks$Pk%in%x]))
-  itab=cbind(diff(oRTs),abs(.GRcompdppm(oMZs,F)))
-  
-  deltaRT=ifelse(is.null(eicParams$dRT),eicParams$nspan*eicParams$bw*3,eicParams$dRT)
-  deltaPPM=ifelse(is.null(eicParams$dPPM),11,eicParams$dPPM)
-  while(any((itab[,1]<deltaRT & itab[,2]<deltaPPM))){
-    l=which(itab[,1]<deltaRT & itab[,2]<deltaPPM)
-    l=l[which.min(itab[l,1])]
-    lcl[[l+1]]=unlist(lcl[l:(l+1)])
-    lcl=lcl[-l]
-    if(length(lcl)==1) break
+    ############################
+    ## reorder based on RT/MZ
+    RTs=round(tapply(finalpks$RT,finalpks$Pk,median),4)
+    MZs=tapply(finalpks$MZ,finalpks$Pk,median)
+    lso=names(RTs)[order(RTs,MZs)]
+    finalpks$Pk=(1:length(lso))[match(finalpks$Pk,lso)]
+    
+    lcl=as.list(1:length(lso))
     oRTs=sapply(lcl,function(x) median(finalpks$RT[finalpks$Pk%in%x]))
     oMZs=sapply(lcl,function(x) median(finalpks$MZ[finalpks$Pk%in%x]))
     itab=cbind(diff(oRTs),abs(.GRcompdppm(oMZs,F)))
-  }
-  oldPk=finalpks$Pk
-  for(i in 1:length(lcl)) finalpks$Pk[oldPk%in%lcl[[i]]]=i
-  if(any(finalpks$IsNA)){
-    lpks2rm=unique(finalpks$Pk[finalpks$IsNA])
-    lpks2rm=lpks2rm[!lpks2rm%in%unique(finalpks$Pk[!finalpks$IsNA])]
-    if(length(lpks2rm)>0) finalpks=finalpks[!finalpks$Pk%in%lpks2rm,,drop=F]
-  }
-  RTs=round(tapply(finalpks$RT,finalpks$Pk,median),4)
-  MZs=tapply(finalpks$MZ,finalpks$Pk,median)
-  lso=names(RTs)[order(RTs,MZs)]
-  finalpks$Pk=(1:length(lso))[match(finalpks$Pk,lso)]
-  
-}
     
+    deltaRT=ifelse(is.null(eicParams$dRT),eicParams$nspan*eicParams$bw*3,eicParams$dRT)
+    deltaPPM=ifelse(is.null(eicParams$dPPM),11,eicParams$dPPM)
+    while(any((itab[,1]<deltaRT & itab[,2]<deltaPPM))){
+      l=which(itab[,1]<deltaRT & itab[,2]<deltaPPM)
+      l=l[which.min(itab[l,1])]
+      lcl[[l+1]]=unlist(lcl[l:(l+1)])
+      lcl=lcl[-l]
+      if(length(lcl)==1) break
+      oRTs=sapply(lcl,function(x) median(finalpks$RT[finalpks$Pk%in%x]))
+      oMZs=sapply(lcl,function(x) median(finalpks$MZ[finalpks$Pk%in%x]))
+      itab=cbind(diff(oRTs),abs(.GRcompdppm(oMZs,F)))
+    }
+    oldPk=finalpks$Pk
+    for(i in 1:length(lcl)) finalpks$Pk[oldPk%in%lcl[[i]]]=i
+    if(any(finalpks$IsNA)){
+      lpks2rm=unique(finalpks$Pk[finalpks$IsNA])
+      lpks2rm=lpks2rm[!lpks2rm%in%unique(finalpks$Pk[!finalpks$IsNA])]
+      if(length(lpks2rm)>0) finalpks=finalpks[!finalpks$Pk%in%lpks2rm,,drop=F]
+    }
+    RTs=round(tapply(finalpks$RT,finalpks$Pk,median),4)
+    MZs=tapply(finalpks$MZ,finalpks$Pk,median)
+    lso=names(RTs)[order(RTs,MZs)]
+    finalpks$Pk=(1:length(lso))[match(finalpks$Pk,lso)]
+    finalpks1=finalpks
+    scl=paste(finalpks1$samp,finalpks1$Pk,sep=";;")
+    finalpks=data.frame(samp=tapply(finalpks1$samp,scl,unique),
+                        tick.loc=tapply(1:nrow(finalpks1),scl,function(x) finalpks1$tick.loc[x][which.max(finalpks1$SNR[x])]),
+                        tick.left=tapply(finalpks1$tick.left,scl,min),
+                        tick.right=tapply(finalpks1$tick.right,scl,max),
+                        SNR=tapply(finalpks1$SNR,scl,max),
+                        IsNA=tapply(finalpks1$IsNA,scl,all),
+                        Pk=tapply(finalpks1$Pk,scl,unique),stringsAsFactors=FALSE)
+    for(i in names(finalpks)) finalpks[,i]=as.vector(finalpks[,i])
+    
+  }
+  
   ###########################
   ## clean eic
   bws2=eicParams$nsmo2*eicParams$bw
@@ -145,50 +168,50 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
 
 
 integrOneEicGrp<-function(tabeic,lSamp=NULL,eicParams,save=TRUE,whichrt="rtcor",whichmz="mzcor"){
-
+  
   ieicgrp=tabeic$GrpEic[1]
   tabeic=tabeic[tabeic$GrpEic==ieicgrp,]
   
-ifile=paste(ifelse(is.null(eicParams$dirEic),"./",eicParams$dirEic),
-            ieicgrp,
-            ifelse(is.null(eicParams$addEic),"./",eicParams$addEic),".rda",sep="")
-
-load(ifile)
-
-dfeic=dfeic[dfeic$eic%in%tabeic$Id,]
-rownames(dfeic)=NULL
-eicdef=attr(dfeic,'eic')
-attr(dfeic,'eic')=eicdef=eicdef[eicdef$Id%in%dfeic$eic,]
-
-allre=list()
-for(ieic in sample(unique(dfeic$eic))){
-  print(ieic)
-  tmpeic=dfeic[dfeic$eic==ieic,]
-  ivMint=tabeic$Bl[tabeic$Id==ieic]
-  ivMint=ifelse(is.null(ivMint),eicParams$Mint,ivMint)
-  allre[[ieic]]=integrOneEic(tmpeic,lSamp=lSamp,ivMint,eicParams,whichrt=whichrt,whichmz=whichmz)
-}
-
-allre=allre[which(!sapply(allre,is.null))]
-cat("\n")
-if(length(allre)==0) return(NULL)
-
-dfeic=do.call("rbind",lapply(allre,function(x) x$Eic))
-dfeic$eic=paste(dfeic$eic,dfeic$Pk,sep="-")
-dfeic=ndfeic[,names(dfeic)!="Pk"]
-
-sstats=do.call("rbind",lapply(allre,function(x) x$SampStats))
-sstats$eic=paste(sstats$eic,sstats$Pk,sep="-")
-sstats=sstats[,names(sstats)!="Pk"]
-rm(list=c("allre"))
-
-if(save){
-  ofile=paste(ifelse(is.null(eicParams$dirEic),"./",eicParams$dirEic),
-            ieicgrp,
-            ifelse(is.null(eicParams$addEic),"./",eicParams$addEic),"-clean.rda",sep="")
-save(file=ofile,dfeic,sstats)
-}
-
-invisible(list(Eic=dfeic,Stats=sstats))
-
+  ifile=paste(ifelse(is.null(eicParams$dirEic),"./",eicParams$dirEic),
+              ieicgrp,
+              ifelse(is.null(eicParams$addEic),"./",eicParams$addEic),".rda",sep="")
+  
+  load(ifile)
+  
+  dfeic=dfeic[dfeic$eic%in%tabeic$Id,]
+  rownames(dfeic)=NULL
+  eicdef=attr(dfeic,'eic')
+  attr(dfeic,'eic')=eicdef=eicdef[eicdef$Id%in%dfeic$eic,]
+  
+  allre=list()
+  for(ieic in unique(dfeic$eic)){
+  #  print(ieic)
+    tmpeic=dfeic[dfeic$eic==ieic,]
+    ivMint=tabeic$Bl[tabeic$Id==ieic]
+    ivMint=ifelse(is.null(ivMint),eicParams$Mint,ivMint)
+    allre[[ieic]]=integrOneEic(tmpeic,lSamp=lSamp,ivMint,eicParams,whichrt=whichrt,whichmz=whichmz)
+  }
+  
+  allre=allre[which(!sapply(allre,is.null))]
+  cat("\n")
+  if(length(allre)==0) return(NULL)
+  
+  dfeic=do.call("rbind",lapply(allre,function(x) x$Eic))
+  dfeic$eic=paste(dfeic$eic,dfeic$Pk,sep="-")
+  dfeic=dfeic[,names(dfeic)!="Pk"]
+  
+  sstats=do.call("rbind",lapply(allre,function(x) x$SampStats))
+  sstats$eic=paste(sstats$eic,sstats$Pk,sep="-")
+  sstats=sstats[,names(sstats)!="Pk"]
+  rm(list=c("allre"))
+  
+  if(save){
+    ofile=paste(ifelse(is.null(eicParams$dirEic),"./",eicParams$dirEic),
+                ieicgrp,
+                ifelse(is.null(eicParams$addEic),"./",eicParams$addEic),"-clean.rda",sep="")
+    save(file=ofile,dfeic,sstats)
+  }
+  
+  invisible(list(Eic=dfeic,Stats=sstats))
+  
 }

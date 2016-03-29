@@ -5,6 +5,7 @@ gatherMultiEICs,.GRgatherMultiEICCl,gatherOneEIC,
 .GRgetArea,.GRmsExtrema,.GRdoksmooth,.GRipeaks,.GRmsPeakSimple,.GRconvEIC,
 aggregCEF,.GRdoOneCef,.GRgetcomptime,.GRmgetTIC,.GRgetTIC,.GRcompVals,.GRcompTICaddRT,.GRfiltreScan,.GRcodadw,.GRcodadw2,.GRestimBl,.GRcompEICst,
 .GRcompSeg,.GRcompSegOne,.GRmsPeakSimple3,.GRgroupPks,.GRchk2vec,integrOneEic,integrOneEicGrp,.GRinfctInt,.GRintegrOneEicGrpCl,
+.inGRconvMS,conv2metaboSet,
 partitionPeaks,.GRfindturnpoint,.GRsplitOne,.GRsplitBoth,.GRsplist,.GRcompdppm,.GRgenpkl)
 
 ### register S3 methods

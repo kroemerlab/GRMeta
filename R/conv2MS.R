@@ -39,9 +39,10 @@ conv2metaboSet<-function(lfiles,Meta,File,method="prof",
   
   if(length(lfiles)<=chunk) llx=list(lfiles) else  llx=split(lfiles, ceiling(seq_along(lfiles)/chunk))
   
+  
   ##########################
   d0=proc.time()[3]
-  cat("Started at ",date(),sep="")
+  cat("Processing ",length(lfiles)," files: starting at ",date(),sep="")
   
   if(ncl==1 | length(llx)==1){
     cat(" on 1 processor\n",sep="")

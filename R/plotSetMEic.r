@@ -1,6 +1,7 @@
 
-plotSetMEic<-function(obj,WhichRT="rtcor",groupCol=NULL,colorCol=NULL,addfile="./",endfile="-Eic",repDots="-",cexEL=0.6,...){
+plotSetMEic<-function(obj,WhichRT="rtcor",groupCol=NULL,colorCol=NULL,doPDF=T,addfile="./",endfile="-Eic",repDots="-",cexEL=0.6,...){
 
+  # WhichRT="rtcor";groupCol=NULL;colorCol=NULL;addfile="./";endfile="-Eic";repDots="-";cexEL=0.6;dots=list()
   
   dots<-list(...)
   
@@ -43,6 +44,8 @@ plotSetMEic<-function(obj,WhichRT="rtcor",groupCol=NULL,colorCol=NULL,addfile=".
   
   par.def=par(no.readonly = TRUE)
   
+  ifeic=lfiles[1]
+  
 for(ifeic in lfiles){
 
 l2plots=obj$Eic$File$Analyte[obj$Eic$File$EicFile==ifeic]
@@ -53,37 +56,40 @@ dfeic<-eicpk<-NULL
 load(ifeic)
 cat(": ")
 
+
+dfeic=dfeic[which(dfeic$eic%in%obj$Eic$File[l2plots,]$Eic),]
+
+lse=paste(dfeic$samp,dfeic$eic)
+## before/after peak zone
+dfeic$InPk2=dfeic$InPk3=FALSE
+dfeic$InPk2[unlist(tapply(1:nrow(dfeic),lse,function(x) x[x<=x[which(dfeic$InPk[x])[1]]]))]=TRUE
+dfeic$InPk3[unlist(tapply(1:nrow(dfeic),lse,function(x) x[x>=x[rev(which(dfeic$InPk[x]))[1]]]))]=TRUE
+
 lx=round(seq(1,length(l2plots),length.out = 5)[2:4])
 # if(sepx[2]%in%names(idf)) llsids=tapply(idf$Sid,idf[,sepx[2]],unique)
 #for(ix in 1:length(l2plots)){
   for(ix in 1:length(l2plots)){
     cat(ifelse(ix%in%lx,"X","."))
     analyte=l2plots[ix]
-ieicpk=obj$Eic$File[analyte,]$EicPK
-ieic=obj$Eic$File[analyte,]$EicId
+ieic=obj$Eic$File[analyte,]$Eic
 
 whichrt=WhichRT
 if(is.null(whichrt))  whichrt="rtcor"
 if(!whichrt%in%names(dfeic)) whichrt="rt"
-ceic=dfeic[dfeic$Eic==ieic & dfeic$Samp%in%obj$Eic$Sample$Samp,]
-ceic$Sid=obj$Eic$Sample$Sid[match(ceic$Samp,obj$Eic$Sample$Samp)]
-ceic$cols=cols[ceic$Sid]
+ceic=dfeic[dfeic$eic==ieic & dfeic$samp%in%unlist(llsids),]
+ceic$cols=cols[ceic$samp]
 rtr=range(ceic[,whichrt])
 rtr=rtr+c(-.5,1)*0.1*diff(rtr)
 rtr[1]=max(0,rtr[1])
 rtr=range(pretty(seq(rtr[1],rtr[2],length.out = 7)))
 
-
-ipkmat=eicpk[[ieic]]$Pks[[ieicpk]]
-ipkmat=ipkmat[rownames(ipkmat)%in%obj$Eic$Sample$Samp,]
-rownames(ipkmat)=obj$Eic$Sample$Sid[match(rownames(ipkmat),obj$Eic$Sample$Samp)]
-Mint=obj$Eic$File[analyte,]$Mint
+Mint=obj$Eic$File[analyte,]$Bl
 
 outfile=paste(addfile,gsub("\\.",repDots,analyte),endfile,".pdf",sep="")
-pdf(file=outfile,width=width,height=height)
+if(doPDF) pdf(file=outfile,width=width,height=height)
 par(dots)
-GRMeta:::.plotEIC(ceic,ipkmat,whichrt,llsids,Mint=Mint,rtr=rtr,cexEL=cexEL)
-dev.off()
+.GRplotEIC(ceic,whichrt,llsids,Mint=Mint,rtr=rtr,cexEL=cexEL)
+if(doPDF) dev.off()
 
 }
 cat("\n")
@@ -92,3 +98,68 @@ rm(list=c('dfeic','eicpk'))
 } ## end of for ifeic
   on.exit(par(par.def))
 }
+
+
+
+
+.GRplotEIC<-function(ceic,whichrt,llsids=list(All=unique(ceic$Sid)),Mint=NA,rtr=NULL,cexEL=0.4){
+  
+  
+  alphadd<-function(hex.color.list,alpha=0.5) sprintf("%s%02X", hex.color.list, floor(alpha * 256))
+  
+  if(is.null(rtr)){
+    rtr=range(ceic[,whichrt])
+    rtr=rtr+c(-.5,1)*0.1*diff(rtr)
+    rtr[1]=max(0,rtr[1])
+    rtr=range(pretty(seq(rtr[1],rtr[2],length.out = 7)))
+  }
+  
+  cols=tapply(ceic$cols,ceic$samp,unique)
+  if(any(!ceic$InPk)) ceic$cols[!ceic$InPk]=alphadd(ceic$cols[!ceic$InPk],.4)
+  
+  for(namsamp in names(llsids)){
+    #   cat(namsamp,"\n")
+    lisamp=llsids[[namsamp]]
+    lisamp=lisamp[lisamp%in%unique(ceic$samp)]# sample ids in ori file to considered in 
+#    lisamp[order(rtmat[lisamp,"HEap.1"],na.last = FALSE)]
+    if(length(lisamp)==0){
+      plot(0:1,0:1,axes=F,xlab="",ylab="",cex=0)
+      text(.5,.5,namsamp)
+      next
+    }
+    rint=range(ceic$y[ceic$samp%in%lisamp])*c(0,1.1)
+    plot(rtr,rint,xlab=paste("Retention time (",whichrt,")",sep=""),
+         ylab="Intensity (cps)",cex=0,bty="l",axes=FALSE,xlim=rtr,ylim=c(-rint[2]/50,rint[2]))
+    abline(h=Mint,lty=2,lwd=par("lwd")*2)
+    for(ik in lisamp){
+      l=which(ceic$samp==ik & ceic$InPk2)
+      if(length(l)>0) points(ceic[l,whichrt],ceic$y[l],col=ceic$cols[l],typ="l")
+      l=which(ceic$samp==ik & ceic$InPk3)
+      if(length(l)>0) points(ceic[l,whichrt],ceic$y[l],col=ceic$cols[l],typ="l")
+    }
+    leg=NULL
+    for(ik in lisamp){
+      l=which(ceic$samp==ik & ceic$InPk)
+      if(length(l)>0){
+      points(ceic[l,whichrt],ceic$y[l],col=ceic$cols[l],typ="l",lwd=par("lwd")*1.5)
+      ir=range(ceic[l,whichrt])
+      segments(ir,-rint[2]/50,ir,rint[2]/50,col=cols[ik],lwd=2)
+      leg[ik]=paste(ik, " [",round(ir[1],2),'-',round(ir[2],2),"]",sep="")
+    }
+    }
+    
+    
+    
+    legend("topright",leg,pch=15,col=cols[lisamp],bty="n",cex=cexEL)
+    legend("topleft",namsamp,bty="n",cex=par("cex.main"))
+    xaxt=axTicks(1) #pretty(seq(rtr[1],rtr[2],length.out = 7))
+    # xaxt=c(min(xaxt)-diff(xaxt)[1],xaxt,max(xaxt)+rev(diff(xaxt))[1])
+    yaxt=pretty(c(0,rint[2]))
+    yaxt=c(yaxt,max(yaxt)+rev(diff(yaxt))[1])
+    axis(1,at=xaxt,las=1)
+    axis(2,at=yaxt,las=2,pos=min(xaxt))
+  } 
+  
+  
+}
+

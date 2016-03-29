@@ -86,12 +86,15 @@ conv2metaboSet<-function(lfiles,Meta,File,method="prof",
     l=which(newn==i)
     newn[l]=sprintf("%.5f-D%d@%.3f-%s",imz[l],1:length(l),irt[l],method)
   }
-  Annot=data.frame(Analyte=newn,MetName=NA,IsSTD=FALSE,OriginalName=eicsdat$PkId,LevelAnnot=4,Method=method,MZ=round(imz,6),RT=round(irt,4),stringsAsFactors=F)
-  rownames(Annot)=newn
+  Annot=data.frame(Analyte=newn,MetName=NA,IsSTD=FALSE,OriginalName=eicsdat$PkId,LevelAnnot=4,
+                   Method=method,MZ=round(imz,6),RT=round(irt,4),stringsAsFactors=FALSE)
+  rownames(Annot)=rownames(eicsdat)=newn
+  eicsdat=cbind(Analyte=newn,EicFile=eicsdat$File,Eic=eicsdat$PkId,
+                eicsdat[,!names(eicsdat)%in%c("File","PkId")],stringsAsFactors=FALSE)
   for(i in names(alldata)) colnames(alldata[[i]])=newn
   
   #########
-  obj=list(Method=method,Sid=lsids,Analyte=newn,Annot=Annot,Meta=Meta,File=File,Eic=list(Path=getwd(),File=eicsdat),Data=alldata)
+  obj=list(Method=method,Sid=lsids,Analyte=newn,Annot=Annot,Meta=Meta,File=File,Eic=list(Path=NULL,File=eicsdat),Data=alldata)
   class(obj)=append(class(obj),"metaboSet")
 print(obj)
   invisible(obj)

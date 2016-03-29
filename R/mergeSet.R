@@ -258,12 +258,28 @@ mergeSet<-function(...){
     }
   }
   cat("\n")
+  
+  ############
+  ##############
+  #### works if the EIC structure is OK for all -> to be updated if no EIC stuff and/or different names
+  Eic=NULL
+  if(all(sapply(re,function(x) !is.null(x$Eic)))){
+  cat("-- Merge Eic file: ")
+  #for(i in names(re)) re[[i]]$Data=lapply(re[[i]]$Data,function(x) x[,matexVar[,i]])
+      EicFile=do.call("rbind",lapply(re,function(x) x$Eic$File))
+      EicFile=EicFile[match(lumet,EicFile$Analyte),]
+      rownames(EicFile)=annot$Analyte
+    Eic=list(Path=NULL,File=EicFile)
+  cat("\n")
+  }
+  
   lnotfound=lnotfound[sapply(lnotfound,length)!=0]
   if(length(lnotfound)>0) for(i in names(lnotfound)) cat("  * not found in ",i,": ",paste(lnotfound[[i]],collapse=" "),"\n",sep="")
   
   allmat=lapply(allmat,function(x){dimnames(x)=list(meta$Sid,annot$Analyte);x})
   
   allmat=list(Method=names(re),Sid=meta$Sid,Analyte=annot$Analyte,Annot=annot,Meta=meta,File=fileinfos,Data=allmat)
+  if(!is.null(Eic)) allmat$Eic=Eic
   class(allmat)=append(class(allmat),"metaboSet")
   if(any(sapply(re,function(x) "fluxoSet"%in%class(x)))) class(allmat)=append(class(allmat),"fluxoSet")
   

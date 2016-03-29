@@ -8,7 +8,7 @@
     alldat=lapply(alldat,function(x) x[match(lsids,rownames(x)),,drop=F])
     alldat=alldat[names(alldat)%in%ldatas]
     for(i in names(alldat)) if(is.null(alldata[[i]])) alldata[[i]]=alldat[[i]] else alldata[[i]]=cbind(alldata[[i]],alldat[[i]])
-    eicstats$File=ifi
+    eicstats$File=lfiles[ifi]
     alleics[[ifi]]=eicstats
   }
   alldata=alldata[!sapply(alldata,is.null)]

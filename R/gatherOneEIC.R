@@ -65,7 +65,7 @@ gatherOneEIC<-function(matEIC,sampfile,root="./",outfile=NULL,eicParams,doMerge=
       names(eicst)=c("GrpEic", "Id","rtap","rtmin","rtmax","mzap","mzmin","mzmax" )
       attr(dfeic,"oeic")<-matEIC[matEIC$GrpEic==inam,]
       attr(dfeic,"eic")<-eicst
-      outfile=paste(root,"/",inam,eicParams$addEic,sep="")
+      outfile=paste(root,"/",inam,eicParams$addEic,".rda",sep="")
       save(file=outfile,dfeic,eicinfos,sampinfos)
       
       #### end of for in each group

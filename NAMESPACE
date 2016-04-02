@@ -1,7 +1,7 @@
 export(cleanMetaboNames,compSetSBR,compSetStats,compSetRatios,corrSetQC,paramsParsing,
 loadAgilentData,loadMavenData,loadAgilentDataFlux,mapSetKegg,matchmzSet,mergeSet,deleteEntries,sortEntries, exportSetXLSX,plotSetMEic,
 parseSampEIC,parseOneSampEIC,.GRparseSampEICCl,
-gatherMultiEICs,.GRgatherMultiEICCl,gatherOneEIC,
+gatherMultiEICs,.GRgatherMultiEICCl,gatherOneEIC,.GRaddmiss,.GRmergeInterval,.GRmergingEIC,
 .GRgetArea,.GRmsExtrema,.GRdoksmooth,.GRipeaks,.GRmsPeakSimple,.GRconvEIC,
 aggregCEF,.GRdoOneCef,.GRgetcomptime,.GRmgetTIC,.GRgetTIC,.GRcompVals,.GRcompTICaddRT,.GRfiltreScan,.GRcodadw,.GRcodadw2,.GRestimBl,.GRcompEICst,
 .GRcompSeg,.GRcompSegOne,.GRmsPeakSimple3,.GRgroupPks,.GRchk2vec,integrOneEic,integrOneEicGrp,.GRinfctInt,.GRintegrOneEicGrpCl,

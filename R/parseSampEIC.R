@@ -207,7 +207,7 @@ parseOneSampEICold<-function(mzfi,tabeic,outfile=NULL,npad=3,stepmz=1/1000,verbo
   ## add missing scans
   if(npad>=0){
     lma=unlist(tapply(1:nrow(mred),mred[,"eic"],function(x)
-      x[match(min(mred[x,'scan']):max(mred[x,'scan']),mred[x,'scan'])]))
+      x[match(min(mred[x,'scan']):max(mred[x,'scan']),mred[x,'scan'])])) ### dodgy implementation: pb if several mz for same scan??
     mred=mred[lma,]
     rm(list=c("lma"))
     for(i in which(is.na(mred[,"scan"]))){

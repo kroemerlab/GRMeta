@@ -18,6 +18,36 @@
 .GRcodadw2<-function(x,lag=1) sum(diff(diff(x),lag=lag)^2)/sum(diff(x)^2)
 .GRcodadw<-function(x) sum(diff(x)^2)/sum((x)^2)
 
+### collapse the eic attr
+.GRgetEicInfos<-function(eicParams,eicloc=NULL){
+  
+  if(!is.null(eicloc)) if(is.data.frame(eicloc)){
+  fileeics=paste(ifelse(is.null(eicParams$dirEic),"./",eicParams$dirEic),
+                 unique(eicloc$GrpEic),
+                 ifelse(is.null(eicParams$addEic),"./",eicParams$addEic),".rda",sep="")
+  names(fileeics)=unique(eicloc$GrpEic)
+  }
+  
+  if(is.null(eicloc))
+    fileeics=list.files(ifelse(is.null(eicParams$dirEic),"./",eicParams$dirEic),pattern=paste(eicParams$addEic,".rda",sep=""),full.names=TRUE)
+  
+  fileeics=fileeics[file.exists(fileeics)]
+  if(length(fileeics)==0) stop('No file found!')
+  
+  allr=list()
+  for(k in 1:length(fileeics)){
+    cat(ifelse(k%%10==0,"X","."))
+    load(fileeics[k])
+    allr[[k]]=attr(dfeic,"eic")
+  }
+  newtabeic=do.call("rbind",allr)
+#  if(is.null(eicloc)){
+    grp=factor(newtabeic$GrpEic,names(sort(tapply(newtabeic$mzap,newtabeic$GrpEic,mean,na.rm=T))))
+    newtabeic=newtabeic[order(grp,newtabeic$mzap),]
+ # }
+  newtabeic
+  
+}
 
 .GRestimBl<-function(tabeic,blSid,eicParams,ncl=1){
   

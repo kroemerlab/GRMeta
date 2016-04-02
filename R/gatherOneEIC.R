@@ -1,4 +1,4 @@
-gatherOneEIC<-function(matEIC,sampfile,root="./",outfile=NULL,eicParams,doMerge=TRUE,serial=TRUE){
+gatherOneEIC<-function(matEIC,sampfile,outfile=NULL,eicParams,doMerge=TRUE,serial=TRUE){
   
   lSids=sampfile$Sid[file.exists(sampfile$Out)]
   
@@ -65,7 +65,7 @@ gatherOneEIC<-function(matEIC,sampfile,root="./",outfile=NULL,eicParams,doMerge=
       names(eicst)=c("GrpEic", "Id","rtap","rtmin","rtmax","mzap","mzmin","mzmax" )
       attr(dfeic,"oeic")<-matEIC[matEIC$GrpEic==inam,]
       attr(dfeic,"eic")<-eicst
-      outfile=paste(root,"/",inam,eicParams$addEic,".rda",sep="")
+      outfile=paste(ifelse(is.null(eicParams$dirEic),".",eicParams$dirEic),"/",inam,eicParams$addEic,".rda",sep="")
       save(file=outfile,dfeic,eicinfos,sampinfos)
       
       #### end of for in each group
@@ -85,13 +85,13 @@ gatherOneEIC<-function(matEIC,sampfile,root="./",outfile=NULL,eicParams,doMerge=
 
 ##########################
 
-.GRgatherMultiEICCl<-function(ix,tabeic,sampfile,root,eicParams,doMerge){
-  gatherOneEIC(tabeic[tabeic$GrpEic%in%ix,],sampfile,root=root,outfile=NA,eicParams=eicParams,doMerge=doMerge,serial=FALSE)
+.GRgatherMultiEICCl<-function(ix,tabeic,sampfile,eicParams,doMerge){
+  gatherOneEIC(tabeic[tabeic$GrpEic%in%ix,],sampfile,outfile=NA,eicParams=eicParams,doMerge=doMerge,serial=FALSE)
 }
 
 ##########################
 
-gatherMultiEICs<-function(matfile,tabeic,root="./",outfile=NA,eicParams,doMerge=TRUE,ncl=1,nsplit=20,serial=TRUE){
+gatherMultiEICs<-function(matfile,tabeic,outfile=NA,eicParams,doMerge=TRUE,ncl=1,nsplit=20,serial=TRUE){
   
   if(ncl!=1){
     require("snowfall")
@@ -110,7 +110,7 @@ gatherMultiEICs<-function(matfile,tabeic,root="./",outfile=NA,eicParams,doMerge=
     cat(" on 1 processor\n",sep="")
     lts=list()
     for(k in 1:length(llcode)){
-        lts[[k]]=gatherOneEIC(tabeic[tabeic$GrpEic%in%llcode[[k]],],sampfile=matfile,root=root,outfile=outfile,eicParams=eicParams,doMerge=doMerge,serial=FALSE)
+        lts[[k]]=gatherOneEIC(tabeic[tabeic$GrpEic%in%llcode[[k]],],sampfile=matfile,outfile=outfile,eicParams=eicParams,doMerge=doMerge,serial=FALSE)
     }
     d1=proc.time()[3]
     cat("\nCompleted at ",date()," -> took ",round(d1-d0,1)," secs - ",round((d1-d0)/length(llcode),1)," secs per iso group\n",sep="")
@@ -122,7 +122,7 @@ gatherMultiEICs<-function(matfile,tabeic,root="./",outfile=NA,eicParams,doMerge=
   sfInit(parallel=TRUE, cpus=ncl, type='SOCK',slaveOutfile=paste('GathEic',format(Sys.time(), "%y-%d-%b-%H:%M"),'.log',sep=""))
   sfLibrary(GRMeta)
   #sfExport( "gatherOneEIC", local=TRUE )
-  re=sfClusterApplyLB(llcode,.GRgatherMultiEICCl,tabeic=tabeic,sampfile=matfile,root=root,eicParams=eicParams,doMerge=doMerge)
+  re=sfClusterApplyLB(llcode,.GRgatherMultiEICCl,tabeic=tabeic,sampfile=matfile,eicParams=eicParams,doMerge=doMerge)
   sfStop()
   d1=proc.time()[3]
   cat(sapply(re,function(x) x[[1]]),sep="\n")

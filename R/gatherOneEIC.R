@@ -57,10 +57,10 @@ gatherOneEIC<-function(matEIC,sampfile,root="./",outfile=NULL,eicParams,doMerge=
       dfeic=.GRaddmiss(dfeic,sampinfos)
       dfeic=dfeic[order(dfeic$eic,dfeic$samp,dfeic$scan,dfeic$mzcor),]
       #### Compute eic stats
-      l=which(!is.na(dfeic$mz))
+      l=which(dfeic$y>0)
       eicst=data.frame(GrpEic=inam,Id=unname(tapply(dfeic$eic[l],dfeic$eic[l],unique)),
-                 do.call("rbind",tapply(l,dfeic$eic[l],function(x) dfeic$rtcor[c(which.max(dfeic$y[x]),range(x))])),
-                 do.call("rbind",tapply(l,dfeic$eic[l],function(x) dfeic$mzcor[c(which.max(dfeic$y[x]),range(x))])),
+                 do.call("rbind",tapply(l,dfeic$eic[l],function(x) c(dfeic$rtcor[x[which.max(dfeic$y[x])]],range(dfeic$rtcor[x])))),
+                 do.call("rbind",tapply(l,dfeic$eic[l],function(x) c(dfeic$mzcor[x[which.max(dfeic$y[x])]],range(dfeic$mzcor[x])))),
                  stringsAsFactors=F)
       names(eicst)=c("GrpEic", "Id","rtap","rtmin","rtmax","mzap","mzmin","mzmax" )
       attr(dfeic,"oeic")<-matEIC[matEIC$GrpEic==inam,]

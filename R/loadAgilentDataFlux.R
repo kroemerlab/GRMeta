@@ -69,10 +69,10 @@ loadAgilentDataFlux<-function(ifile,ofile=NULL,params=list()){
   isnotmrm=which(grepl("^Qualifier_.*$",metnams))
   isnotmrm=isnotmrm[!isnotmrm%in%ismrm]
   if(length(ismrm)>0){
-    q1[ismrm]=as.numeric(sapply(strsplit(metnams,"_"),function(x) x[2]))[ismrm]
-    q3[ismrm]=as.numeric(sapply(strsplit(metnams,"_"),function(x) x[3]))[ismrm]
+    q1[ismrm]=as.numeric(sapply(strsplit(metnams[ismrm],"_"),function(x) x[2]))
+    q3[ismrm]=as.numeric(sapply(strsplit(metnams[ismrm],"_"),function(x) x[3]))
   }
-  if(length(isnotmrm)>0)  q1[isnotmrm]=as.numeric(sapply(strsplit(metnams,"_"),function(x) x[2]))[isnotmrm]
+  if(length(isnotmrm)>0)  q1[isnotmrm]=as.numeric(sapply(strsplit(metnams[isnotmrm],"_"),function(x) x[2]))
   ananams=rep("",length(lmetinfos))
   ananams[!grepl("^Qualifier_.*$",metnams)]=metnams[!grepl("^Qualifier_.*$",metnams)]
   for(i in which(ananams=="")) ananams[i]=ananams[i-1]

@@ -50,29 +50,56 @@ loadAgilentDataFlux<-function(ifile,ofile=NULL,params=list()){
   rownames(metainfos)=metainfos$Sid
   fileinfos=data.frame(File=filenam,Date=dts,Name=nams,Sid=sid,stringsAsFactors=FALSE)
   rownames(fileinfos)=fileinfos$Sid
-####################################################################################################
+  ####################################################################################################
+  stmets=unique(sort(c(grep("Results$",names(tab)),grep("Results\\.[0-9]+$",names(tab)))))[1]
+  mat=apply(as.matrix(tab[-1,stmets:ncol(tab)]),2,function(x) as.numeric(gsub(",",".",x)))
+  metnams=colnames(mat)
+  lmetinfos=as.matrix(tab[1,])[,stmets:ncol(tab)]
+  if(any(grepl(" ",lmetinfos))){
+    cat(" ! Spaces in variable names removed !\n")
+    lmetinfos=gsub(" ",".",lmetinfos)
+  }
+  ## 
+  lmets=unique(sort(c(grep("Results$",metnams),grep("Results\\.[0-9]+$",metnams))))
+  for(i in (1:length(metnams))[-lmets])  metnams[i]=metnams[i-1]
+  metnams=gsub("[\\.]{2,}","_",gsub("[\\.]{1,}Results\\.[1-9]$","",gsub("[\\.]{1,}Results$","",metnams)))
   
-  lmets=sort(c(grep("Results$",names(tab)),grep("Results\\.[1-9]$",names(tab))))
-  lmetinfos=as.matrix(tab[1,])[,lmets[1]:ncol(tab)]
-  metnams=rep("",length(lmetinfos))
   niso=q1=q3=rep(NA,length(lmetinfos))
-  metnams[lmets-lmets[1]+1]=gsub("[\\.]{2,}","_",gsub("[\\.]{1,}Results\\.[1-9]$","",gsub("[\\.]{1,}Results$","",names(tab)[lmets])))
-  for(i in which(metnams=="")) metnams[i]=metnams[i-1]
-  metnams2=metnams;metnams2[grep("^Qualifi",metnams2)]=""
-  metnams2=cleanMetaboNames(metnam=metnams2,RegExpr=NA,Syno=NA)$newnam
-  metnams2=gsub("Cysteine;Cystine","Cysteine",gsub("Citric;Isocitric acid","Citric acid",
-                                                   gsub("Uracile","Uracil",metnams2)))
+  ismrm=which(grepl("^Qualifier_.*_.*$",metnams))
+  isnotmrm=which(grepl("^Qualifier_.*$",metnams))
+  isnotmrm=isnotmrm[!isnotmrm%in%ismrm]
+  if(length(ismrm)>0){
+    q1[ismrm]=as.numeric(sapply(strsplit(metnams,"_"),function(x) x[2]))[ismrm]
+    q3[ismrm]=as.numeric(sapply(strsplit(metnams,"_"),function(x) x[3]))[ismrm]
+  }
+  if(length(isnotmrm)>0)  q1[isnotmrm]=as.numeric(sapply(strsplit(metnams,"_"),function(x) x[2]))[isnotmrm]
+  ananams=rep("",length(lmetinfos))
+  ananams[!grepl("^Qualifier_.*$",metnams)]=metnams[!grepl("^Qualifier_.*$",metnams)]
+  for(i in which(ananams=="")) ananams[i]=ananams[i-1]
   
-  for(i in which(metnams2=="")) metnams2[i]=metnams2[i-1]
-  q1[grep("^Qualif",metnams)]=as.numeric(sapply(strsplit(metnams[grep("^Qualif",metnams)],"_"),function(x) x[2]))
-  q3[grep("^Qualif",metnams)]=as.numeric(sapply(strsplit(metnams[grep("^Qualif",metnams)],"_"),function(x) x[3]))
-  for(i in unique(metnams2)){
-  q1[which(metnams2==i & is.na(q1))]=min(q1[which(metnams2==i & !is.na(q1))])-1
-  q3[which(metnams2==i & is.na(q3))]=q3[which(metnams2==i & !is.na(q3))][1]
-  niso[which(metnams2==i)]=q1[which(metnams2==i)]-min(q1[which(metnams2==i)])
+  for(i in unique(ananams[is.na(q1)])){
+    if(all(is.na(q1[which(ananams==i)]))) next
+    q1[which(ananams==i & is.na(q1))]=min(q1[which(ananams==i)],na.rm=T)-1
+    if(all(is.na(q3[which(ananams==i)]))) next
+    q3i=unique(na.omit(q3[which(ananams==i)]))
+    q3i=ifelse(length(q3i)==1,q3i,min(q3i)-1)
+    q3[which(ananams==i & is.na(q3))]=q3i
   }
   
+  for(i in unique(ananams)){
+    l=which(ananams==i)
+    if(all(is.na(q3[l])) & all(is.na(q1[l]))){niso[l]=0;next}
+    if(all(is.na(q3[l]))){niso[l]=round(q1[l]-min(q1[l]));next}
+    nq1=round(q1[l]-min(q1[l]))
+    nq3=round(q3[l]-min(q3[l]))
+    niso[l]=nq1+nq3
+  }
+  
+  metnams2=cleanMetaboNames(metnam=ananams,RegExpr=NA,Syno=NA)$newnam
   newnam=paste(metnams2,"_M",niso,sep="")
+  colnames(mat)=paste(newnam,";-;",lmetinfos,sep="")
+  
+  
   newnamf=factor(newnam,levels=unique(newnam))
   lumetnams=tapply(newnam,newnamf,unique)
   annot=data.frame(Analyte=tapply(newnam,newnamf,unique),MetName=tapply(metnams2,newnamf,unique),
@@ -85,12 +112,13 @@ loadAgilentDataFlux<-function(ifile,ofile=NULL,params=list()){
   lso=order(factor(annot$MetName,levels=unique(annot$MetName)),annot$Iso)
   annot=annot[lso,]
   
-  mat=apply(as.matrix(tab[-1,lmets[1]:ncol(tab)]),2,function(x) as.numeric(gsub(",",".",x)))
+  #####
   
   ldatatype=sort(unique(lmetinfos))
   allmat=lapply(ldatatype,function(x){
     imat=mat[,which(lmetinfos==x)]
-    imat=imat[,match(annot$Analyte,newnam[which(lmetinfos==x)])]
+    colnames(imat)=gsub(paste(";-;",x,"$",sep=""),"",colnames(imat))
+    imat=imat[,match(annot$Analyte,colnames(imat))]
     dimnames(imat)=list(rownames(metainfos),annot$Analyte)
     imat
   })
@@ -99,7 +127,8 @@ loadAgilentDataFlux<-function(ifile,ofile=NULL,params=list()){
   #########
   rtmed=round(apply(allmat$RT,2,median,na.rm=T),4)
   annot$RT=rtmed
-  annot$Analyte=gsub("@NA$","",paste(annot$Analyte,"@",sprintf("%.2f",rtmed),"-",params$AssayName,sep=""))
+  newn=sprintf("%s@%.3f-%s",annot$Analyte,rtmed,params$AssayName)
+  annot$Analyte=newn
   NewDB=params$AnnotDB
   vnam0=unique(unlist(strsplit(annot$MetName,";")))
   lnotfound=unique(vnam0[!vnam0%in%NewDB$GName])
@@ -121,9 +150,9 @@ loadAgilentDataFlux<-function(ifile,ofile=NULL,params=list()){
     allmat=lapply(allmat,function(x) x[lso,,drop=F])
   }
   
-  l1=c("S/N","BL End","BL Start","Int. End","Int. Start")
+  l1=c("S/N","BL.End","BL.Start","Int..End","Int..Start")
   l2=c("SNR","Height.Start","Height.End","RT.Start","RT.End")
-  for(i in 1:length(l1)) names(allmat)[names(allmat)==l1[i]]=l2[i]
+  for(i in which(l1%in%names(allmat))) names(allmat)[names(allmat)==l1[i]]=l2[i]
   
   l2chk=names(allmat)
   if(is.null(params$nozeroscheck)) l2chk=l2chk[!l2chk%in%params$nozeroscheck]

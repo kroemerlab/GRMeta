@@ -127,7 +127,9 @@ loadAgilentDataFlux<-function(ifile,ofile=NULL,params=list()){
   #########
   rtmed=round(apply(allmat$RT,2,median,na.rm=T),4)
   annot$RT=rtmed
-  newn=sprintf("%s@%.3f-%s",annot$Analyte,rtmed,params$AssayName)
+  
+  rtM0=tapply(annot$RT,annot$MetName,function(x) x[which(!is.na(x))[1]])[annot$MetName]
+  newn=sprintf("%s@%.3f-%s",annot$Analyte,rtM0,params$AssayName)
   annot$Analyte=newn
   NewDB=params$AnnotDB
   vnam0=unique(unlist(strsplit(annot$MetName,";")))

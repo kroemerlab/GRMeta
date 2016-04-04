@@ -131,6 +131,7 @@ loadAgilentDataFlux<-function(ifile,ofile=NULL,params=list()){
   rtM0=tapply(annot$RT,annot$MetName,function(x) x[which(!is.na(x))[1]])[annot$MetName]
   newn=sprintf("%s@%.3f-%s",annot$Analyte,rtM0,params$AssayName)
   annot$Analyte=newn
+  annot$IsoNam=sprintf("%s@%.3f-%s",annot$MetName,rtM0,params$AssayName)
   NewDB=params$AnnotDB
   vnam0=unique(unlist(strsplit(annot$MetName,";")))
   lnotfound=unique(vnam0[!vnam0%in%NewDB$GName])
@@ -143,6 +144,7 @@ loadAgilentDataFlux<-function(ifile,ofile=NULL,params=list()){
       allmat=lapply(allmat,function(x){colnames(x)=annot$Analyte;x})
     rownames(annot)=annot$Analyte
   annot$Method=params$AssayName
+  annot$IsoNam=sprintf("%s@%.3f-%s",annot$MetName,rtM0,params$AssayName)
   
  
   if(params$ordering){

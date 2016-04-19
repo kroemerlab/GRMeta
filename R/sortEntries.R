@@ -42,7 +42,7 @@ sortEntries<-function(obj,...){
     obj$Meta=obj$Meta[lso,]
     obj$File=obj$File[lso,]
     obj$Data=lapply(obj$Data,function(x) x[lso,,drop=F])
-    if(!is.null(obj$Eic)) obj$Eic$Sample=obj$Eic$Sample[lso,]
+    if(!is.null(obj$Eic))  if(!is.null(obj$Eic$Samp)) obj$Eic$Samp=obj$Eic$Samp[lso,]
     cat("Sorting samples based on:",colnames(ssort),"\n",sep=" ")
   }  
   if(!is.null(asort)){
@@ -50,7 +50,7 @@ sortEntries<-function(obj,...){
     obj$Analyte=obj$Analyte[lso]
     obj$Annot=obj$Annot[lso,]
     obj$Data=lapply(obj$Data,function(x) x[,lso,drop=F])
-    if(!is.null(obj$Eic)) obj$Eic$File=obj$Eic$File[lso,]
+    if(!is.null(obj$Eic))  if(!is.null(obj$Eic$File)) obj$Eic$File=obj$Eic$File[lso,]
     cat("Sorting analytes based on",colnames(asort),"\n",sep=" ")
   }
   

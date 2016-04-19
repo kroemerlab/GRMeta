@@ -26,7 +26,7 @@ update.metaboSet<-function(obj,what="Sid",formerid=NULL,newid=NULL,exact=TRUE,sw
   obj$File$Sid=rownames(obj$File)=newnames
   obj$Data=lapply(obj$Data,function(x){rownames(x)=newnames;x})
   
-  if(!is.null(obj$Eic)) if(!is.null(obj$Eic$Sample)) obj$Eic$Sample$Sid=rownames(obj$Eic$Sample)=newnames
+  if(!is.null(obj$Eic)) if(!is.null(obj$Eic$Samp)) obj$Eic$Samp$Sid=rownames(obj$Eic$Samp)=newnames
   
   if(any(newnames!=oldnames)){
    cat("Samples with updated id:\n")
@@ -39,7 +39,7 @@ update.metaboSet<-function(obj,what="Sid",formerid=NULL,newid=NULL,exact=TRUE,sw
     obj$Annot$Analyte=rownames(obj$Annot)=newnames
     obj$Data=lapply(obj$Data,function(x){colnames(x)=newnames;x})
     
-    if(!is.null(obj$Eic)) obj$Eic$File$Analyte=rownames(obj$Eic$File)=newnames
+    if(!is.null(obj$Eic))  if(!is.null(obj$Eic$File)) obj$Eic$File$Analyte=rownames(obj$Eic$File)=newnames
     
     if(any(newnames!=oldnames)){
       cat("Analytes with updated id:\n")

@@ -13,7 +13,7 @@ mergeSet<-function(...){
   names(re)=nams[tokeep]
   if(length(re)==1) return(invisible(re[[1]]))
   lmethods0=lmethods=sapply(re,function(x) unique(x$Method))
- # print(lmethods)
+#  print(lmethods)
   if(is.list(lmethods)){
     if(any(table(unlist(lmethods))>1))  stop("Oups, merging of these objects not yet implemented!")
     lmethods=sapply(lmethods,function(x) paste(sort(x),collapse=";"))
@@ -41,7 +41,10 @@ mergeSet<-function(...){
   res=.mergeDataMethods(re[lred])
   if(is.list(lmethods0)){
     l2rem=res$Method[grep(";",res$Method)]
-    for(i in l2rem) names(res$File)=gsub(paste("\\.",i,"$",sep=""),"",names(res$File))
+    for(i in l2rem){
+      names(res$File)=gsub(paste("\\.",i,"$",sep=""),"",names(res$File))
+      if(!is.null(res$Eic$Samp))  names(res$Eic$Samp)=gsub(paste("\\.",i,"$",sep=""),"",names(res$Eic$Samp))
+    }
     res$Method=unlist(strsplit(res$Method,";"))
    }
   return(invisible(res))  

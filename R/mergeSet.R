@@ -7,6 +7,7 @@ mergeSet<-function(...){
   
   re <- list(...)
   nams=as.character(as.list( match.call() ))[-1]
+#  print(nams)
   tokeep=sapply(unique(nams),function(x) which(nams==x)[1])
   re=re[tokeep]
   names(re)=nams[tokeep]
@@ -183,7 +184,7 @@ mergeSet<-function(...){
   if(length(re)==1) return(re)
   
   cat("************************************\nMerging:", names(re),"\n************************************\n")
-  lmethods=sapply(re,function(x) x$Method)
+  lmethods=sapply(re,function(x) paste(x$Method,collapse=""))
   if(max(table(lmethods))>1) stop("Only applicable to datasets from different methods\n")
 #  if(is.list(lmethods))
   names(re)=lmethods

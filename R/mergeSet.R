@@ -266,17 +266,27 @@ mergeSet<-function(...){
   ##############
   #### works if the EIC structure is OK for all -> to be updated if no EIC stuff and/or different names
   Eic=NULL
-  if(all(sapply(re,function(x) !is.null(x$Eic)))){
+  leics=names(which(sapply(re,function(x) !is.null(x$Eic))))
+  if(length(leics)>0){
+    print(leics)
   cat("-- Merge Eic file: ")
   #for(i in names(re)) re[[i]]$Data=lapply(re[[i]]$Data,function(x) x[,matexVar[,i]])
-      EicFile=do.call("rbind",lapply(re,function(x) x$Eic$File))
+      EicFile=do.call("rbind",lapply(re[leics],function(x) x$Eic$File))
       EicFile=EicFile[match(lumet,EicFile$Analyte),]
       rownames(EicFile)=annot$Analyte
+      metaeic=data.frame(Sid=lusamp,stringsAsFactors = FALSE)
+      rownames(metaeic)=lusamp
+      for(i in leics){
+        addfi=re[[i]]$Eic$Samp[,names(re[[i]]$Eic$Samp)!="Sid",drop=FALSE]
+        if(i %in% lumethods) names(addfi)=paste(names(addfi),i,sep=".")
+        metaeic=cbind(metaeic,addfi[matexSa[,i],,drop=FALSE])
+      }
+
 #       metaeic=NULL
 #       if(any(sapply(re,function(x) !is.null(x$Eic$Samp))))
 #         metaeic=.joinDF2(lapply(re,function(x) x$Eic$Samp),c("Sid","SidEic"),matexSa)
       
-    Eic=list(Path=NULL,File=EicFile)
+    Eic=list(Path=NULL,File=EicFile,Samp=metaeic)
   cat("\n")
   }
   

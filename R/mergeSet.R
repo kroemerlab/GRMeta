@@ -184,9 +184,10 @@ mergeSet<-function(...){
   if(length(re)==1) return(re)
   
   cat("************************************\nMerging:", names(re),"\n************************************\n")
+  lumethods=unlist(lapply(re,function(x) x$Method))
+  if(max(table(lumethods))>1) stop("Only applicable to datasets from different methods\n")
   lmethods=sapply(re,function(x) paste(x$Method,collapse=""))
-  if(max(table(lmethods))>1) stop("Only applicable to datasets from different methods\n")
-#  if(is.list(lmethods))
+  #  if(is.list(lmethods))
   names(re)=lmethods
   
   cat("-- Checking samples")
@@ -203,12 +204,13 @@ mergeSet<-function(...){
   if(all(rowSums(is.na(matexSa))==0)) cat(" and ", sum(rowSums(is.na(matexSa))==0)," found everywhere\n")
   ##
   meta=.joinDF2(lapply(re,function(x) x$Meta),c("Sid","sType"),matexSa)
+  
   fileinfos=data.frame(Sid=lusamp,stringsAsFactors = FALSE)
   rownames(fileinfos)=rownames(meta)=lusamp
   for(i in names(re)){
     addfi=re[[i]]$File[,names(re[[i]]$File)!="Sid"]
     addfi$InjOrder=re[[i]]$Meta$InjOrder
-    names(addfi)=paste(names(addfi),i,sep=".")
+    if(i %in% lumethods) names(addfi)=paste(names(addfi),i,sep=".")
     fileinfos=cbind(fileinfos,addfi[matexSa[,i],])
   }
   neworder=fileinfos[,grep("InjOrder",names(fileinfos))]
@@ -270,6 +272,10 @@ mergeSet<-function(...){
       EicFile=do.call("rbind",lapply(re,function(x) x$Eic$File))
       EicFile=EicFile[match(lumet,EicFile$Analyte),]
       rownames(EicFile)=annot$Analyte
+#       metaeic=NULL
+#       if(any(sapply(re,function(x) !is.null(x$Eic$Samp))))
+#         metaeic=.joinDF2(lapply(re,function(x) x$Eic$Samp),c("Sid","SidEic"),matexSa)
+      
     Eic=list(Path=NULL,File=EicFile)
   cat("\n")
   }

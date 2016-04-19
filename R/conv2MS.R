@@ -27,6 +27,8 @@ conv2metaboSet<-function(lfiles,Meta,File,method="prof",
     return(list(dat=alldata,eic=eicsdat))
   }
   
+  ###########
+  
   if(any(!c("Sid","sType")%in%names(Meta))) stop('Meta must contain: Sid/sType')
   if(any(!c("Sid","File","Date")%in%names(File))) stop('File must contain: Sid/File/Date')
   
@@ -94,9 +96,11 @@ conv2metaboSet<-function(lfiles,Meta,File,method="prof",
                 eicsdat[,!names(eicsdat)%in%c("File","PkId")],stringsAsFactors=FALSE)
   for(i in names(alldata)) colnames(alldata[[i]])=newn
   
+  eicsamp=data.frame(Sid=lsids,SidEic=lsids,stringsAsFactors=F)
+  rownames(eicsamp)=lsids
   #########
-  obj=list(Method=method,Sid=lsids,Analyte=newn,Annot=Annot,Meta=Meta,File=File,Eic=list(Path=NULL,File=eicsdat),Data=alldata)
+  obj=list(Method=method,Sid=lsids,Analyte=newn,Annot=Annot,Meta=Meta,File=File,
+           Eic=list(Path=NULL,File=eicsdat,Samp=eicsamp),Data=alldata)
   class(obj)=append(class(obj),"metaboSet")
-print(obj)
   invisible(obj)
 }

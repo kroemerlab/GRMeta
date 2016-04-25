@@ -18,7 +18,7 @@ plotSetMEic<-function(obj,WhichRT="rtcor",groupCol=NULL,colorCol=NULL,doPDF=T,ad
     lanalytes=obj$Eic$File$Analyte
   }
   
-  lanalytes=lanalytes[lanalytes%in%obj$Eic$File$Analyte][1:10]
+  lanalytes=lanalytes[lanalytes%in%obj$Eic$File$Analyte]
   lfiles=lfiles2=unique(obj$Eic$File$EicFile[obj$Eic$File$Analyte%in%lanalytes])
   if(!is.null(obj$Eic$Path)) lfiles2=paste(obj$Eic$Path,lfiles2,sep="")
   lexist=which(file.exists(lfiles2))
@@ -46,7 +46,7 @@ plotSetMEic<-function(obj,WhichRT="rtcor",groupCol=NULL,colorCol=NULL,doPDF=T,ad
   par.def=par(no.readonly = TRUE)
   
   ifeic=lfiles[1]
-  print(ifeic)
+  #print(ifeic)
   for(ifeic in lfiles){
     
     l2plots=obj$Eic$File$Analyte[obj$Eic$File$EicFile==ifeic]

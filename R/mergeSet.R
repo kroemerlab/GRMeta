@@ -298,7 +298,7 @@ mergeSet<-function(...){
   
   allmat=lapply(allmat,function(x){dimnames(x)=list(meta$Sid,annot$Analyte);x})
   
-  allmat=list(Method=names(re),Sid=meta$Sid,Analyte=annot$Analyte,Annot=annot,Meta=meta,File=fileinfos,Data=allmat)
+  allmat=list(Method=unname(lumethods),Sid=meta$Sid,Analyte=annot$Analyte,Annot=annot,Meta=meta,File=fileinfos,Data=allmat)
   if(!is.null(Eic)) allmat$Eic=Eic
   class(allmat)=append(class(allmat),"metaboSet")
   if(any(sapply(re,function(x) "fluxoSet"%in%class(x)))) class(allmat)=append(class(allmat),"fluxoSet")

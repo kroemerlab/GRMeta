@@ -137,5 +137,5 @@
   amat[is.na(amat)]=0
   colnames(amat)=lsamp
   rownames(amat)=xnew
-  return(list(amat,xnew))
+  return(list(y=amat,x=xnew))
 }

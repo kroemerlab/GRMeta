@@ -30,19 +30,20 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
 }
 
 ################
-.GRcompAlignGrpEIC<-function(grpeic,lrefs,tabeic=NULL,eicfile=NULL,whichrt="rtcor",eicParams){
+.GRcompAlignGrpEIC<-function(grpeic,lrefs,tabeic=NULL,eicfile=NULL,whichrt="rtcor",eicParams,verbose=FALSE){
   
-  
+  require(limma)
   if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,grpeic,
                                      eicParams$addEic,".rda",sep="")
-  
+  if(verbose) cat("* ",eicfile,": ")
   load(eicfile)
   if(is.null(tabeic)) leics=tabeic$Id[tabeic==grpeic] else leics=unique(dfeic$eic)
   leics=leics[leics%in%dfeic$eic]
   
   ares=list()
   for(ieic in leics){
-  tmpeic=dfeic[dfeic$eic==ieic,]
+    if(verbose) cat(ieic," ",sep=" ")
+    tmpeic=dfeic[dfeic$eic==ieic,]
   meic = .GRconvEIC(tmpeic, whichrt = whichrt, bw = eicParams$nsmo1 * eicParams$bw, delrt = eicParams$bw/2)
   
   m=meic[[1]]           
@@ -55,12 +56,14 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
   for(iref in lrefs[lrefs%in%colnames(m)]){
     rec=apply(m,2,.GRcompVals,m[,iref],lenout,21)
     cmax[iref,]=apply(rec,2,max)
-    drt[iref,]=(which.max(rec[,iref])-apply(rec,2,which.max))*median(diff(rt))
+    drt[iref,]=(which.max(rec[,iref])-apply(rec,2,which.max))*median(diff(xrt))
     rtref[iref]=weighted.median(xrt,m[,iref])
     codaref[iref]= .GRcodadw2(tmpeic$y[tmpeic$samp==iref])
   }
   ares[[ieic]]=list(cmax=cmax,drt=drt,rtref=rtref,codaref=codaref)
   }
+  if(verbose) cat("\n")
+  
   return(ares)
 }
 
@@ -72,11 +75,11 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
 #   lfiles=lfiles[file.exists(lfiles)]
 #   if(length(lfiles)==0) return(NULL)
 #   
-  require(mgcv)
+  require(limma)
   
   leicgrp=unique(tabeic$GrpEic)
   leicgrp=leicgrp[file.exists(paste(eicParams$dirEic,leicgrp,eicParams$addEic,".rda",sep=""))]
-  
+  print(leicgrp)
   if(ncl!=1){
     require("snowfall")
     ncl=max(1,min(ncl,parallel:::detectCores()))
@@ -88,13 +91,13 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
   if(ncl==1){
     cat(" on 1 processor\n",sep="")
     acef=lapply(leicgrp,.GRcompAlignGrpEIC,
-                          lrefs,tabeic,eicfile=NULL,whichrt=whichrt,eicParams)
+                          lrefs,tabeic,eicfile=NULL,whichrt=whichrt,eicParams,verbose=TRUE)
   }
   if(ncl>1){
     cat(" on ",ncl," processors\n",sep="")
     sfInit(parallel=TRUE, cpus=ncl, type='SOCK')
     sfLibrary(GRMeta)
-    sfLibrary(mgcv)
+    sfLibrary(limma)
     #if(local) 
 #    sfExport( ".GRcompAlignGrpEIC", local=TRUE )
     acef=sfClusterApplyLB(leicgrp,.GRcompAlignGrpEIC,

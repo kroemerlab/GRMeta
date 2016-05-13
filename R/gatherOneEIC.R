@@ -1,14 +1,14 @@
-gatherOneEIC<-function(matEIC,sampfile,outfile=NULL,eicParams,doMerge=TRUE,serial=TRUE){
+gatherOneEIC<-function(matEIC,sampfile,outfile=NULL,eicParams,doMerge=TRUE,verbose=TRUE,serial=TRUE){
   
   lSids=sampfile$Sid[file.exists(sampfile$Out)]
   
   d0=proc.time()[3]
   dfeic=eicinfos=sampinfos=list()
-  if(serial) cat("Gathering ",length(unique(matEIC$Id))," EICs")
+  if(verbose) cat("Gathering ",length(unique(matEIC$Id))," EICs")
   for(ix in 1:length(lSids)){
     load(sampfile[ix,]$Out)
     if(!exists('mred')) next
-    if(serial) cat(ifelse(ix%%10==0,"X","."))
+    if(verbose) cat(ifelse(ix%%10==0,"X","."))
     iattr=attributes(mred)[c("file","rts","addRT","addMZ" )]
     tabeic=attr(mred,"eic")
     if(any(tabeic$Id%in%matEIC$Id)){
@@ -26,7 +26,7 @@ gatherOneEIC<-function(matEIC,sampfile,outfile=NULL,eicParams,doMerge=TRUE,seria
     }
   }
   
-  if(serial) cat(" OK...\n")
+  if(verbose) cat(" OK...\n")
   dfeic=do.call("rbind",dfeic)
   if(!serial) top=paste(length(unique(dfeic[,'eic'])),"/",nrow(matEIC)," in ",length(unique(dfeic[,'samp']))," samp. - ",sep="")
   
@@ -36,7 +36,7 @@ gatherOneEIC<-function(matEIC,sampfile,outfile=NULL,eicParams,doMerge=TRUE,seria
     adfeic=dfeic
     for(inam in unique(matEIC$GrpEic)){
       
-      if(serial) cat(inam," ")
+      if(verbose) cat(inam," ")
       dfeic=data.frame(adfeic[adfeic[,"eic"]%in%which(matEIC$GrpEic==inam),,drop=FALSE])
       if(nrow(dfeic)==0) next
       dfeic$samp=lSids[dfeic$samp]
@@ -54,8 +54,7 @@ gatherOneEIC<-function(matEIC,sampfile,outfile=NULL,eicParams,doMerge=TRUE,seria
       #### remerging 
       whichmz=ifelse("mzcor"%in%names(dfeic),"mzcor","mz")
       whichrt=ifelse("rtcor"%in%names(dfeic),"rtcor","rt")
-      if(doMerge) dfeic=.GRmergingEIC(dfeic,eicParams,whichmz=whichmz,
-                                      whichrt=whichrt,serial=serial)
+      if(doMerge) dfeic=.GRmergingEIC(dfeic,eicParams,whichmz=whichmz, whichrt=whichrt,verbose=verbose)
       #### expand missing scans
       dfeic=.GRaddmiss(dfeic,sampinfos)
       dfeic=dfeic[order(dfeic$eic,dfeic$samp,dfeic$scan,dfeic$mzcor),]
@@ -75,6 +74,7 @@ gatherOneEIC<-function(matEIC,sampfile,outfile=NULL,eicParams,doMerge=TRUE,seria
       
       #### end of for in each group
     }
+    if(verbose) cat(inam,"\n")
     dfeic=adfeic
   }
   
@@ -84,19 +84,19 @@ gatherOneEIC<-function(matEIC,sampfile,outfile=NULL,eicParams,doMerge=TRUE,seria
     top=paste(c(top,paste(round(d1-d0,1)," secs",sep="")),collapse="")
     return(list(top,d1-d0))
   }
-  cat("Done in ",round(d1-d0,1)," secs\n",sep="")
+  if(verbose) cat("Done in ",round(d1-d0,1)," secs\n",sep="")
   invisible(dfeic)
 }
 
 ##########################
 
 .GRgatherMultiEICCl<-function(ix,tabeic,sampfile,eicParams,doMerge){
-  gatherOneEIC(tabeic[tabeic$GrpEic%in%ix,],sampfile,outfile=NA,eicParams=eicParams,doMerge=doMerge,serial=FALSE)
+  gatherOneEIC(tabeic[tabeic$GrpEic%in%ix,],sampfile,outfile=NA,eicParams=eicParams,doMerge=doMerge,verbose=FALSE,serial=FALSE)
 }
 
 ##########################
 
-gatherMultiEICs<-function(matfile,tabeic,outfile=NA,eicParams,doMerge=TRUE,ncl=1,nsplit=20,serial=TRUE){
+gatherMultiEICs<-function(matfile,tabeic,outfile=NA,eicParams,doMerge=TRUE,ncl=1,nsplit=20,serial=TRUE,verbose=TRUE){
   
   if(ncl!=1){
     require("snowfall")
@@ -104,18 +104,15 @@ gatherMultiEICs<-function(matfile,tabeic,outfile=NA,eicParams,doMerge=TRUE,ncl=1
   }
 
     if(!"GrpEic"%in%names(tabeic)) tabeic$GrpEic=tabeic$Id
-  nmols=length(unique(tabeic$GrpEic))
-  ngrps=max(1,round(nmols/nsplit))
-  lst=seq(1,nmols,length.out=ngrps+1)
-  llcode=suppressWarnings(split(unique(tabeic$GrpEic),1:ngrps))
 
+      llcode=split(unique(tabeic$GrpEic), ceiling(seq_along(unique(tabeic$GrpEic))/nsplit))
   d0=proc.time()[3]
   cat("Started at ",date(),sep="")
   if(ncl==1){
     cat(" on 1 processor\n",sep="")
     lts=list()
     for(k in 1:length(llcode)){
-        lts[[k]]=gatherOneEIC(tabeic[tabeic$GrpEic%in%llcode[[k]],],sampfile=matfile,outfile=outfile,eicParams=eicParams,doMerge=doMerge,serial=FALSE)
+        lts[[k]]=gatherOneEIC(tabeic[tabeic$GrpEic%in%llcode[[k]],],sampfile=matfile,outfile=outfile,eicParams=eicParams,doMerge=doMerge,serial=FALSE,verbose=verbose)
     }
     d1=proc.time()[3]
     cat("\nCompleted at ",date()," -> took ",round(d1-d0,1)," secs - ",round((d1-d0)/length(llcode),1)," secs per iso group\n",sep="")
@@ -183,7 +180,7 @@ gatherMultiEICs<-function(matfile,tabeic,outfile=NA,eicParams,doMerge=TRUE,ncl=1
 }
 
 #########
-.GRmergingEIC<-function(dfeic,eicParams,whichmz="mzcor",whichrt="rtcor",serial=TRUE){
+.GRmergingEIC<-function(dfeic,eicParams,whichmz="mzcor",whichrt="rtcor",verbose=TRUE){
   
   l=which(!is.na(dfeic[,whichmz]))
   lpp=.GRsplist(dfeic[l,whichmz],l,ismass=TRUE,d=eicParams$dPPM)
@@ -212,7 +209,7 @@ gatherMultiEICs<-function(matfile,tabeic,outfile=NA,eicParams,doMerge=TRUE,ncl=1
   dfeic2=dfeic
 #  print(ndups2)
   if(any(ndups2>1)) for(ix in names(ldups2[which(ndups2>1)])){
-    if(serial) cat(" merging:",ldups2[[ix]],"\n",sep=" ")
+    if(verbose) cat(" merging:",ldups2[[ix]],"\n",sep=" ")
     dfeic2$eic[dfeic2$eic%in%ldups2[[ix]]]=ix
   }
   dfeic2=dfeic2[which(!duplicated(dfeic2[,c("scan","samp","mz","eic")])),]

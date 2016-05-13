@@ -58,7 +58,7 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
   for(iref in lrefs[lrefs%in%colnames(m)]){
     rec=apply(m,2,.GRcompVals,m[,iref],lenout,nmax)
     cmax[iref,]=apply(rec,2,max)
-    drt[iref,]=(which.max(rec[,iref])-apply(rec,2,which.max))*median(diff(xrt))
+    drt[iref,]= (apply(rec,2,which.max)-which.max(rec[,iref]))*median(diff(xrt))
     rtref[iref]=weighted.median(xrt,m[,iref])
     codaref[iref]= .GRcodadw2(tmpeic$y[tmpeic$samp==iref])
   }
@@ -89,9 +89,10 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
   names(addrtv)=paste(rep(rownames(addrt),ncol(addrt)),rep(colnames(addrt),each=nrow(addrt)),sep=";;;")
   
   addnewrt=addrtv[paste(dfeic$eic,dfeic$samp,sep=";;;")]
-  if(verbose) if(any(is.na(addnewrt))) cat(" some missing!")
+  if(any(is.na(addnewrt))){
+    if(verbose) cat(" some missing!")
   addnewrt[is.na(addnewrt)]=0
-  
+  }
   addnewrt=dfeic[,whichrt]+addnewrt
   dfeic[,newrt]=addnewrt
   

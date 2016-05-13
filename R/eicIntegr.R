@@ -165,14 +165,19 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
 }
 
 ####################
-.GRintegrOneEicGrpCl<-function(tabeic,lSamp=NULL,eicParams,whichrt="rtcor",whichmz="mzcor",ncl=4){
+.GRintegrOneEicGrpCl<-function(tabeic,lSamp=NULL,eicParams,whichrt="rtcor",whichmz="mzcor",ncl=4,save=TRUE,verbose=TRUE){
  
-  .inGRintegrOneEicGrpCl<-function(igrpeic,tabeic,lSamp,eicParams,whichrt,whichmz){
+  .inGRintegrOneEicGrpCl<-function(igrpeic,tabeic,lSamp,eicParams,whichrt,whichmz,save=TRUE,verbose=FALSE){
      itabeic=tabeic[tabeic$GrpEic==igrpeic,]
-     tt=integrOneEicGrp(itabeic,lSamp,eicParams,whichrt,whichmz,save=TRUE,verbose=FALSE)$EicInfos
+     tt=integrOneEicGrp(itabeic,lSamp,eicParams,whichrt,whichmz,save=save,verbose=verbose)$EicInfos
      re=c(nrow(itabeic),nrow(tt))
      rm(list=c("tt","itabeic"))
      re
+  }
+  
+  if(ncl!=1){
+    require("snowfall")
+    ncl=max(1,min(ncl,parallel:::detectCores()))
   }
   
    lgrpeic=unique(tabeic$GrpEic)
@@ -183,16 +188,17 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
    lgrpeic=lgrpeic[file.exists(lfiles)]
    tabeic=tabeic[tabeic$GrpEic%in%lgrpeic,]
    d0=proc.time()[3]
-   cat("Started at ",date(),sep="")
-     require("snowfall")
-     ncl=max(1,min(ncl,parallel:::detectCores()))
-     cat(" on ",ncl," processors\n",sep="")
+   cat("Started at ",date()," on ",ncl," processors\n",sep="")
+   if(ncl==1)
+     allr=lapply(lgrpeic,.inGRintegrOneEicGrpCl,tabeic,lSamp,eicParams,whichrt,whichmz,save=save,verbose=verbose)
+   if(ncl>1){
      sfInit(parallel=TRUE, cpus=ncl, type='SOCK')
      sfExport( ".inGRintegrOneEicGrpCl", local=TRUE )
      sfLibrary(GRMeta)
      sfLibrary(limma)
-     allr=sfClusterApplyLB(lgrpeic,.inGRintegrOneEicGrpCl,tabeic,lSamp,eicParams,whichrt,whichmz)
+     allr=sfClusterApplyLB(lgrpeic,.inGRintegrOneEicGrpCl,tabeic,lSamp,eicParams,whichrt,whichmz,save=TRUE,verbose=FALSE)
      sfStop()
+   }
    d1=proc.time()[3]
    neics=do.call("rbind",allr)[,1]
    npks=do.call("rbind",allr)[,2]

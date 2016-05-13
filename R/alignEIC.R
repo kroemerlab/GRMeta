@@ -30,7 +30,7 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
 }
 
 ################
-.GRcompAlignGrpEIC<-function(grpeic,lrefs,tabeic=NULL,eicfile=NULL,whichrt="rtcor",eicParams,verbose=FALSE){
+.GRcompAlignGrpEIC<-function(grpeic,lrefs,drtmax=0.3,tabeic=NULL,eicfile=NULL,whichrt="rtcor",eicParams,verbose=FALSE){
   
   require(limma)
   if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,grpeic,
@@ -52,9 +52,11 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
   rtref=codaref=rep(NA,length(lrefs));names(rtref)=names(codaref)=lrefs
   cmax=drt=matrix(NA,nrow=length(lrefs),ncol=ncol(m),dimnames=list(lrefs,colnames(m)))
   
+  nmax=ceiling(drtmax/median(diff(xrt)))
+  if(nmax%%2==0) nmax=nmax+1
   lenout=2^ceiling(log2(nrow(m)*2))
   for(iref in lrefs[lrefs%in%colnames(m)]){
-    rec=apply(m,2,.GRcompVals,m[,iref],lenout,21)
+    rec=apply(m,2,.GRcompVals,m[,iref],lenout,nmax)
     cmax[iref,]=apply(rec,2,max)
     drt[iref,]=(which.max(rec[,iref])-apply(rec,2,which.max))*median(diff(xrt))
     rtref[iref]=weighted.median(xrt,m[,iref])
@@ -101,7 +103,7 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
   return(invisible(dfeic))
 }
 
-.GRcompAlignMGrpEIC<-function(tabeic,lrefs,whichrt="rtcor",eicParams,ncl=1){
+.GRcompAlignMGrpEIC<-function(tabeic,lrefs,drtmax=0.3,whichrt="rtcor",eicParams,ncl=1){
                              
 # 
 #   if(is.null(names(lfiles))) names(lfiles)=1:length(lfiles)
@@ -124,7 +126,7 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
   if(ncl==1){
     cat(" on 1 processor\n",sep="")
     acef=lapply(leicgrp,.GRcompAlignGrpEIC,
-                          lrefs,tabeic,eicfile=NULL,whichrt=whichrt,eicParams,verbose=TRUE)
+                          lrefs,tabeic,drtmax=drtmax,eicfile=NULL,whichrt=whichrt,eicParams,verbose=TRUE)
   }
   if(ncl>1){
     cat(" on ",ncl," processors\n",sep="")
@@ -134,7 +136,7 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
     #if(local) 
 #    sfExport( ".GRcompAlignGrpEIC", local=TRUE )
     acef=sfClusterApplyLB(leicgrp,.GRcompAlignGrpEIC,
-                          lrefs,tabeic,eicfile=NULL,whichrt=whichrt,eicParams)
+                          lrefs,tabeic,drtmax=drtmax,eicfile=NULL,whichrt=whichrt,eicParams)
     sfStop()
   }  
   acef=unlist(acef,recursive=FALSE)

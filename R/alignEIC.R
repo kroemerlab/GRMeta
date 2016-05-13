@@ -52,7 +52,7 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
   rtref=codaref=rep(NA,length(lrefs));names(rtref)=names(codaref)=lrefs
   cmax=drt=matrix(NA,nrow=length(lrefs),ncol=ncol(m),dimnames=list(lrefs,colnames(m)))
   
-  nmax=ceiling(drtmax/median(diff(xrt)))
+  nmax=ceiling(drtmax/median(diff(xrt))+3)
   if(nmax%%2==0) nmax=nmax+1
   lenout=2^ceiling(log2(nrow(m)*2))
   for(iref in lrefs[lrefs%in%colnames(m)]){

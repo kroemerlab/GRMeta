@@ -37,7 +37,7 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
                                      eicParams$addEic,".rda",sep="")
   if(verbose) cat("* ",eicfile,": ")
   load(eicfile)
-  if(is.null(tabeic)) leics=tabeic$Id[tabeic==grpeic] else leics=unique(dfeic$eic)
+  if(!is.null(tabeic)) leics=tabeic$Id[tabeic==grpeic] else leics=unique(dfeic$eic)
   leics=leics[leics%in%dfeic$eic]
   
   ares=list()
@@ -67,6 +67,39 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
   return(ares)
 }
 
+################
+.GRcorGrpEIC<-function(grpeic,shmat,tabeic=NULL,eicfile=NULL,byGrp=FALSE,dosave=FALSE,
+                       whichrt="rtcor",newrt="rtcor2",eicParams,verbose=FALSE){
+  
+  if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,grpeic,
+                                     eicParams$addEic,".rda",sep="")
+  if(verbose) cat("* ",eicfile)
+  load(eicfile)
+  if(!is.null(tabeic)) leics=tabeic$Id[tabeic==grpeic] else leics=unique(dfeic$eic)
+  leics=leics[leics%in%dfeic$eic]
+  
+  eicinf=attr(dfeic,"eic")
+  eicinf=eicinf[eicinf$Id%in%leics,]
+  rts=as.numeric(rownames(shmat))
+  addrt=apply(shmat,2,function(x) approx(rts,x,eicinf$rtap)$y)
+  rownames(addrt)=eicinf$Id
+  addrtv=as.vector(addrt)
+  names(addrtv)=paste(rep(rownames(addrt),ncol(addrt)),rep(colnames(addrt),each=nrow(addrt)),sep=";;;")
+  
+  addnewrt=addrtv[paste(dfeic$eic,dfeic$samp,sep=";;;")]
+  if(verbose) if(any(is.na(addnewrt))) cat(" some missing!")
+  addnewrt[is.na(addnewrt)]=0
+  
+  addnewrt=dfeic[,whichrt]+addnewrt
+  dfeic[,newrt]=addnewrt
+  
+  if(dosave) save(file=eicfile,dfeic,eicinfos,sampinfos)
+  
+  if(verbose) cat("\n")
+  
+
+  return(invisible(dfeic))
+}
 
 .GRcompAlignMGrpEIC<-function(tabeic,lrefs,whichrt="rtcor",eicParams,ncl=1){
                              
@@ -112,48 +145,86 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
   
 }
 
-# .GRcompAlignEICs
+.GRcompAlignEICs<-function(ares,newrts=NULL,lsamps=NULL,lrefs=NULL,rtlim=NULL,drtmax=0.5){
 
-# 
-# lsamps=unique(unlist(lapply(ares,function(x) colnames(x[[1]]))))
-# lrefs=unique(unlist(lapply(ares,function(x) rownames(x[[1]]))))
-# 
-# adrt=lapply(ares,function(x){
-#   x=x$drt[match(lrefs,rownames(x$drt)),match(lsamps,colnames(x$drt))]
-#   dimnames(x)=list(lrefs,lsamps);x
-#   })
-# acmax=lapply(ares,function(x){
-#   x=x$cmax[match(lrefs,rownames(x$cmax)),match(lsamps,colnames(x$cmax))]
-#   dimnames(x)=list(lrefs,lsamps);x
-# })
-# 
-# artref=sapply(ares,function(x) x$rtref[lrefs])
-# acodaref=sapply(ares,function(x) x$codaref[lrefs])
-# 
-# newrts=(floor(min(artref,na.rm=T)/(2*eicParams$bw))-2):(ceiling(max(artref,na.rm=T)/(2*eicParams$bw))+2)
-# newrts=newrts*eicParams$bw*2
-# 
-# ###################
-# # for each sample
-# allmpr=list()
-# for(isamp in lsamps){
-#   allmpr[[isamp]]=matrix(NA,nrow=length(newrts),ncol=length(lrefs),dimnames=list(newrts,lrefs))
-# mrt=sapply(adrt,function(x) x[,isamp])
-# cmax=sapply(acmax,function(x) x[,isamp])
-# cmax[which(cmax<0.2)]=0
-# 
-# for(iref in lrefs){
-# df=na.omit(data.frame(y=mrt[iref,],x=artref[iref,],w=cmax[iref,],cw=acodaref[iref,]))
-# df$w[df$w<0.2]=0
-# if(sum(df$w>0)>11){
-#   m<-try(mgcv:::gam(y~s(x),data=df,weights=w),TRUE)
-#   if("try-error"%in%class(m))  m<-try(mgcv:::gam(y~(x),data=df,weights=w),TRUE)
-#   pr=mgcv:::predict.gam(m,data.frame(x=newrts))
-#   #  pr[rts1<min(df$x,na.rm=T) | rts1>max(df$x,na.rm=T)]=NA
-#   allmpr[[isamp]][,iref]=pr
-# }
-# }
-# }
+
+if(is.null(lsamps)) lsamps=unique(unlist(lapply(ares,function(x) colnames(x[[1]]))))
+if(is.null(lrefs)) lrefs=unique(unlist(lapply(ares,function(x) rownames(x[[1]]))))
+
+adrt=lapply(ares,function(x){
+  x=x$drt[match(lrefs,rownames(x$drt)),match(lsamps,colnames(x$drt))]
+  dimnames(x)=list(lrefs,lsamps);x
+  })
+acmax=lapply(ares,function(x){
+  x=x$cmax[match(lrefs,rownames(x$cmax)),match(lsamps,colnames(x$cmax))]
+  dimnames(x)=list(lrefs,lsamps);x
+})
+
+artref=sapply(ares,function(x) x$rtref[lrefs])
+acodaref=sapply(ares,function(x) x$codaref[lrefs])
+
+if(is.null(newrts)){
+  toadd=max(2,ceiling(drtmax/eicParams$bw))
+  newrts=(floor(min(artref,na.rm=T)/(2*eicParams$bw))-toadd):(ceiling(max(artref,na.rm=T)/(2*eicParams$bw))+toadd)
+newrts=newrts*eicParams$bw*2
+}
+
+doborderu=doborderb=FALSE
+if(!is.null(rtlim) & any(newrts<rtlim[1])){
+  lbe=which(newrts<rtlim[1])
+  lbe2=which(newrts>=rtlim[1])[1:3]
+  doborderb=TRUE
+}
+if(!is.null(rtlim) & any(newrts>rtlim[2])){
+  lup=which(newrts>rtlim[2])
+  lup2=rev(which(newrts<=rtlim[2]))[1:3]
+  doborderu=TRUE
+}
+
+
+###################
+# for each sample
+allmpr=list()
+for(isamp in lsamps){
+  cat(".")
+  allmpr[[isamp]]=matrix(NA,nrow=length(newrts),ncol=length(lrefs),dimnames=list(newrts,lrefs))
+mrt=sapply(adrt,function(x) x[,isamp])
+cmax=sapply(acmax,function(x) x[,isamp])
+cmax[which(cmax<0.2)]=0
+
+for(iref in lrefs){
+df=na.omit(data.frame(y=mrt[iref,],x=artref[iref,],w=cmax[iref,],cw=acodaref[iref,]))
+df$w[df$w<0.2]=0
+if(sum(df$w>0)>11){
+  m<-try(mgcv:::gam(y~s(x),data=df,weights=w),TRUE)
+  if("try-error"%in%class(m))  m<-try(mgcv:::gam(y~(x),data=df,weights=w),TRUE)
+  pr=mgcv:::predict.gam(m,data.frame(x=newrts))
+  if(any(abs(pr)>drtmax)) pr[which(abs(pr)>drtmax)]=drtmax*sign(pr[which(abs(pr)>drtmax)])
+  if(doborderb)  pr[lbe]=median(pr[lbe2])
+  if(doborderu)  pr[lup]=median(pr[lup2])
+  allmpr[[isamp]][,iref]=pr
+}
+}
+}
+cat("\n")
+
+shmat=sapply(allmpr,function(x){
+  pr=apply(x,1,median)
+  if(any(abs(pr)>drtmax)) pr[which(abs(pr)>drtmax)]=drtmax*sign(pr[which(abs(pr)>drtmax)])
+  if(doborderb)  pr[lbe]=median(pr[lbe2])
+  if(doborderu)  pr[lup]=median(pr[lup2])
+  pr=mgcv:::gam(pr~s(newrts))$fit
+  if(doborderb)  pr[lbe]=pr[lbe2[which.min(lbe2)]]
+  if(doborderu)  pr[lup]=pr[lup2[which.max(lup2)]]
+  pr
+})
+
+
+rownames(shmat)=newrts
+
+return(list(ShMat=shmat,RT=newrts,AllPr=allmpr,Ref=lrefs,RTref=artref))
+
+}
 # 
 # iref
 # 

@@ -24,8 +24,8 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
   
   ieic=tmpeic$eic[1]
   m=.GRconvEIC(tmpeic,whichrt=whichrt,bw=eicParams$nsmo1*eicParams$bw,delrt=eicParams$bw/2)
-  lrt=m[[2]];m=m[[1]]
-  mz=.GRconvEIC(tmpeic,whichrt=whichrt,bw=eicParams$nsmo2*eicParams$bw,delrt=eicParams$bw/2,xnew=lrt)[[1]]
+  lrt=m$x;m=m$y
+  mz=.GRconvEIC(tmpeic,whichrt=whichrt,bw=eicParams$nsmo2*eicParams$bw,delrt=eicParams$bw/2,xnew=lrt)$y
   
   if(is.null(lSamp)) lSamp=colnames(m)
   lsa=colnames(m)[colnames(m)%in%lSamp]
@@ -225,13 +225,12 @@ integrOneEicGrp<-function(tabeic,lSamp=NULL,eicParams,whichrt="rtcor",whichmz="m
     itmpeic=dfeic[dfeic$eic==ieic,]
     ivMint=tabeic$Bl[tabeic$Id==ieic]
     ivMint=ifelse(is.null(ivMint),eicParams$Mint,ivMint)
-    if(nrow(itmpeic)>0){
+    if(nrow(itmpeic)<5) next
       if(verbose) cat(" * ",ieic,": ",sep="")
       allre[[ieic]]=integrOneEic(itmpeic,lSamp=lSamp,ivMint=ivMint,eicParams=eicParams,
                             whichrt=whichrt,whichmz=whichmz,verbose=verbose)
       if(verbose) 
       cat(ifelse(is.null(allre[[ieic]]),' 0 ',length(unique(allre[[ieic]]$SampStats$Pk)))," peaks\n",sep="")
-    }
   }
   
   allre=allre[which(!sapply(allre,is.null))]

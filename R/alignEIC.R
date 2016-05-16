@@ -141,6 +141,7 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
   return(invisible(allr))
 }
 
+
 ################
 .GRcorGrpEICo<-function(grpeic,shmat,tabeic=NULL,eicfile=NULL,byGrp=FALSE,dosave=FALSE,
                        whichrt="rtcor",newrt="rtcor2",eicParams,verbose=FALSE,ncl=1){

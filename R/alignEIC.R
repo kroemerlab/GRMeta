@@ -121,7 +121,7 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
   d0=proc.time()[3]
   cat("Started at ",date()," on ",ncl," processors\n",sep="")
   if(ncl==1){
-    allr=lapply(lgrpeic,.inGRcorGrpEIC,shmat=shmat,tabeic=tabeic=tabeic,byGrp=byGrp,dosave=dosave,whichrt=whichrt,newrt=newrt,eicParams,
+    allr=lapply(lgrpeic,.inGRcorGrpEIC,shmat=shmat,tabeic=tabeic,byGrp=byGrp,dosave=dosave,whichrt=whichrt,newrt=newrt,eicParams,
                 verbose=verbose,retres=retres)
    if(retres) totop=sum(sapply(allr,function(x) length(unique(dfeic$eic)))) else totop=sum(unlist(allr))
   }
@@ -130,7 +130,7 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
     sfExport( ".inGRcorGrpEIC", local=TRUE )
     sfLibrary(GRMeta)
     sfLibrary(limma)
-    allr=sfClusterApplyLB(lgrpeic,.inGRcorGrpEIC,shmat=shmat,tabeic=tabeic=tabeic,byGrp=byGrp,dosave=TRUE,
+    allr=sfClusterApplyLB(lgrpeic,.inGRcorGrpEIC,shmat=shmat,tabeic=tabeic,byGrp=byGrp,dosave=TRUE,
                           whichrt=whichrt,newrt=newrt,eicParams,verbose=FALSE,retres=FALSE)
     totop=sum(unlist(allr))
     sfStop()

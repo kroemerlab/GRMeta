@@ -102,7 +102,7 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
   if(dosave) save(file=eicfile,dfeic,eicinfos,sampinfos)
   
   if(verbose) cat("\n")
-  if(retres) invisible(dfeic)  return(nrow(eicinf))
+  if(retres) invisible(dfeic) else return(nrow(eicinf))
   }
   
   ###################

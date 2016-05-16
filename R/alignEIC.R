@@ -7,18 +7,19 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
                                    eicParams$addEic,".rda",sep="")
 
   load(eicfile)
-  
   tmpeic=dfeic[dfeic$eic==ieic,]
+  
+  rtref=codaref=rep(NA,length(lrefs));names(rtref)=names(codaref)=lrefs
+  cmax=drt=matrix(NA,nrow=length(lrefs),ncol=ncol(m),dimnames=list(lrefs,colnames(m)))
+  if(any(!lrefs%in%dfeic$samp)) return(list(cmax=cmax,drt=drt,rtref=rtref,codaref=codaref))
+  
   meic = .GRconvEIC(tmpeic, whichrt = whichrt, bw = eicParams$nsmo1 * eicParams$bw, delrt = eicParams$bw/2)
         
   m=meic[[1]]           
   xrt=meic[[2]]           
   
-  rtref=codaref=rep(NA,length(lrefs));names(rtref)=names(codaref)=lrefs
-  cmax=drt=matrix(NA,nrow=length(lrefs),ncol=ncol(m),dimnames=list(lrefs,colnames(m)))
-
   lenout=2^ceiling(log2(nrow(m)*2))
-   for(iref in lrefs[lrefs%in%colnames(m)]){
+  for(iref in lrefs[lrefs%in%colnames(m)]){
     rec=apply(m,2,.GRcompVals,m[,iref],lenout,21)
   cmax[iref,]=apply(rec,2,max)
   drt[iref,]=(which.max(rec[,iref])-apply(rec,2,which.max))*median(diff(rt))
@@ -70,8 +71,79 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
 }
 
 ################
-.GRcorGrpEIC<-function(grpeic,shmat,tabeic=NULL,eicfile=NULL,byGrp=FALSE,dosave=FALSE,
-                       whichrt="rtcor",newrt="rtcor2",eicParams,verbose=FALSE){
+.GRcorGrpEIC<-function(lgrpeic,shmat,tabeic=NULL,byGrp=FALSE,dosave=FALSE,
+                       whichrt="rtcor",newrt="rtcor2",eicParams,verbose=FALSE,retres=TRUE,ncl=1){
+  
+  .inGRcorGrpEIC<-function(grpeic,shmat,tabeic=NULL,byGrp=FALSE,dosave=FALSE,
+                           whichrt="rtcor",newrt="rtcor2",eicParams,verbose=TRUE,retres=TRUE){
+    
+  eicfile=paste(eicParams$dirEic,grpeic,eicParams$addEic,".rda",sep="")
+  if(verbose) cat("* ",eicfile)
+  load(eicfile)
+  if(!is.null(tabeic)) leics=tabeic$Id[tabeic$GrpEic==grpeic] else leics=unique(dfeic$eic)
+  leics=leics[leics%in%dfeic$eic]
+  
+  eicinf=attr(dfeic,"eic")
+  eicinf=eicinf[eicinf$Id%in%leics,]
+  rts=as.numeric(rownames(shmat))
+  addrt=apply(shmat,2,function(x) approx(rts,x,eicinf$rtap)$y)
+  rownames(addrt)=eicinf$Id
+  addrtv=as.vector(addrt)
+  names(addrtv)=paste(rep(rownames(addrt),ncol(addrt)),rep(colnames(addrt),each=nrow(addrt)),sep=";;;")
+  
+  addnewrt=addrtv[paste(dfeic$eic,dfeic$samp,sep=";;;")]
+  if(any(is.na(addnewrt))){
+    if(verbose) cat(" some missing!")
+    addnewrt[is.na(addnewrt)]=0
+  }
+  addnewrt=dfeic[,whichrt]+addnewrt
+  dfeic[,newrt]=addnewrt
+  
+  if(dosave) save(file=eicfile,dfeic,eicinfos,sampinfos)
+  
+  if(verbose) cat("\n")
+  if(retres) invisible(dfeic)  return(nrow(eicinf))
+  }
+  
+  ###################
+  if(ncl!=1){
+    require("snowfall")
+    ncl=max(1,min(ncl,parallel:::detectCores()))
+  }
+  
+  if(!is.null(tabeic) & is.null(lgrpeic))  lgrpeic=unique(tabeic$GrpEic)
+  lfiles=paste(ifelse(is.null(eicParams$dirEic),"./",eicParams$dirEic),
+               lgrpeic,
+               ifelse(is.null(eicParams$addEic),"./",eicParams$addEic),".rda",sep="")
+  lgrpeic=unique(lgrpeic[file.exists(lfiles)])
+  if(!is.null(tabeic)) lgrpeic=unique(tabeic$GrpEic[tabeic$GrpEic%in%lgrpeic])
+  
+  d0=proc.time()[3]
+  cat("Started at ",date()," on ",ncl," processors\n",sep="")
+  if(ncl==1){
+    allr=lapply(lgrpeic,.inGRcorGrpEIC,shmat=shmat,tabeic=tabeic=tabeic,byGrp=byGrp,dosave=dosave,whichrt=whichrt,newrt=newrt,eicParams,
+                verbose=verbose,retres=retres)
+   if(retres) totop=sum(sapply(allr,function(x) length(unique(dfeic$eic)))) else totop=sum(unlist(allr))
+  }
+  if(ncl>1){
+    sfInit(parallel=TRUE, cpus=ncl, type='SOCK')
+    sfExport( ".inGRcorGrpEIC", local=TRUE )
+    sfLibrary(GRMeta)
+    sfLibrary(limma)
+    allr=sfClusterApplyLB(lgrpeic,.inGRcorGrpEIC,shmat=shmat,tabeic=tabeic=tabeic,byGrp=byGrp,dosave=TRUE,
+                          whichrt=whichrt,newrt=newrt,eicParams,verbose=FALSE,retres=FALSE)
+    totop=sum(unlist(allr))
+    sfStop()
+  }
+  d1=proc.time()[3]
+  cat("\nCompleted at ",date()," -> took ",round(d1-d0,1)," secs to process ",length(lgrpeic)," EIC groups\n",sep="")
+  cat(" * ",totop," EICs in all, ",round(totop/length(lgrpeic),3)," on av.\n")
+  return(invisible(allr))
+}
+
+################
+.GRcorGrpEICo<-function(grpeic,shmat,tabeic=NULL,eicfile=NULL,byGrp=FALSE,dosave=FALSE,
+                       whichrt="rtcor",newrt="rtcor2",eicParams,verbose=FALSE,ncl=1){
   
   if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,grpeic,
                                      eicParams$addEic,".rda",sep="")
@@ -97,7 +169,7 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
   dfeic[,newrt]=addnewrt
   
   if(dosave) save(file=eicfile,dfeic,eicinfos,sampinfos)
-  
+
   if(verbose) cat("\n")
   
 

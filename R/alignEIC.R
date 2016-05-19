@@ -263,23 +263,23 @@ allmpr=list()
 for(isamp in lsamps){
   cat(".")
   allmpr[[isamp]]=matrix(NA,nrow=length(newrts),ncol=length(lrefs),dimnames=list(newrts,lrefs))
-mrt=sapply(adrt,function(x) x[,isamp])
-cmax=sapply(acmax,function(x) x[,isamp])
-cmax[which(cmax<0.2)]=0
-
-for(iref in lrefs){
-df=na.omit(data.frame(y=mrt[iref,],x=artref[iref,],w=cmax[iref,],cw=acodaref[iref,]))
-df$w[df$w<0.2]=0
-if(sum(df$w>0)>11){
-  m<-try(mgcv:::gam(y~s(x),data=df,weights=w),TRUE)
-  if("try-error"%in%class(m))  m<-try(mgcv:::gam(y~(x),data=df,weights=w),TRUE)
-  pr=mgcv:::predict.gam(m,data.frame(x=newrts))
-  if(any(abs(pr)>drtmax)) pr[which(abs(pr)>drtmax)]=drtmax*sign(pr[which(abs(pr)>drtmax)])
-  if(doborderb)  pr[lbe]=median(pr[lbe2])
-  if(doborderu)  pr[lup]=median(pr[lup2])
-  allmpr[[isamp]][,iref]=pr
-}
-}
+  mrt=sapply(adrt,function(x) x[,isamp])
+  cmax=sapply(acmax,function(x) x[,isamp])
+  cmax[which(cmax<0.2)]=0
+  
+  for(iref in lrefs){
+    df=na.omit(data.frame(y=mrt[iref,],x=artref[iref,],w=cmax[iref,],cw=acodaref[iref,]))
+    df$w[df$w<0.2]=0
+    if(sum(df$w>0)>11){
+      m<-try(mgcv:::gam(y~s(x),data=df,weights=w),TRUE)
+      if("try-error"%in%class(m))  m<-try(mgcv:::gam(y~(x),data=df,weights=w),TRUE)
+      pr=mgcv:::predict.gam(m,data.frame(x=newrts))
+      if(any(abs(pr)>drtmax)) pr[which(abs(pr)>drtmax)]=drtmax*sign(pr[which(abs(pr)>drtmax)])
+      if(doborderb)  pr[lbe]=median(pr[lbe2])
+      if(doborderu)  pr[lup]=median(pr[lup2])
+      allmpr[[isamp]][,iref]=pr
+    }
+  }
 }
 cat("\n")
 

@@ -257,10 +257,14 @@
 
 .GRgroupPks<-function(apks,tabres){
  
+  apks0=apks
+
+  apks=apks0
+  apks$scl=paste(apks$samp,apks$cl,sep=";;")
   inloc=inlocr=inlocl=rep(0,nrow(apks))
-  lseg=sort(unique(tabres[tabres[,4]!=0,2]))
-  lseg=lseg[lseg>0]
-  lsegsc=lapply(lseg,function(x) which(tabres[,2]==x))
+  lseg=sort(unique(tabres[which(tabres[,"Peak"]!=0),"Segment"]))
+  lseg=lseg[which(lseg>0)]
+  lsegsc=lapply(lseg,function(x) which(tabres[,"Segment"]==x))
   lsegsc=lsegsc[order(sapply(lsegsc,median))]
   for(ij in 1:length(lsegsc)){
     inloc[apks$tick.loc%in%lsegsc[[ij]]]=ij
@@ -270,16 +274,18 @@
   toadd=cbind(pkreg=inloc,lefreg=inlocl,rireg=inlocr)
   ### remove all zeros alone in their cluster
   allz=apply(toadd,1,function(x) all(x==0))*1
-  scl=paste(apks$samp,apks$cl)
-  tab=table(scl,factor(allz,levels=0:1))
-  l2rm=which(scl%in%names(which(tab[,1]==0 & tab[,2]>0)))
+  tab=table(apks$scl,factor(allz,levels=0:1))
+  l2rm=which(apks$scl%in%names(which(tab[,1]==0 & tab[,2]>0)))
   if(length(l2rm)){toadd=toadd[-l2rm,,drop=F];apks=apks[-l2rm,,drop=F]}
   if(nrow(apks)==0) return(NULL)
   ### chk if all agree
   ndif=apply(toadd,1,function(x) length(unique(x[x>0])))
+  ## contains the cluster id or NA is several clusters or zeros if part of cluster not in the lsegsc 
   ndif[which(ndif>1)]=NA
-  ndif[which(ndif==1)]=apply(toadd[which(ndif==1),,drop=F],1,function(x) unique(x[x>0]))
-  if(length(ndif)>1) if(any(ndif==0,na.rm=T)) for(mergezer in 1:2){
+  ndif[which(ndif==1)]=apply(toadd[which(ndif==1),,drop=F],1,function(x) unique(x[x>0])) 
+  
+  tt=cbind(apks,toadd,ndif);rownames(tt)=1:nrow(tt) ## debuggin
+  if(length(ndif)>1) if(any(ndif==0,na.rm=T)) for(mergezer in 1:2){ ## better implementation for each sample + what happens if zeros b/w peaks-?
     ### all zeros before
     if(any(ndif[-length(ndif)]==0,na.rm=T)){
       lzer=which(ndif[-length(ndif)]==0)
@@ -295,13 +301,12 @@
   }
   ### chk if only in the sample/cluster NA
   if(any(is.na(ndif))){
-    scl=paste(apks$samp,apks$cl)
     lna=which(is.na(ndif))
-    l=which(scl%in%scl[lna])
+    l=which(apks$scl%in%apks$scl[lna])
     if(!all(is.na(ndif[l]))){
-    tab=table(scl[l],ndif[l])
+    tab=table(apks$scl[l],ndif[l])
     tab=tab[rowSums(tab>0)==1,,drop=F]
-    if(nrow(tab)>0) for(i in rownames(tab)) ndif[which(scl%in%i)]=unique(na.omit(ndif[which(scl%in%i)]))
+    if(nrow(tab)>0) for(i in rownames(tab)) ndif[which(apks$scl%in%i)]=unique(na.omit(ndif[which(apks$scl%in%i)]))
     }
   }  
   
@@ -313,7 +318,11 @@
     if(maxov[which.max(maxov)]>.24) ndif[i]=which.max(maxov) # else print(i)
     }
   }
-  return(cbind(apks,toadd,Pk=ndif))
+  
+  ## normalise ndif
+  ndif2=as.numeric(factor(ndif,levels=sort(unique(na.omit(ndif)))))
+  if(any(ndif==0,na.rm=T)) ndif2=ndif2-1
+  return(cbind(apks[,!names(apks)%in%"scl",drop=F],toadd,Pk=ndif2))
 }
 
 

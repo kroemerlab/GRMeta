@@ -25,16 +25,17 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
   ieic=tmpeic$eic[1]
   m=.GRconvEIC(tmpeic,whichrt=whichrt,bw=eicParams$nsmo1*eicParams$bw,delrt=eicParams$bw/2)
   lrt=m$x;m=m$y
+  #matplot(lrt,m,type='l')
   mz=.GRconvEIC(tmpeic,whichrt=whichrt,bw=eicParams$nsmo2*eicParams$bw,delrt=eicParams$bw/2,xnew=lrt)$y
   
   if(is.null(lSamp)) lSamp=colnames(m)
-  lsa=colnames(m)[colnames(m)%in%lSamp]
+  lsa=intersect(lSamp,colnames(m))
   if(length(lsa)==0) return(NULL)
   cm=m[,lsa,drop=F]
   cmz=mz[,lsa,drop=F]
+  
   if(ncol(cm)>1) tabres=cbind(rt=lrt,.GRcompSeg(cm,cmz,eicParams,ivMint=ivMint))
   if(ncol(cm)==1) tabres=cbind(rt=lrt,.GRcompSegOne(cm,cmz,eicParams,ivMint=ivMint))
-  
   if(all(tabres[,4]==0 | tabres[,2]==0)){
     if(verbose) cat("No master peaks in ",ieic,"\n")
     return(NULL)
@@ -60,6 +61,7 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
     if(is.null(finalpks$Pk)) cat("No peaks in ",ieic,"\n")
     if(any(finalpks$IsNA)) cat("NAs in ",ieic,"\n")
   }
+#  if(any(finalpks$IsNA)) finalpksNA=finalpks[which(finalpks$IsNA),,drop=F]
   finalpks=finalpks[which(finalpks$Pk!=0),,drop=F]
   if(nrow(finalpks)==0) return(NULL)
   finalpks0=finalpks
@@ -72,9 +74,8 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
                       tick.right=tapply(finalpks0$tick.right,scl,max),
                       SNR=tapply(finalpks0$SNR,scl,max),
                       IsNA=tapply(finalpks0$IsNA,scl,all),
-  Pk=tapply(finalpks0$Pk,scl,unique),stringsAsFactors=FALSE)
+                      Pk=tapply(finalpks0$Pk,scl,unique),stringsAsFactors=FALSE)
   for(i in names(finalpks)) finalpks[,i]=as.vector(finalpks[,i])
-  
   
   ###########################
   ## get final pks stats
@@ -89,7 +90,7 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
     finalpks$MZ[i]=tmp[iapex,whichmz]
     finalpks$MZ2[i]=weighted.median(tmp[,whichmz],tmp[,"y"])
   }
-  if(max(finalpks$Pk)>1){
+  if(any(finalpks$Pk>1)){
     ############################
     ## reorder based on RT/MZ
     RTs=round(tapply(finalpks$RT,finalpks$Pk,median),4)
@@ -100,8 +101,8 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
     lcl=as.list(1:length(lso))
     oRTs=sapply(lcl,function(x) median(finalpks$RT[finalpks$Pk%in%x]))
     oMZs=sapply(lcl,function(x) median(finalpks$MZ[finalpks$Pk%in%x]))
-    itab=cbind(diff(oRTs),abs(.GRcompdppm(oMZs,F)))
-    
+    itab=cbind(diff(oRTs),abs(.GRcompdppm(oMZs,sort=FALSE)))
+#    print(itab)
     deltaRT=ifelse(is.null(eicParams$dRT),eicParams$nspan*eicParams$bw*3,eicParams$dRT)
     deltaPPM=ifelse(is.null(eicParams$dPPM),11,eicParams$dPPM)
     while(any((itab[,1]<deltaRT & itab[,2]<deltaPPM))){
@@ -137,6 +138,7 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
     for(i in names(finalpks)) finalpks[,i]=as.vector(finalpks[,i])
     
   }
+  finalpks$Pk=as.numeric(factor(finalpks$Pk,sort(unique(finalpks$Pk))))
   
   ###########################
   ## clean eic
@@ -212,7 +214,7 @@ integrOneEic<-function(tmpeic,lSamp=NULL,ivMint,eicParams,whichrt="rtcor",whichm
 integrOneEicGrp<-function(tabeic,lSamp=NULL,eicParams,whichrt="rtcor",whichmz="mzcor",save=TRUE,verbose=TRUE){
   
   ieicgrp=tabeic$GrpEic[1]
-  tabeic=tabeic[tabeic$GrpEic==ieicgrp,]
+  tabeic=tabeic[tabeic$GrpEic==ieicgrp,,drop=FALSE]
   
   ifile=paste(ifelse(is.null(eicParams$dirEic),"./",eicParams$dirEic),
               ieicgrp,

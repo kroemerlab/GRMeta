@@ -1,5 +1,5 @@
 
-plotSetMEic<-function(obj,WhichRT="rtcor",groupCol=NULL,colorCol=NULL,doPDF=T,addfile="./",endfile="-Eic",repDots="-",cexEL=0.6,...){
+plotSetMEic<-function(obj,WhichRT="rtcor",groupCol=NULL,colorCol=NULL,doPDF=T,addfile="./",endfile="-Eic",repDots="-",cexEL=0.6,what="Eic",...){
   
   # WhichRT="rtcor";groupCol=NULL;colorCol=NULL;addfile="./";endfile="-Eic";repDots="-";cexEL=0.6;dots=list()
   # width=10;height=14
@@ -18,6 +18,13 @@ plotSetMEic<-function(obj,WhichRT="rtcor",groupCol=NULL,colorCol=NULL,doPDF=T,ad
     lanalytes=obj$Eic$File$Analyte
   }
   
+  what0=what
+  what=tolower(unique(what[what%in%c("eic","mz")]))
+  if(length(what)==0){
+    cat(what0," invalid: plot Eics instead\n",sep="")
+    what="eic"
+  }
+  
   lanalytes=lanalytes[lanalytes%in%obj$Eic$File$Analyte]
   lfiles=lfiles2=unique(obj$Eic$File$EicFile[obj$Eic$File$Analyte%in%lanalytes])
   if(!is.null(obj$Eic$Path)) lfiles2=paste(obj$Eic$Path,lfiles2,sep="")
@@ -28,8 +35,18 @@ plotSetMEic<-function(obj,WhichRT="rtcor",groupCol=NULL,colorCol=NULL,doPDF=T,ad
   cat(length(lanalytes),"analytes from",length(lfiles),"files\n")
   if(length(lanalytes)==0) stop("Nothing found!")
   
-  width = ifelse(is.null(dots$width),5*par()$mfrow[2],dots$width)
-  height = ifelse(is.null(dots$height),5*par()$mfrow[1],dots$height)
+  if(is.null(dots$width)){
+    if("mfrow"%in%names(dots)) width=5*par()$mfrow[2]
+    if("mfcol"%in%names(dots)) width=5*par()$mfcol[2]
+    if("mfcol"%in%names(dots) | "mfrow"%in%names(dots)) width = 5*max(par()$mfrow[2],par()$mfcol[2])
+  } else width=dots$width
+  
+  if(is.null(dots$height)){
+    if("mfrow"%in%names(dots)) height=5*par()$mfrow[1]
+    if("mfcol"%in%names(dots)) height=5*par()$mfcol[1]
+    if("mfcol"%in%names(dots) | "mfrow"%in%names(dots)) height = 5*max(par()$mfrow[1],par()$mfcol[1])
+  } else height=dots$height
+
   dots=dots[names(dots)%in%names(par())]
   
   
@@ -103,7 +120,10 @@ plotSetMEic<-function(obj,WhichRT="rtcor",groupCol=NULL,colorCol=NULL,doPDF=T,ad
       outfile=paste(addfile,gsub("\\.",repDots,analyte),endfile,".pdf",sep="")
       if(doPDF) pdf(file=outfile,width=width,height=height)
       par(dots)
-      .GRplotEIC(ceic,whichrt,llsids,Mint=Mint,rtr=rtr,cexEL=cexEL)
+      for(iwhat in what){
+        if(iwhat=="eic") .GRplotEIC(ceic,whichrt,llsids,Mint=Mint,rtr=rtr,cexEL=cexEL)
+        if(iwhat=="mz") .GRplotMZ(ceic,whichrt,whichmz,llsids,Mint=obj$Annot[analyte,]$MZ,rtr=rtr,cexEL=cexEL)
+      }
       if(doPDF) dev.off()
       
     }
@@ -178,3 +198,63 @@ plotSetMEic<-function(obj,WhichRT="rtcor",groupCol=NULL,colorCol=NULL,doPDF=T,ad
   
 }
 
+
+.GRplotMZ<-function(ceic,whichrt,whichmz,llsids=list(All=unique(ceic$Sid)),Mint=NA,rtr=NULL,cexEL=0.4){
+  
+  
+  alphadd<-function(hex.color.list,alpha=0.5) sprintf("%s%02X", hex.color.list, floor(alpha * 256))
+  rint=range(pretty(range(ceic[,whichmz],na.rm=TRUE)*(1+c(-5,5)*10^-6)))
+  if(is.na(Mint)) Mint=median(rint)
+  if(is.null(rtr)){
+    rtr=range(ceic[,whichrt])
+    rtr=rtr+c(-.5,1)*0.1*diff(rtr)
+    rtr[1]=max(0,rtr[1])
+    rtr=range(pretty(seq(rtr[1],rtr[2],length.out = 7)))
+  }
+  
+  cols=tapply(ceic$cols,ceic$samp,unique)
+  if(any(!ceic$InPk)) ceic$cols[!ceic$InPk]=alphadd(ceic$cols[!ceic$InPk],.4)
+  
+  for(namsamp in names(llsids)){
+    #   cat(namsamp,"\n")
+    lisamp=llsids[[namsamp]]
+    lisamp=lisamp[lisamp%in%unique(ceic$samp)]# sample ids in ori file to considered in 
+    #    lisamp[order(rtmat[lisamp,"HEap.1"],na.last = FALSE)]
+    if(length(lisamp)==0){
+      plot(0:1,0:1,axes=F,xlab="",ylab="",cex=0)
+      text(.5,.5,namsamp)
+      next
+    }
+    
+    
+    l=which(ceic$samp%in%lisamp & !is.na(ceic[,whichmz]))
+    if(length(l)>50){
+    Lab.palette <- colorRampPalette(c("grey90", "grey60"))
+    smoothScatter(x=na.omit(ceic[l,whichrt]),y=na.omit(ceic[l,whichmz]),colramp = Lab.palette,nrpoints=0,bty="n",
+                  xlab=paste("Retention time (",whichrt,")",sep=""),postPlotHook=NULL,
+                  ylab=paste("M/z (",whichmz,")",sep=""),cex=0,axes=FALSE,xlim=rtr,ylim=rint)
+    }
+    if(length(l)<=50){
+    plot(rtr,rint,xlab=paste("Retention time (",whichrt,")",sep=""),
+         ylab=paste("M/z (",whichmz,")",sep=""),cex=0,bty="l",axes=FALSE,xlim=rtr,ylim=rint)
+         l=which(ceic$samp%in%lisamp & (ceic$InPk2 | ceic$InPk3) & !is.na(ceic[,whichmz]))
+         if(length(l)>0) points(ceic[l,whichrt],ceic[l,whichmz],col=ceic$cols[l],pch=16,cex=cexEL*.75)
+    }
+    
+    l=which(ceic$samp%in%lisamp & (ceic$InPk) & !is.na(ceic[,whichmz]))
+    leg=NULL
+    if(length(l)>0){
+      points(ceic[l,whichrt],ceic[l,whichmz],col=ceic$cols[l],pch=16,cex=cexEL)
+      leg=tapply(ceic[l,whichmz],ceic$samp[l],length)
+      leg=sprintf("%s (%d)",names(leg),leg)
+    }
+    
+    abline(h=Mint*(1+c(-20,-10,0,10,20)*10^-6),lty=c(3,2,1,2,3),lwd=par("lwd")*c(1,1,2,1,1))
+    axis(2,las=2,cex.axis=par("cex")*.8)
+    axis(1)
+    legend("topright",leg,pch=15,col=cols[lisamp],bty="n",cex=cexEL)
+    legend("topleft",namsamp,bty="n",cex=par("cex.main"))
+  } 
+  
+  
+}

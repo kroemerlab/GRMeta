@@ -5,7 +5,7 @@ gatherMultiEICs,.GRgatherMultiEICCl,gatherOneEIC,.GRaddmiss,.GRmergeInterval,.GR
 .GRgetArea,.GRmsExtrema,.GRdoksmooth,.GRipeaks,.GRmsPeakSimple,.GRconvEIC,
 aggregCEF,.GRdoOneCef,.GRgetcomptime,.GRmgetTIC,.GRgetTIC,.GRcompVals,.GRcompTICaddRT,.GRfiltreScan,.GRcodadw,.GRcodadw2,.GRestimBl,.GRcompEICst,.GRgetEicInfos,
 .GRcompSeg,.GRcompSegOne,.GRmsPeakSimple3,.GRgroupPks,.GRchk2vec,integrOneEic,integrOneEicGrp,.GRinfctInt,.GRintegrOneEicGrpCl,
-conv2metaboSet,.GRplotEIC,
+conv2metaboSet,.GRplotEIC,.GRplotMZ,
 .GRcompAlignMGrpEIC,.GRcompAlignGrpEIC,.GRcompAlignOneEIC,.GRcompAlignEICs,.GRcorGrpEIC,
 partitionPeaks,.GRfindturnpoint,.GRsplitOne,.GRsplitBoth,.GRsplist,.GRcompdppm,.GRgenpkl)
 

@@ -1,5 +1,5 @@
 
-plotSetMEic<-function(obj,WhichRT="rtcor",groupCol=NULL,colorCol=NULL,doPDF=T,addfile="./",endfile="-Eic",repDots="-",cexEL=0.6,what="Eic",...){
+plotSetMEic<-function(obj,WhichRT="rtcor",WhichMZ="mzcor",groupCol=NULL,colorCol=NULL,doPDF=T,addfile="./",endfile="-Eic",repDots="-",cexEL=0.6,what="Eic",...){
   
   # WhichRT="rtcor";groupCol=NULL;colorCol=NULL;addfile="./";endfile="-Eic";repDots="-";cexEL=0.6;dots=list()
   # width=10;height=14
@@ -106,8 +106,11 @@ plotSetMEic<-function(obj,WhichRT="rtcor",groupCol=NULL,colorCol=NULL,doPDF=T,ad
       
       
       whichrt=WhichRT
-      if(is.null(whichrt))  whichrt="rtcor"
       if(!whichrt%in%names(dfeic)) whichrt="rt"
+      
+      whichmz=WhichMZ
+      if(!whichmz%in%names(dfeic)) whichmz="mz"
+
       ceic=dfeic[dfeic$eic==ieic & dfeic$samp%in%unlist(llsids),]
       ceic$cols=cols[ceic$samp]
       rtr=range(ceic[,whichrt])
@@ -245,8 +248,8 @@ plotSetMEic<-function(obj,WhichRT="rtcor",groupCol=NULL,colorCol=NULL,doPDF=T,ad
     leg=NULL
     if(length(l)>0){
       points(ceic[l,whichrt],ceic[l,whichmz],col=ceic$cols[l],pch=16,cex=cexEL)
-      leg=tapply(ceic[l,whichmz],ceic$samp[l],length)
-      leg=sprintf("%s (%d)",names(leg),leg)
+      leg=tapply(ceic[l,whichmz],ceic$samp[l],function(x) sprintf("%d/%.1f",length(x),(median(x)-Mint)*10^6/Mint))
+      leg=sprintf("%s (%s)",names(leg),leg)
     }
     
     abline(h=Mint*(1+c(-20,-10,0,10,20)*10^-6),lty=c(3,2,1,2,3),lwd=par("lwd")*c(1,1,2,1,1))

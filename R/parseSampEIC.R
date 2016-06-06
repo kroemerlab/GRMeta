@@ -81,7 +81,8 @@ parseOneSampEIC<-function(mzfi,tabeic,outfile=NULL,npad=3,stepmz=1/1000,mzdata=F
      amred[[ilins]]=mred
     rm(list="mred")
   }
-  rm(list=c(ifelse(keepM,"m",NULL),'lcode','llcode'))
+  rm(list=c('lcode','llcode'))
+  if(!keepM) rm(list="m")
   mred=do.call("rbind",amred)
   rm(list=c('amred'))
   mred<-mred[order(mred[,"eic"],mred[,"scan"]),]

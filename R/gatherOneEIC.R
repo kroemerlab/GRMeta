@@ -65,7 +65,7 @@ gatherOneEIC<-function(matEIC,sampfile,outfile=NULL,eicParams,doMerge=TRUE,verbo
                    c(dfeic[x[which.max(dfeic$y[x])],whichrt],range(dfeic[x,whichrt])))),
                  do.call("rbind",tapply(l,dfeic$eic[l],function(x) 
                    c(dfeic[x[which.max(dfeic$y[x])],whichmz],range(dfeic[x,whichmz])))),
-                 stringsAsFactors=F)
+                 stringsAsFactors=F,row.names=NULL)
       names(eicst)=c("GrpEic", "Id","rtap","rtmin","rtmax","mzap","mzmin","mzmax" )
       attr(dfeic,"oeic")<-matEIC[matEIC$GrpEic==inam,]
       attr(dfeic,"eic")<-eicst

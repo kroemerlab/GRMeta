@@ -1,5 +1,5 @@
 
-parseOneSampEIC<-function(mzfi,tabeic,outfile=NULL,npad=3,stepmz=1/1000,mzdata=FALSE,addMZ=NA,addRT=NA,keepM=FALSE,verbose=TRUE,serial=TRUE,chunk=200){
+parseOneSampEIC<-function(mzfi,tabeic,outfile=NULL,npad=3,stepmz=1/1000,mzdata=FALSE,addMZ=1,addRT=0.1,extraRT=NA,extraPPM=NA,keepM=FALSE,verbose=TRUE,serial=TRUE,chunk=200){
   
   
   d0=proc.time()[3]
@@ -40,7 +40,7 @@ parseOneSampEIC<-function(mzfi,tabeic,outfile=NULL,npad=3,stepmz=1/1000,mzdata=F
   tabeic=tabeic[order(tabeic[,'mzmin']),]
   
   
-  padrt=ifelse(npad<0,0,npad*median(diff(rts))*(npad+1))
+#  padrt=ifelse(npad<0,0,npad*median(diff(rts))*(npad+1))
   
   ##########################################
   ## filter the data file: wide mz
@@ -55,8 +55,23 @@ parseOneSampEIC<-function(mzfi,tabeic,outfile=NULL,npad=3,stepmz=1/1000,mzdata=F
     if(verbose) cat(ifelse(ilins%%10==0,'*','.'))
     lins=llcode[[ilins]]
     itab=tabeic[lins,]
-    rtmzrange=cbind(floor((itab[,'mzmin']-3*stepmz)/stepmz),
-                    ceiling((itab[,'mzmax']+3*stepmz)/stepmz))
+    mzmin=itab[,'mzmin']
+    mzmax=itab[,'mzmax']
+    if(!is.na(extraPPM)){
+      mzmin=mzmin-itab[,"mzap"]*extraPPM*10^-6
+      mzmax=mzmax+itab[,"mzap"]*extraPPM*10^-6
+    }
+    rtmin=itab[,'rtmin']
+    rtmax=itab[,'rtmax']
+#    print(rtmin)
+    if(!is.na(extraRT)){
+      rtmin=rtmin-extraRT
+      rtmax=rtmax+extraRT
+    }
+    names(rtmin)=names(rtmax)=names(mzmin)=names(mzmax)=itab[,"Id"]
+#    print(rtmin)
+    rtmzrange=cbind(floor((mzmin-3*stepmz)/stepmz),
+                    ceiling((mzmax+3*stepmz)/stepmz))
     l=which(lcode>=min(rtmzrange) & lcode<=max(rtmzrange))
     if(length(l)==0) next
     v=lcode[l]
@@ -70,11 +85,15 @@ parseOneSampEIC<-function(mzfi,tabeic,outfile=NULL,npad=3,stepmz=1/1000,mzdata=F
      if(nrow(mred)>0){
      mred=cbind(mred,eic=unlist(lapply(1:length(ucode),function(x) rep(x,length(ucode[[x]])))))
 #     print(dim(mred))
-     mred=mred[which((mred[,whichrt]-itab[mred[,'eic'],"rtmin"]+padrt)>=0),,drop=FALSE]
-    mred=mred[which((mred[,whichrt]-itab[mred[,'eic'],"rtmax"]-padrt)<=0),,drop=FALSE]
+     mred=mred[which((mred[,whichrt]-rtmin[mred[,'eic']])>=0),,drop=FALSE]
+    mred=mred[which((mred[,whichrt]-rtmax[mred[,'eic']])<=0),,drop=FALSE]
 #    print(dim(mred))
-    mred=mred[which((mred[,whichmz]-itab[mred[,'eic'],"mzmin"])>=0),,drop=FALSE]
-    mred=mred[which((mred[,whichmz]-itab[mred[,'eic'],"mzmax"])<=0),,drop=FALSE]
+    mred=mred[which((mred[,whichmz]-mzmin[mred[,'eic']])>=0),,drop=FALSE]
+    mred=mred[which((mred[,whichmz]-mzmax[mred[,'eic']])<=0),,drop=FALSE]
+    mred=cbind(mred,ineic=0)
+    linrt=(mred[,whichrt]-itab[mred[,'eic'],"rtmin"])>=0 & (mred[,whichrt]-itab[mred[,'eic'],"rtmax"])<=0
+    linmz=(mred[,whichmz]-itab[mred[,'eic'],"mzmin"])>=0 & (mred[,whichmz]-itab[mred[,'eic'],"mzmax"])<=0
+    mred[,"ineic"]=(linrt & linmz)*1
     mred[,"eic"]=lins[mred[,"eic"]]
      } else{mred=matrix(nrow=0,ncol=length(mnames)+1);colnames(mred)=c(mnames,'eic')}
 #     print(c(5,dim(mred)))
@@ -109,19 +128,20 @@ parseOneSampEIC<-function(mzfi,tabeic,outfile=NULL,npad=3,stepmz=1/1000,mzdata=F
 }
 
 
-.GRparseSampEICCl<-function(ix,matfile,tabeic,npad,stepmz,mzdata,keepM,chunk,addCor=TRUE){
+.GRparseSampEICCl<-function(ix,matfile,tabeic,stepmz,mzdata,keepM,extraRT,extraPPM,chunk,addCor=TRUE){
   addMZ=ifelse("shppm"%in%names(matfile),matfile[ix,]$shppm,ifelse(addCor,0,NA))
   addRT=ifelse("shrt"%in%names(matfile),matfile[ix,]$shrt,ifelse(addCor,0,NA))
   
- parseOneSampEIC(matfile[ix,]$In,tabeic=tabeic,outfile=matfile[ix,]$Out, npad=npad,stepmz=stepmz,
-                mzdata=mzdata,addRT=addRT,addMZ=addMZ,keepM=keepM,chunk=chunk,verbose=FALSE,serial=FALSE)
+ parseOneSampEIC(matfile[ix,]$In,tabeic=tabeic,outfile=matfile[ix,]$Out,stepmz=stepmz,
+                mzdata=mzdata,addRT=addRT,addMZ=addMZ,keepM=keepM,extraRT=extraRT,extraPPM=extraPPM,
+                chunk=chunk,verbose=FALSE,serial=FALSE)
 # parseOneSampEIC<-function(mzfi,tabeic,outfile=NULL,npad=3,stepmz=1/1000,mzdata=FALSE,addMZ=NA,addRT=NA,verbose=TRUE,serial=TRUE,chunk=200){
    
 }
 
 
 #### wrapper for loadEICs
-parseSampEIC<-function(matfile,tabeic,npad=3,stepmz=1/1000,keepM=TRUE,verbose=TRUE,ncl=1,mzdata=FALSE,addCor=TRUE,chunk=200){
+parseSampEIC<-function(matfile,tabeic,stepmz=1/1000,keepM=TRUE,extraRT=NA,extraPPM=NA,verbose=TRUE,ncl=1,mzdata=FALSE,addCor=TRUE,chunk=200){
   
   if(ncl!=1){
     require("snowfall")
@@ -138,8 +158,8 @@ parseSampEIC<-function(matfile,tabeic,npad=3,stepmz=1/1000,keepM=TRUE,verbose=TR
       addMZ=ifelse("shppm"%in%names(matfile),matfile[ix,]$shppm,ifelse(addCor,0,NA))
       addRT=ifelse("shrt"%in%names(matfile),matfile[ix,]$shrt,ifelse(addCor,0,NA))
       
-      re[[ix]]=parseOneSampEIC(matfile[ix,]$In,outfile=matfile[ix,]$Out,tabeic=tabeic,npad=npad,
-            stepmz=stepmz,mzdata=mzdata,addRT=addRT,addMZ=addMZ,keepM=keepM,chunk=chunk,verbose=verbose,serial=TRUE)
+      re[[ix]]=parseOneSampEIC(matfile[ix,]$In,outfile=matfile[ix,]$Out,tabeic=tabeic,
+            stepmz=stepmz,mzdata=mzdata,addRT=addRT,addMZ=addMZ,keepM=keepM,extraRT=extraRT,extraPPM=extraPPM,chunk=chunk,verbose=verbose,serial=TRUE)
     }
     d1=proc.time()[3]
     cat("\nCompleted at ",date()," -> took ",round(d1-d0,1)," secs - ",round((d1-d0)/length(lsids),1)," secs per file\n",sep="")
@@ -150,7 +170,8 @@ parseSampEIC<-function(matfile,tabeic,npad=3,stepmz=1/1000,keepM=TRUE,verbose=TR
   #if(sfIsRunning()) sfStop()
   if(mzdata) sfLibrary(mzR)
   sfLibrary(GRMeta)
-  re=sfClusterApplyLB(lsids,.GRparseSampEICCl,matfile=matfile,tabeic=tabeic,npad=npad,stepmz=stepmz,mzdata=mzdata,keepM=keepM,chunk=chunk,addCor=addCor)
+  re=sfClusterApplyLB(lsids,.GRparseSampEICCl,matfile=matfile,tabeic=tabeic,stepmz=stepmz,mzdata=mzdata,keepM=keepM,
+                     extraRT=extraRT,extraPPM=extraPPM,chunk=chunk,addCor=addCor)
 #  .GRparseSampEICCl<-function(ix,matfile,tabeic,npad,stepmz,mzdata,chunk,addCor=TRUE){
     sfStop()
   d1=proc.time()[3]

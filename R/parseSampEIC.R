@@ -1,5 +1,5 @@
 
-parseOneSampEIC<-function(mzfi,tabeic,outfile=NULL,npad=3,stepmz=1/1000,mzdata=FALSE,addMZ=NA,addRT=NA,verbose=TRUE,serial=TRUE,chunk=200){
+parseOneSampEIC<-function(mzfi,tabeic,outfile=NULL,npad=3,stepmz=1/1000,mzdata=FALSE,addMZ=NA,addRT=NA,keepM=FALSE,verbose=TRUE,serial=TRUE,chunk=200){
   
   
   d0=proc.time()[3]
@@ -81,7 +81,7 @@ parseOneSampEIC<-function(mzfi,tabeic,outfile=NULL,npad=3,stepmz=1/1000,mzdata=F
      amred[[ilins]]=mred
     rm(list="mred")
   }
-  rm(list=c("m",'lcode','llcode'))
+  rm(list=c(ifelse(keepM,"m",NULL),'lcode','llcode'))
   mred=do.call("rbind",amred)
   rm(list=c('amred'))
   mred<-mred[order(mred[,"eic"],mred[,"scan"]),]
@@ -99,7 +99,8 @@ parseOneSampEIC<-function(mzfi,tabeic,outfile=NULL,npad=3,stepmz=1/1000,mzdata=F
   d1=proc.time()[3]
   n=table(mred[,'eic'])
   top=paste(mzfi," :"," -> ",round(d1-d0,1)," secs :",length(n),"/",nrow(tabeic),": ",round(mean(n),3)," scan "," (",round(100*length(n)/nrow(tabeic),1),"%) EICs founds.",sep="")
-  if(!is.null(outfile)) save(file=outfile,mred)
+  if(!is.null(outfile))
+    if(keepM) save(file=outfile,m,mred) else save(file=outfile,mred)
   if(!serial) return(invisible(list(top,d1-d0)))
   if(verbose)   cat(top,sep="\n")
   return(invisible(mred))
@@ -107,19 +108,19 @@ parseOneSampEIC<-function(mzfi,tabeic,outfile=NULL,npad=3,stepmz=1/1000,mzdata=F
 }
 
 
-.GRparseSampEICCl<-function(ix,matfile,tabeic,npad,stepmz,mzdata,chunk,addCor=TRUE){
+.GRparseSampEICCl<-function(ix,matfile,tabeic,npad,stepmz,mzdata,keepM,chunk,addCor=TRUE){
   addMZ=ifelse("shppm"%in%names(matfile),matfile[ix,]$shppm,ifelse(addCor,0,NA))
   addRT=ifelse("shrt"%in%names(matfile),matfile[ix,]$shrt,ifelse(addCor,0,NA))
   
  parseOneSampEIC(matfile[ix,]$In,tabeic=tabeic,outfile=matfile[ix,]$Out, npad=npad,stepmz=stepmz,
-                mzdata=mzdata,addRT=addRT,addMZ=addMZ,chunk=chunk,verbose=FALSE,serial=FALSE)
+                mzdata=mzdata,addRT=addRT,addMZ=addMZ,keepM=keepM,chunk=chunk,verbose=FALSE,serial=FALSE)
 # parseOneSampEIC<-function(mzfi,tabeic,outfile=NULL,npad=3,stepmz=1/1000,mzdata=FALSE,addMZ=NA,addRT=NA,verbose=TRUE,serial=TRUE,chunk=200){
    
 }
 
 
 #### wrapper for loadEICs
-parseSampEIC<-function(matfile,tabeic,npad=3,stepmz=1/1000,verbose=TRUE,ncl=1,mzdata=FALSE,addCor=TRUE,chunk=200){
+parseSampEIC<-function(matfile,tabeic,npad=3,stepmz=1/1000,keepM=TRUE,verbose=TRUE,ncl=1,mzdata=FALSE,addCor=TRUE,chunk=200){
   
   if(ncl!=1){
     require("snowfall")
@@ -137,7 +138,7 @@ parseSampEIC<-function(matfile,tabeic,npad=3,stepmz=1/1000,verbose=TRUE,ncl=1,mz
       addRT=ifelse("shrt"%in%names(matfile),matfile[ix,]$shrt,ifelse(addCor,0,NA))
       
       re[[ix]]=parseOneSampEIC(matfile[ix,]$In,outfile=matfile[ix,]$Out,tabeic=tabeic,npad=npad,
-            stepmz=stepmz,mzdata=mzdata,addRT=addRT,addMZ=addMZ,chunk=chunk,verbose=verbose,serial=TRUE)
+            stepmz=stepmz,mzdata=mzdata,addRT=addRT,addMZ=addMZ,keepM=keepM,chunk=chunk,verbose=verbose,serial=TRUE)
     }
     d1=proc.time()[3]
     cat("\nCompleted at ",date()," -> took ",round(d1-d0,1)," secs - ",round((d1-d0)/length(lsids),1)," secs per file\n",sep="")
@@ -148,7 +149,7 @@ parseSampEIC<-function(matfile,tabeic,npad=3,stepmz=1/1000,verbose=TRUE,ncl=1,mz
   #if(sfIsRunning()) sfStop()
   if(mzdata) sfLibrary(mzR)
   sfLibrary(GRMeta)
-  re=sfClusterApplyLB(lsids,.GRparseSampEICCl,matfile=matfile,tabeic=tabeic,npad=npad,stepmz=stepmz,mzdata=mzdata,chunk=chunk,addCor=addCor)
+  re=sfClusterApplyLB(lsids,.GRparseSampEICCl,matfile=matfile,tabeic=tabeic,npad=npad,stepmz=stepmz,mzdata=mzdata,keepM=keepM,chunk=chunk,addCor=addCor)
 #  .GRparseSampEICCl<-function(ix,matfile,tabeic,npad,stepmz,mzdata,chunk,addCor=TRUE){
     sfStop()
   d1=proc.time()[3]

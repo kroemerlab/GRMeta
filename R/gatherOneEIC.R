@@ -152,6 +152,8 @@ gatherMultiEICs<-function(matfile,tabeic,outfile=NA,eicParams,doMerge=TRUE,ncl=1
                                eic=tmp$eic[1],samp=tmp$samp[1],stringsAsFactors=F)
       if("rtcor"%in%names(tmp))  alladd[[iss]]$rtcor=alladd[[iss]]$rt+mean(tmp$rtcor-tmp$rt,na.rm=T)
       if("mzcor"%in%names(tmp))  alladd[[iss]]$mzcor=alladd[[iss]]$mz*mean(tmp$mzcor/tmp$mz,na.rm=T)
+      if("ineic"%in%names(tmp))  alladd[[iss]]$ineic=NA
+      
     }
   }
   if(length(alladd)>0){

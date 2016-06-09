@@ -54,9 +54,9 @@
   .infctBlfct<-function(ifile,blSid=NULL,minScan=11,quantBl=0.5){
     load(ifile)
     dfeic=dfeic[dfeic$samp%in%blSid,]
-    if("ineic" %in% names(dfeic)) dfeic=dfeic[which(dfeic$ineic==1),]
     leics=attr(dfeic,"eic")[,"Id"]
     matbl=matrix(NA,nrow=length(leics),ncol=length(blSid),dimnames=list(leics,blSid))
+    if("ineic" %in% names(dfeic)) dfeic=dfeic[which(dfeic$ineic==1),]
     if(nrow(dfeic)==0) return(matbl)
     eicbl=paste(dfeic$samp,dfeic$eic)
     l2use=names(which(table(eicbl)>=minScan))
@@ -64,7 +64,14 @@
     dfeic=dfeic[which(eicbl%in%l2use & dfeic$y>0 & !is.na(dfeic$y)),]
     if(nrow(dfeic)==0) return(matbl)
     blsamp=tapply(1:nrow(dfeic),dfeic$samp,function(x) tapply(dfeic$y[x],dfeic$eic[x],quantile,quantBl))
-    for(i in names(blsamp)) matbl[names(blsamp[[i]]),i]=blsamp[[i]]
+    for(i in names(blsamp)){
+      print(i)
+      lma=match(names(blsamp[[i]]),rownames(matbl))
+      print(names(blsamp[[i]])[!names(blsamp[[i]])%in%rownames(matbl)])
+      matbl[names(blsamp[[i]]),i]=blsamp[[i]]
+      
+    }
+    print("OKKK")
     rm(list=c("dfeic"))
     return(matbl)
   }

@@ -192,7 +192,12 @@ gatherMultiEICs<-function(matfile,tabeic,outfile=NA,eicParams,doMerge=TRUE,ncl=1
   if(!"ineic" %in% names(dfeic)) l=which(!is.na(dfeic[,whichmz]))
 
   lpp=.GRsplist(dfeic[l,whichmz],l,ismass=TRUE,d=eicParams$dPPM)
-  ldups=ldups2=sapply(lpp,function(x) unique(dfeic$eic[x]))
+  ldups=lapply(lpp,function(x) unique(dfeic$eic[x]))
+  l2excl=names(which(table(unlist(ldups))>1))
+  if(length(l2excl)>0){ldups=lapply(ldups,function(x) x[!x%in%l2excl])
+  ldups=c(ldups,as.list(l2excl))
+  }
+  ldups2=ldups
   ndups=sapply(ldups,length)
   ### 
   if(any(ndups>1)){
@@ -230,14 +235,26 @@ gatherMultiEICs<-function(matfile,tabeic,outfile=NA,eicParams,doMerge=TRUE,ncl=1
   ###
   dfeic2=dfeic
 #  print(ndups2)
-  if(any(ndups2>1)) for(ix in names(ldups2[which(ndups2>1)])){
+  if(any(ndups2>1)) 
+    for(ix in which(ndups2>1)){
     if(verbose) cat(" merging:",ldups2[[ix]],"\n",sep=" ")
-    dfeic2$eic[dfeic2$eic%in%ldups2[[ix]]]=ix
-  }
-  dfeic2=dfeic2[which(!duplicated(dfeic2[,c("scan","samp","mz","eic")])),]
-  
+       ## fix ineic
+      l=which(dfeic2$eic%in%ldups2[[ix]])
+      tmp=dfeic2[l,]
+      neic=names(which.max(table(tmp$eic)))
+      if("ineic"%in%names(tmp)){
+        tmpsc=apply(as.matrix(tmp[,c("scan","samp","mz")]),1,paste,collapse=";;")
+      tmp[,"ineic"]=tapply(tmp[,"ineic"],tmpsc,max)[tmpsc]
+      neic=names(which.max(table(tmp$eic[tmp["ineic"]>0])))
+      }
+      tmp=tmp[which(!duplicated(tmp[,c("scan","samp","mz")])),]
+      tmp$eic=neic
+      dfeic2=dfeic2[-l,]
+      dfeic2=rbind(dfeic2,tmp)
+    }
+
   ######
-  # remove duplcared and with na
+  # remove duplicated and with na
   l=1:nrow(dfeic2)
   isdups=tapply(l,dfeic2$eic[l],function(x) sum(table(dfeic2$scan[x],dfeic2$samp[x])>1))
   for(ix in names(which(isdups>0))){

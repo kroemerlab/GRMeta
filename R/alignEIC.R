@@ -45,6 +45,7 @@ if(is.null(eicfile)) eicfile=paste(eicParams$dirEic,tabeic$GrpEic[which(tabeic$I
   for(ieic in leics){
     if(verbose) cat(ieic," ",sep=" ")
     tmpeic=dfeic[dfeic$eic==ieic,]
+    if("ineic" %in%names(tmpeic)) tmpeic=tmpeic[tmpeic[,"ineic"]==1,]
   meic = .GRconvEIC(tmpeic, whichrt = whichrt, bw = eicParams$nsmo1 * eicParams$bw, delrt = eicParams$bw/2)
   
   m=meic[[1]]           

@@ -54,6 +54,7 @@
   .infctBlfct<-function(ifile,blSid=NULL,minScan=11,quantBl=0.5){
     load(ifile)
     dfeic=dfeic[dfeic$samp%in%blSid,]
+    if("ineic" %in% names(dfeic)) dfeic=dfeic[which(dfeic$ineic==1),]
     leics=attr(dfeic,"eic")[,"Id"]
     matbl=matrix(NA,nrow=length(leics),ncol=length(blSid),dimnames=list(leics,blSid))
     if(nrow(dfeic)==0) return(matbl)
@@ -126,8 +127,11 @@
     
     dfeic$csc=as.vector(dfeic$y>=iblvect[dfeic$eic])
     Ncons=Coda2=HMax=list()
-    for(isamp in unique(dfeic$samp)){
+    lusamp=unique(dfeic$samp)
+    if("ineic" %in% names(dfeic)) unique(dfeic$samp[which(dfeic$ineic==1)])
+    for(isamp in lusamp){
       idfeic=dfeic[which(dfeic$samp==isamp),]
+      if("ineic" %in% names(idfeic)) idfeic=idfeic[which(idfeic$ineic==1),]
       re=.GRfiltreScan(idfeic$csc,idfeic$eic,alpha=eicParams$LSc,perc=eicParams$Perc) 
       Ncons[[isamp]]=tapply(re,idfeic$eic,sum)[leics]
       Coda2[[isamp]]=tapply(idfeic$y,idfeic$eic,.GRcodadw2)[leics]

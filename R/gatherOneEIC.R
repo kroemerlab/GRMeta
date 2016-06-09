@@ -60,6 +60,7 @@ gatherOneEIC<-function(matEIC,sampfile,outfile=NULL,eicParams,doMerge=TRUE,verbo
       dfeic=dfeic[order(dfeic$eic,dfeic$samp,dfeic$scan,dfeic$mzcor),]
       #### Compute eic stats
       l=which(dfeic$y>0)
+      if("ineic" %in% names(dfeic)) l=l[which(dfeic[,"ineic"]==1)]
       eicst=data.frame(GrpEic=inam,Id=unname(tapply(dfeic$eic[l],dfeic$eic[l],unique)),
                  do.call("rbind",tapply(l,dfeic$eic[l],function(x) 
                    c(dfeic[x[which.max(dfeic$y[x])],whichrt],range(dfeic[x,whichrt])))),
@@ -145,16 +146,19 @@ gatherMultiEICs<-function(matfile,tabeic,outfile=NA,eicParams,doMerge=TRUE,ncl=1
     l=which(grpss==iss)
     if(length(l)<2) next
     tmp=df[l,,drop=F]
-    lnewsc=min(tmp[,"scan"]):max(tmp[,"scan"])
-    lnewsc=lnewsc[!lnewsc%in%tmp[,"scan"]]
+    l2use=1:nrow(tmp)
+    if("ineic" %in% names(df)) l2use=which(tmp[,"ineic"]==1)
+    if(length(l2use)<2) next
+    lnewsc=min(tmp[l2use,"scan"]):max(tmp[l2use,"scan"])
+    lnewsc=lnewsc[!lnewsc%in%tmp[l2use,"scan"]]
     if(length(lnewsc)>0){
       alladd[[iss]]=data.frame(scan=lnewsc,mz=NA,y=0,rt=sampinfos[[tmp$samp[1]]]$rts[as.character(lnewsc)],
                                eic=tmp$eic[1],samp=tmp$samp[1],stringsAsFactors=F)
       if("rtcor"%in%names(tmp))  alladd[[iss]]$rtcor=alladd[[iss]]$rt+mean(tmp$rtcor-tmp$rt,na.rm=T)
       if("mzcor"%in%names(tmp))  alladd[[iss]]$mzcor=alladd[[iss]]$mz*mean(tmp$mzcor/tmp$mz,na.rm=T)
-      if("ineic"%in%names(tmp))  alladd[[iss]]$ineic=NA
-      
+      if("ineic"%in%names(tmp))  alladd[[iss]]$ineic=1
     }
+    
   }
   if(length(alladd)>0){
     alladd=do.call("rbind",alladd)
@@ -184,10 +188,26 @@ gatherMultiEICs<-function(matfile,tabeic,outfile=NA,eicParams,doMerge=TRUE,ncl=1
 #########
 .GRmergingEIC<-function(dfeic,eicParams,whichmz="mzcor",whichrt="rtcor",verbose=TRUE){
   
-  l=which(!is.na(dfeic[,whichmz]))
+  if("ineic" %in% names(dfeic)) l=which(!is.na(dfeic[,whichmz]) & dfeic[,"ineic"]==1)
+  if(!"ineic" %in% names(dfeic)) l=which(!is.na(dfeic[,whichmz]))
+
   lpp=.GRsplist(dfeic[l,whichmz],l,ismass=TRUE,d=eicParams$dPPM)
   ldups=ldups2=sapply(lpp,function(x) unique(dfeic$eic[x]))
   ndups=sapply(ldups,length)
+  ### 
+  if(any(ndups>1)){
+    for(i in which(ndups>1)){
+  li=l[dfeic$eic[l]%in%ldups[[i]]]
+  lirt=do.call("cbind",tapply(dfeic[li,whichrt],dfeic[li,"eic"],range))
+  lirt=lirt[,order(lirt[1,]),drop=F]
+  lcuts=c(1)
+  for(j in 2:ncol(lirt)) lcuts=c(lcuts,max(lcuts)+ifelse(lirt[1,j]<lirt[2,j-1],0,1))
+  ldups[[i]]=tapply(colnames(lirt),lcuts,list)
+    }
+    ldups=ldups2=unlist(ldups,rec=F)
+  ndups=sapply(ldups,length)
+    }
+
   if(any(ndups>1)){
     for(i in which(ndups>1)){
       tmp=dfeic[dfeic$eic%in%ldups[[i]],]
@@ -197,7 +217,7 @@ gatherMultiEICs<-function(matfile,tabeic,outfile=NA,eicParams,doMerge=TRUE,ncl=1
       amts=tapply(1:nrow(tmp),tmp$eic,function(x)
         .GRconvEIC(tmp[x,],whichrt=whichrt,bw=eicParams$nsmo1*eicParams$bw,delrt=eicParams$bw/2,xnew=xnew))
       apcs=sapply(amts,function(x) prcomp(x[[1]],center=F)$x[,1])
-      lcl=cutree(hclust(dist(1-abs(cor(apcs))),method="average"),h=.1)
+      lcl=cutree(hclust(as.dist(1-abs(cor(apcs))),method="average"),h=.1)
       ldups2[[i]]=tapply(names(lcl),lcl,c)
       # drt=do.call("rbind",tapply(tmp[,whichrt],tmp$eic,range))
       # ldups2[[i]]=.GRmergeInterval(drt)

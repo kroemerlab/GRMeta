@@ -231,6 +231,7 @@ integrOneEicGrp<-function(tabeic,lSamp=NULL,eicParams,whichrt="rtcor",whichmz="m
   allre=list()
   for(ieic in leics){
     itmpeic=dfeic[dfeic$eic==ieic,]
+    if("ineic"%in%names(itmpeic)) itmpeic=itmpeic[itmpeic[,"ineic"]>0,]
     ivMint=tabeic$Bl[tabeic$Id==ieic]
     ivMint=ifelse(is.null(ivMint),eicParams$Mint,ivMint)
     if(nrow(itmpeic)<5) next

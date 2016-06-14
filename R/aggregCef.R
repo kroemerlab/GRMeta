@@ -16,7 +16,7 @@ aggregCEF<-function(lfiles,minrt=0,maxrt=Inf,maxmz=+Inf,minmz=1,ncl=1,type="MS",
   if(ncl==1){
     acef=list()
     cat(" on 1 processor\n",sep="")
-    if(type=="MS") for(i in 1:length(lfiles)) acef[[i]]=.GRdoOneCef(lfiles[i],type=type,verbose=verbose)
+    for(i in 1:length(lfiles)) acef[[i]]=.GRdoOneCef(lfiles[i],type=type,verbose=verbose)
   }
   if(ncl>1){
     cat(" on ",ncl," processors\n",sep="")

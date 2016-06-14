@@ -75,7 +75,7 @@ aggregCEF<-function(lfiles,minrt=0,maxrt=Inf,maxmz=+Inf,minmz=1,ncl=1,type="MS",
     pks=do.call("rbind",pks)
     colnames(pks)=c("mz","y","id2")
     rownames(pks)=1:nrow(pks)
-    pks=cbind(samp=NA,mfid=nid,mfid2=paste(ix,pks[,3],sep="."),pks[,1:2],infos[pks[,3],c("ce","parent","rtmin","rtmax")])
+    pks=data.frame(samp=NA,mfid=nid,mfid2=paste(ix,pks[,3],sep="."),pks[,1:2],infos[pks[,3],c("ce","parent","rtmin","rtmax")],stringsAsFactors=FALSE)
     return(Pks=pks)
     #return(list(Id=nid,Infos=infos,Pks=pks))
   }

@@ -79,8 +79,19 @@ conv2metaboSet<-function(lfiles,Meta,File,method="prof",
   eicsdat=do.call("rbind",alleics)
 
   ########## prep annot
-  imz=apply(alldata$MZ,2,median,na.rm=T)
-  irt=apply(alldata$RT,2,median,na.rm=T)
+  library(limma)
+  imz=sapply(colnames(alldata$MZ),function(x){
+    l=unname(which(!is.na(alldata$MZ[,x]) & !is.na(alldata$Height[,x])))
+    if(length(l)<1) return(NA)
+    weighted.median(alldata$MZ[l,x],alldata$Height[l,x],na.rm=T)
+  })
+  
+  irt=sapply(colnames(alldata$RT),function(x){
+    l=unname(which(!is.na(alldata$RT[,x]) & !is.na(alldata$Height[,x])))
+    if(length(l)<1) return(NA)
+    weighted.median(alldata$RT[l,x],alldata$Height[l,x],na.rm=T)
+  })
+
   newn=sprintf("%.4f@%.2f-%s",imz,irt,method)
   ldups=names(which(table(newn)>1))
   newn[newn%in%ldups]=sprintf("%.5f@%.3f-%s",imz,irt,method)[newn%in%ldups]

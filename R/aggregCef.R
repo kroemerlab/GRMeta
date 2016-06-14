@@ -1,4 +1,6 @@
-aggregCEF<-function(lfiles,minrt=0,maxrt=Inf,maxmz=+Inf,minmz=1,ncl=1,verbose=TRUE){
+aggregCEF<-function(lfiles,minrt=0,maxrt=Inf,maxmz=+Inf,minmz=1,ncl=1,type="MS",verbose=TRUE){
+  
+  if(!type%in%c('MS','AIMS')) stop('Wrong type')
   
   if(is.null(names(lfiles))) names(lfiles)=1:length(lfiles)
   lfiles=lfiles[file.exists(lfiles)]
@@ -14,7 +16,7 @@ aggregCEF<-function(lfiles,minrt=0,maxrt=Inf,maxmz=+Inf,minmz=1,ncl=1,verbose=TR
   if(ncl==1){
     acef=list()
     cat(" on 1 processor\n",sep="")
-    for(i in 1:length(lfiles)) acef[[i]]=.GRdoOneCef(lfiles[i],verbose=verbose)
+    if(type=="MS") for(i in 1:length(lfiles)) acef[[i]]=.GRdoOneCef(lfiles[i],type=type,verbose=verbose)
   }
   if(ncl>1){
     cat(" on ",ncl," processors\n",sep="")
@@ -22,13 +24,15 @@ aggregCEF<-function(lfiles,minrt=0,maxrt=Inf,maxmz=+Inf,minmz=1,ncl=1,verbose=TR
     sfLibrary(GRMeta)
     #if(local) 
     #sfExport( ".GRdoOneCef", local=TRUE )
-    acef=sfClusterApplyLB(lfiles,.GRdoOneCef,verbose=FALSE)
+    acef=sfClusterApplyLB(lfiles,.GRdoOneCef,type=type,verbose=FALSE)
     sfStop()
   }  
-  re=do.call("rbind",acef)
-  re$samp=names(lfiles)[match(re$samp,lfiles)]
-  re=re[which(re$rt>=minrt & re$rt<=maxrt),]
-  re=re[which(re$mz>=minmz & re$mz<=maxmz),]
+    re=do.call("rbind",acef)
+    re$samp=names(lfiles)[match(re$samp,lfiles)]
+   if(type=="MS"){
+     re=re[which(re$rt>=minrt & re$rt<=maxrt),]
+    re=re[which(re$mz>=minmz & re$mz<=maxmz),]
+   }
   d1=proc.time()[3]
   cat("\nCompleted at ",date()," -> took ",round(d1-d0,1)," secs - ",round((d1-d0)/length(lfiles),1)," secs per file\n",sep="")
   return(invisible(re))
@@ -36,7 +40,45 @@ aggregCEF<-function(lfiles,minrt=0,maxrt=Inf,maxmz=+Inf,minmz=1,ncl=1,verbose=TR
   
 }
 
-.GRdoOneCef<-function(cefi,verbose=TRUE){
+.GRdoOneCef<-function(cefi,type="MS",verbose=TRUE){
+  if(!type%in%c('MS','AIMS')) stop('Wrong type')
+  inOneAION<-function(ient,ix){
+    
+    ient2=xmlChildren(ient)
+    
+    lmspk=which(names(ient2)=="Spectrum")
+    infos=pks=list()
+    for(j in lmspk){
+      k=j-lmspk[1]+1
+      x=xmlChildren(ient2[[j]])
+      infos[[k]]=(c(k,xmlAttrs(x$MSDetails)[c("p","ce","fv")],
+                    as.numeric(xmlAttrs(x$RTRanges[[1]])),
+                    xmlValue(x$MzOfInterest)))
+      pks[[k]]=cbind(t(xmlSApply(x$MSPeaks,function(x) as.numeric(xmlAttrs(x)[c("x","y")]))),k)
+    }
+    infos=data.frame(do.call("rbind",infos),stringsAsFactors=FALSE)
+    names(infos)=c("id","mod","ce","fv","rtmin","rtmax","parent")
+    
+    #######
+    infos$ce=as.numeric(gsub("[A-Za-z]","",infos$ce))
+    infos$ce[is.na(infos$ce)]=0
+    infos$fv=as.numeric(gsub("[A-Za-z]","",infos$fv))
+    infos$fv[is.na(infos$fv)]=0
+    infos$rtmin=as.numeric(infos$rtmin)
+    infos$rtmax=as.numeric(infos$rtmax)
+    infos$parent=as.numeric(infos$parent)
+    
+    #######
+    nid=sprintf("%.4f@%.3f",infos$parent[1],(infos$rtmin[1]+infos$rtmax[1])/2)
+    
+    #######
+    pks=do.call("rbind",pks)
+    colnames(pks)=c("mz","y","id2")
+    rownames(pks)=1:nrow(pks)
+    pks=cbind(samp=NA,mfid=nid,mfid2=paste(ix,pks[,3],sep="."),pks[,1:2],infos[pks[,3],c("ce","parent","rtmin","rtmax")])
+    return(Pks=pks)
+    #return(list(Id=nid,Infos=infos,Pks=pks))
+  }
   
   inOne<-function(ient,ix){
     
@@ -68,7 +110,8 @@ aggregCEF<-function(lfiles,minrt=0,maxrt=Inf,maxmz=+Inf,minmz=1,ncl=1,verbose=TR
   if(verbose) cat(cefi,":")
   doc <- xmlParse(cefi, useInternal=TRUE)
   xml=xmlChildren(xmlChildren(doc)[[1]])[[1]]
-  adat=lapply(1:xmlSize(xml),function(i) suppressWarnings(inOne(xml[[i]],i)))
+  if(type=="MS") adat=lapply(1:xmlSize(xml),function(i) suppressWarnings(inOne(xml[[i]],i)))
+  if(type=="AIMS") adat=lapply(1:xmlSize(xml),function(i) suppressWarnings(inOneAION(xml[[i]],i)))
   cefdat=do.call("rbind",adat)
   rm(list=c("adat","xml"))
   free(doc)

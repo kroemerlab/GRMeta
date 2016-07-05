@@ -2,10 +2,12 @@
   l=which(NewDB$GName%in%strsplit(x,";")[[1]])
   if(length(l)==0) return(NA)
   if(is.numeric(NewDB[,what])) return(mean(NewDB[l,what],na.rm=T))
-  l=unique(strsplit(NewDB[l,what],";")[[1]])
-  l=l[which(l!="")]
+  l=unique(unlist(strsplit(NewDB[l,what],";"),use.names=FALSE))
+  l=l[which(!(l=="" & is.na(l) & l=="NA"))]
   if(length(l)==0) return(NA)
+#  if(what=="KEGG") print(c(x,paste(l,collapse=";")))
   paste(l,collapse=";")
+  
 }
 
 
@@ -101,6 +103,7 @@ loadAgilentData<-function(ifile,ofile=NULL,params=list()){
     if(!is.null(params$AnnotDB)){
       NewDB=params$AnnotDB
       vnam0=unique(unlist(strsplit(newnam,";")))
+#      print(vnam0)
       lnotfound=unique(vnam0[!vnam0%in%NewDB$GName])
       if(length(lnotfound)>0) cat("Not found in annotation database:\n",lnotfound,"\n",sep=" ")
       l2add=names(NewDB)[names(NewDB)!="GName"]

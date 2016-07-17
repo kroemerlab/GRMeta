@@ -222,7 +222,7 @@ for(iplot in 1:length(lgraphs)){
     if(is.character(idf$X))
       .plotLinP(idf[lsoSa,],whaty,logs=gsub("x","",logs),xlim,ylim,analyte,cexBP,cexPT,vlines=vlines,hlines=hlines)
     if(is.factor(idf$X))
-      .plotBoxP(idf[lsoSa,],whaty,logs=gsub("x","",logs),xlim,ylim,analyte,cexBX,vlines=vlines,hlines=hlines)
+      .plotBoxP(idf[lsoSa,],whaty,logs=gsub("x","",logs),xlim,ylim,analyte,cexBX,cexPT,vlines=vlines,hlines=hlines)
 
   }  
   if(is.null(whatx) & whaty!="Eic")
@@ -308,7 +308,7 @@ on.exit(par(par.def))
   for(i in 1:nrow(idf)) axis(1,at=i,labels = idf$X[i],cex.axis=cexBP,las=2,tick=F,pos=min(ylim))
 }
 
-.plotBoxP<-function(idf,whaty,logs="",xlim,ylim,analyte,cexBX,vlines=NULL,hlines=NULL){
+.plotBoxP<-function(idf,whaty,logs="",xlim,ylim,analyte,cexBX,cexPT=1,vlines=NULL,hlines=NULL){
 # cat("Ylim: ",ylim)
  # print(idf)
 #   #print(r)
@@ -322,10 +322,11 @@ on.exit(par(par.def))
     if(grepl("y",logs)) ylim=.infctlimlog(idf$Y[l])
     if(!grepl("y",logs)) ylim=pretty(seq(min(idf$Y[l]),max(idf$Y[l]),length=7))
   }
-  re=boxplot(Y~X,data=idf,axes=F,xlab="",ylab=whaty,bty="n",log=logs,ylim=range(ylim),xlim=range(xlim),main=analyte,cex=0)
+  re=boxplot(Y~X,data=idf,axes=F,xlab="",ylab=whaty,bty="n",log=logs,ylim=range(ylim),xlim=range(xlim),
+             main=analyte,cex=0,medlwd=par("lwd"))
   if(!is.null(hlines)) abline(h=hlines,lwd=par("lwd"),col="grey",lty=2)
   if(!is.null(vlines)) abline(v=vlines,lwd=par("lwd"),col="grey",lty=2)
-  beeswarm(Y~X,data=idf,add=T,pwcol = idf$color,pch=16)
+  beeswarm(Y~X,data=idf,add=T,pwcol = idf$color,cex=cexPT,pch=16)
   axis(2,at=ylim,las=2)
   labs=paste(re$names,"\n(",re$n,")",sep="")
   for(i in 1:length(labs)) axis(1,at=i,labels =labs[i],tick=F,cex.axis=cexBX)

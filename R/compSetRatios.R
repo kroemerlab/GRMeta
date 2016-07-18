@@ -52,7 +52,11 @@ compSetRatios<-function(obj,l2add=names(obj$Data),lpairs=RatiosGR,conv2set=FALSE
     #}
   }
   ratstats=do.call("rbind",cmb)
+  if(nrow(ratstats)==0) return(NULL)
   rownames(ratstats)=ratstats$Analyte
+  l=which(ratstats$AnalyteNum!=ratstats$AnalyteDen)
+  ratstats=ratstats[l,]
+  if(nrow(ratstats)==0) return(NULL)
   
   Data=list()
   for(i in l2add[l2add%in%names(obj$Data)]){

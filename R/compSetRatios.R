@@ -1,10 +1,10 @@
 
-
+# 
 # load("/home/david/Metabo/Packaging/GRMeta/data/RatiosGR.rda")
 # RatiosGR$`AcSpmd/Spmd`=list(c("N8-acetylspermidine","N1-acetylspermidine","N-acetylspermidine"),c("Spermidine"),8)
 # RatiosGR$`AcSpr/Spr`=list(c("N-acetylspermine","N12-acetylspermine","N1-acetylspermine"),c('Spermine'),8)
-# RatiosGR$`DiAcSpmd/AcSpmd`=list('N1,N8-diacetylspermidine',c("N8-acetylspermidine","N12-acetylspermidine","N-acetylspermidine"),8)
-# RatiosGR$`DiAcSpr/AcSpr`=list('N1,N12-diacetylspermine',c("N-acetylspermine","N8-acetylspermine","N1-acetylspermine"),8)
+# RatiosGR$`DiAcSpmd/AcSpmd`=list('N1,N8-diacetylspermidine',c("N8-acetylspermidine","N1-acetylspermidine","N-acetylspermidine"),8)
+# RatiosGR$`DiAcSpr/AcSpr`=list('N1,N12-diacetylspermine',c("N-acetylspermine","N8-acetylspermine","N12-acetylspermine"),8)
 # save(file="/home/david/Metabo/Packaging/GRMeta/data/RatiosGR.rda",RatiosGR)
 
 

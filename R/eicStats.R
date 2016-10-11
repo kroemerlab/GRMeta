@@ -63,15 +63,16 @@
     if(length(l2use)==0) return(matbl)
     dfeic=dfeic[which(eicbl%in%l2use & dfeic$y>0 & !is.na(dfeic$y)),]
     if(nrow(dfeic)==0) return(matbl)
-    blsamp=tapply(1:nrow(dfeic),dfeic$samp,function(x) tapply(dfeic$y[x],dfeic$eic[x],quantile,quantBl))
-    for(i in names(blsamp)){
-      print(i)
-      lma=match(names(blsamp[[i]]),rownames(matbl))
-      print(names(blsamp[[i]])[!names(blsamp[[i]])%in%rownames(matbl)])
-      matbl[names(blsamp[[i]]),i]=blsamp[[i]]
-      
+    blsamp=tapply(1:nrow(dfeic),dfeic$samp,function(x){
+      x=tapply(dfeic$y[x],dfeic$eic[x],quantile,quantBl)
+      x=x[match(rownames(matbl),names(x))]
+      names(x)=rownames(matbl)
+      x
+      })
+    for(i in names(blsamp))    matbl[names(blsamp[[i]]),i]=blsamp[[i]]
     }
-    print("OKKK")
+    
+ #   print("OKKK")
     rm(list=c("dfeic"))
     return(matbl)
   }
@@ -82,6 +83,7 @@
                  ifelse(is.null(eicParams$addEic),"./",eicParams$addEic),".rda",sep="")
   names(fileeics)=unique(tabeic$GrpEic)
   fileeics=fileeics[file.exists(fileeics)]
+  print(fileeics)
   if(length(fileeics)==0) stop('No file found!')
   
   d0=proc.time()[3]
@@ -92,7 +94,7 @@
     allr=list()
     for(k in 1:length(fileeics)){
       cx=fileeics[k]
-      cat(ifelse(k%%10==0,"X","."))
+      cat(cx," ")
       allr[[k]]=.infctBlfct(cx,blSid,eicParams$minScanBl,eicParams$quantBl)
     }
   }

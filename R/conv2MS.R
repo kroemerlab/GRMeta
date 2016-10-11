@@ -43,6 +43,7 @@ conv2metaboSet<-function(lfiles,Meta,File,method="prof",
   
   if(length(lfiles)<=chunk) llx=list(lfiles) else  llx=split(lfiles, ceiling(seq_along(lfiles)/chunk))
   
+  print(llx)
   
   ##########################
   d0=proc.time()[3]
@@ -52,7 +53,7 @@ conv2metaboSet<-function(lfiles,Meta,File,method="prof",
     cat(" on 1 processor\n",sep="")
     allr=list()
     for(k in 1:length(llx)){
-      cx=lx[[k]]
+      cx=llx[[k]]
       cat(ifelse(k%%10==0,"X","."))
       system.time(allr[[k]]<-.inGRconvMS(llx[[k]],lsids,ldatas))
     }

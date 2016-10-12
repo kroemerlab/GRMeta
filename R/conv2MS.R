@@ -71,38 +71,34 @@ conv2metaboSet<-function(lfiles,Meta,File,method="prof",
   cat("\nCompleted at ",date()," -> took ",round(d1-d0,1)," secs \n",sep="")
   
   ##########################
-  alldata=list()
-  for(x in allr)
-    for(i in names(x[[1]])) if(is.null(alldata[[i]])) alldata[[i]]=x[[1]][[i]] else alldata[[i]]=cbind(alldata[[i]],x[[1]][[i]])
-  alleics=list()
-  for(x in 1:length(allr)) alleics[[x]]=allr[[x]]$eic
+  eicsdat=NULL
+  dat2exp=names(ldatas)[names(ldatas)%in%unlist(lapply(allr,function(x) names(x$dat)))]
+  alldata=vector(mode='list',length=length(dat2exp));names(alldata)=dat2exp
+  for(x in allr){
+     for(i in dat2exp) alldata[[i]]=cbind(alldata[[i]],x$dat[[i]])
+     eicsdat=rbind(eicsdat,x$eic)
+  }
+  print(sapply(alldata,function(x) all(rownames(eicsdat)==colnames(x))))
   
-  eicsdat=do.call("rbind",alleics)
-
   ########## prep annot
   library(limma)
-  imz=sapply(colnames(alldata$MZ),function(x){
-    l=unname(which(!is.na(alldata$MZ[,x]) & !is.na(alldata$Height[,x])))
+  imzrt=sapply(colnames(alldata$MZ),function(x){
+    l=unname(which(!is.na(alldata$MZ[,x]) & !is.na(alldata$RT[,x]) & !is.na(alldata$Height[,x])))
     if(length(l)<1) return(NA)
-    weighted.median(alldata$MZ[l,x],alldata$Height[l,x],na.rm=T)
-  })
-  
-  irt=sapply(colnames(alldata$RT),function(x){
-    l=unname(which(!is.na(alldata$RT[,x]) & !is.na(alldata$Height[,x])))
-    if(length(l)<1) return(NA)
-    weighted.median(alldata$RT[l,x],alldata$Height[l,x],na.rm=T)
+    l=l[alldata$Height[l,x]>=median(alldata$Height[l,x])]
+    c(unname(weighted.median(alldata$MZ[l,x],log(alldata$Height[l,x]),na.rm=T)),unname(weighted.median(alldata$RT[l,x],alldata$Height[l,x],na.rm=T)))
   })
 
-  newn=sprintf("%.4f@%.2f-%s",imz,irt,method)
+  newn=sprintf("%.4f@%.2f-%s",imzrt[1,],imzrt[2,],method)
   ldups=names(which(table(newn)>1))
-  newn[newn%in%ldups]=sprintf("%.5f@%.3f-%s",imz,irt,method)[newn%in%ldups]
+  newn[newn%in%ldups]=sprintf("%.5f@%.3f-%s",imzrt[1,],imzrt[2,],method)[newn%in%ldups]
   ldups=names(which(table(newn)>1))
   for(i in ldups){
     l=which(newn==i)
-    newn[l]=sprintf("%.5f-D%d@%.3f-%s",imz[l],1:length(l),irt[l],method)
+    newn[l]=sprintf("%.5f-D%d@%.3f-%s",imzrt[1,l],1:length(l),imzrt[2,l],method)
   }
   Annot=data.frame(Analyte=newn,MetName=NA,IsSTD=FALSE,OriginalName=eicsdat$PkId,LevelAnnot=4,
-                   Method=method,MZ=round(imz,6),RT=round(irt,4),stringsAsFactors=FALSE)
+                   Method=method,MZ=round(imzrt[1,],6),RT=round(imzrt[2,],4),stringsAsFactors=FALSE)
   rownames(Annot)=rownames(eicsdat)=newn
   eicsdat=cbind(Analyte=newn,EicFile=eicsdat$File,Eic=eicsdat$PkId,
                 eicsdat[,!names(eicsdat)%in%c("File","PkId")],stringsAsFactors=FALSE)

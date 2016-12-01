@@ -101,7 +101,7 @@ gatherMultiEICs<-function(matfile,tabeic,outfile=NA,eicParams,doMerge=TRUE,ncl=1
   
   if(ncl!=1){
     require("snowfall")
-    ncl=max(1,min(ncl,parallel:::detectCores()))
+    ncl=max(1,min(ncl,nrow(matfile),parallel:::detectCores()))
   }
 
     if(!"GrpEic"%in%names(tabeic)) tabeic$GrpEic=tabeic$Id

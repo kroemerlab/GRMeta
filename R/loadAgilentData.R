@@ -123,7 +123,7 @@ loadAgilentData<-function(ifile,ofile=NULL,params=list()){
     allmat=lapply(allmat,function(x) x[lso,,drop=F])
   }
   
-  l1=c("S/N","BL End","BL Start","Int. End","Int. Start")
+  l1=c("S/N","BL Start","BL End","Int. Start","Int. End")
   l2=c("SNR","Height.Start","Height.End","RT.Start","RT.End")
   for(i in 1:length(l1)) names(allmat)[names(allmat)==l1[i]]=l2[i]
   
@@ -247,7 +247,7 @@ loadAgilentData<-function(ifile,ofile=NULL,params=list()){
     allmat=lapply(allmat,function(x) x[lso,,drop=F])
   }
   
-  l1=c("S/N","BL End","BL Start","Int. End","Int. Start")
+  l1=c("S/N","BL Start","BL End","Int. Start","Int. End")
   l2=c("SNR","Height.Start","Height.End","RT.Start","RT.End")
   for(i in 1:length(l1)) names(allmat)[names(allmat)==l1[i]]=l2[i]
   

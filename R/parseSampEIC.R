@@ -10,8 +10,8 @@ parseOneSampEIC<-function(mzfi,tabeic,outfile=NULL,npad=3,stepmz=1/1000,mzdata=F
   ## load data
   if(mzdata){
     aa=openMSfile(mzfi,backend="Ramp",verb=T)
-    rts=header(aa)[,"retentionTime"]/60
-    names(rts)=header(aa)[,1]
+    rts=mzR::header(aa)[,"retentionTime"]/60
+    names(rts)=mzR::header(aa)[,1]
     pl <- mzR::peaks(aa)
     mzR::close(aa)
     m=do.call("rbind",lapply(1:length(pl),function(x) cbind(Scan=rep(x,nrow(pl[[x]])),pl[[x]])))
@@ -145,7 +145,7 @@ parseSampEIC<-function(matfile,tabeic,stepmz=1/1000,keepM=TRUE,extraRT=NA,extraP
   
   if(ncl!=1){
     require("snowfall")
-    ncl=max(1,min(ncl,parallel:::detectCores()))
+    ncl=max(1,min(ncl,nrow(matfile),parallel:::detectCores()))
   }
   d0=proc.time()[3]
   cat("Started at ",date(),sep="")
@@ -196,8 +196,8 @@ parseOneSampEICold<-function(mzfi,tabeic,outfile=NULL,npad=3,stepmz=1/1000,verbo
   ## load data
   if(grepl('mzdata',mzfi)){
     aa=openMSfile(mzfi,backend="Ramp",verb=T)
-    rts=header(aa)[,"retentionTime"]/60
-    names(rts)=header(aa)[,1]
+    rts=mzR::header(aa)[,"retentionTime"]/60
+    names(rts)=mzR::header(aa)[,1]
     pl <- mzR::peaks(aa)
     close(aa)
     m=do.call("rbind",lapply(1:length(pl),function(x) cbind(Scan=rep(x,nrow(pl[[x]])),pl[[x]])))

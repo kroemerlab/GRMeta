@@ -2,8 +2,8 @@
 corrSetQC<-function(obj,what,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[which(obj$Meta$sType=="QC")],
                     nminQC=3,propNNA=0.5,lPcs=1:2,outfile=NULL,doplot=TRUE,Date2use="Date",complete="nothing",ipc=1,imod=4,verbose=FALSE){
   
-  if(!Date2use%in%names(obj$File)) stop("Date does not exist")
-  if(any(is.na(obj$File[Samp2Corr,Date2use]))) warning("Date unknown for several samples!")
+  if(!Date2use%in%names(obj$File)) stop("********* Date does not exist *********")
+  if(any(is.na(obj$File[Samp2Corr,Date2use]))) warning("******** Date unknown for several samples! **********")
 
     Samp2Corr=Samp2Corr[!is.na(obj$File[Samp2Corr,Date2use])]
   
@@ -15,7 +15,10 @@ corrSetQC<-function(obj,what,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[
   
   clqc=lQC[lQC%in%Samp2Corr]
   if(length(clqc)<nminQC) stop("Not enough QC with data available")
-    
+  
+  if(any(dts[Samp2Corr]<min(dts[clqc])))  warning(paste0("***** ",sum(dts[Samp2Corr]<min(dts[clqc]))," samples before the first QC **********"))
+  if(any(dts[Samp2Corr]>max(dts[clqc])))  warning(paste0("***** ",sum(dts[Samp2Corr]>max(dts[clqc]))," samples after the last QC **********"))
+  
   clqc=clqc[order(dts[clqc])]
   curmat=names(which(colSums(!is.na(m[clqc,]))>=nminQC))
   clqc=clqc[(rowSums(!is.na(m[clqc,curmat]))/length(curmat))>propNNA]

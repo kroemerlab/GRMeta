@@ -27,7 +27,7 @@
   x=eic$x
   y=eic$y
   y2=(y!=0)*1
-  if(!is.null(eic$cons)) lmiss=which(y==0 & cons)
+  if(!is.null(eic$cons)) lmiss=which(y==0 & eic$cons)
   else lmiss=which((y2[2:(length(y)-1)]-y2[1:(length(y)-2)]-y2[3:(length(y))])==-2)+1
   
   if(length(lmiss)>0){

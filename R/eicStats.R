@@ -15,8 +15,6 @@
   return(isFeat)
 }
 
-.GRcodadw2<-function(x,lag=1) sum(diff(diff(x),lag=lag)^2)/sum(diff(x)^2)
-.GRcodadw<-function(x) sum(diff(x)^2)/sum((x)^2)
 
 ### collapse the eic attr
 .GRgetEicInfos<-function(eicParams,eicloc=NULL){

@@ -2,12 +2,20 @@ export(cleanMetaboNames,compSetSBR,compSetStats,compSetRatios,corrSetQC,paramsPa
 loadAgilentData,loadMavenData,loadAgilentDataFlux,mapSetKegg,matchmzSet,mergeSet,deleteEntries,sortEntries, exportSetXLSX,plotSetMEic,
 parseSampEIC,parseOneSampEIC,.GRparseSampEICCl,
 gatherMultiEICs,.GRgatherMultiEICCl,gatherOneEIC,.GRaddmiss,.GRmergeInterval,.GRmergingEIC,
-.GRgetArea,.GRmsExtrema,.GRdoksmooth,.GRipeaks,.GRmsPeakSimple,.GRconvEIC,
-aggregCEF,.GRdoOneCef,.GRgetcomptime,.GRmgetTIC,.GRgetTIC,.GRcompVals,.GRcompTICaddRT,.GRfiltreScan,.GRcodadw,.GRcodadw2,.GRestimBl,.GRcompEICst,.GRgetEicInfos,
+.GRmsPeakSimple,.GRconvEIC,
+aggregCEF,.GRdoOneCef,.GRgetcomptime,.GRmgetTIC,.GRgetTIC,.GRcompVals,.GRcompTICaddRT,.GRfiltreScan,.GRestimBl,.GRcompEICst,.GRgetEicInfos,
 .GRcompSeg,.GRcompSegOne,.GRmsPeakSimple3,.GRgroupPks,.GRchk2vec,integrOneEic,integrOneEicGrp,.GRinfctInt,.GRintegrOneEicGrpCl,
 conv2metaboSet,.GRplotEIC,.GRplotMZ,
 .GRcompAlignMGrpEIC,.GRcompAlignGrpEIC,.GRcompAlignOneEIC,.GRcompAlignEICs,.GRcorGrpEIC,
-partitionPeaks,.GRfindturnpoint,.GRsplitOne,.GRsplitBoth,.GRsplist,.GRcompdppm,.GRgenpkl)
+partitionPeaks,.GRfindturnpoint,.GRsplitOne,.GRgenpkl,
+.GRsplitBoth2,.GRsplitBoth,.GRsplist,.GRsplistMZ,.GRcompdppm,
+.GRisover,.GRmergellx,.GRcombnPrim,
+.GRcodadw,.GRcodadw2,.GRcoda,
+.GRgetArea,.GRmsExtrema,.GRipeaks,.GRchksign,.GRatan,
+.GRdoksmooth,.GRdoksmooth2,.GRasysm,.GRwhit2,
+.GRfindROIs,.GRrawMat,.GRcompSBRCef,
+.GRchkrange,printElapse
+)
 
 ### register S3 methods
 S3method(plot, metaboSet)
@@ -27,6 +35,9 @@ import(beeswarm)
 import(impute)
 import(mgcv)
 import(xlsx)
-import(KernSmooth)
+#import(KernSmooth)
+#import(dplyr)
 
+## 
+useDynLib(GRMeta)
 

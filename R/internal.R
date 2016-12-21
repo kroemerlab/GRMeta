@@ -1,7 +1,7 @@
 .onAttach <- 
   function(libname, pkgname) {
     packageStartupMessage(" **********************************************************************")
-    packageStartupMessage(" GRMeta: chemical data processing at Gustave Roussy - David Enot - 2016")
+    packageStartupMessage(" GRMeta: chemical data processing at Gustave Roussy - David Enot - 2017")
     packageStartupMessage(" Latest source code available at https://github.com/tonedivad/GRMeta")
     packageStartupMessage(" **********************************************************************")
   }

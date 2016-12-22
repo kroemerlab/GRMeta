@@ -66,10 +66,10 @@
 }
 
 ########## compute SBR from Agilent cefmat data.frame
-.GRcompSBRCef<-function(blsamp,cefmat,dppm=30,drt=0.3,nSmo=30,minNoise=350){
+.GRcompSBRCef<-function(blsamp,cefmat,dppm=21,drt=.5,nSmo=31,minNoise=350){
   
   require(xcms)
-  xRawBl <- xcmsRaw(blsamp, profmethod = "bin", profparam = list(step = 0.01), profstep = 0)
+  xRawBl <- xcmsRaw(blsamp, profmethod = "bin", profparam = list(step = 0.001), profstep = 0)
   rangeSc=c(1,length(xRawBl@scantime))
   dscan=ceiling(60*drt/median(diff(xRawBl@scantime)))+nSmo
   
@@ -79,9 +79,9 @@
     x=cefmat[ientry,]
     lmz=range(x$mz*(1+c(-1,1)*dppm*10^-6))
     iscan=which.min(abs(xRawBl@scantime-x$rt*60))
-    lsc=chkrange(iscan+c(-1,1)*dscan,rangeSc)
+    lsc=.GRchkrange(iscan+c(-1,1)*dscan,rangeSc)
     
-    xb=rawEIC(xRawBl, mzrange =lmz, scanrange = lsc)
+    xb=xcms:::rawEIC(xRawBl, mzrange =lmz, scanrange = lsc)
     if(!any(xb$intensity<minNoise)) next
     xbi=xb$intensity[match(lsc[1]:lsc[2],xb$scan)]
     xbi[xbi<minNoise]=minNoise

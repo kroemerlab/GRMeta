@@ -10,6 +10,20 @@
   x
 }
 
+# .GRchkrange2<-function(x,rangeSc=c(1,1,Inf,Inf)){
+#   if(is.vector(x)){
+#     x=c(floor(min(x,na.rm=T)),ceiling(max(x,na.rm=T)))
+#     if(!(x[2]>rangeSc[2] | x[1]<rangeSc[3])) return(c(NA,NA))
+#     ifelse(x[1])
+#        
+#     return(c(max(max(x[1],rangeSc[1]),rangeSc[2]),min(x[2]),rangeSc[2])))
+#   }
+#   x=t(apply(x,1,range))
+#   x[,1]= floor(x[,1]) %>% {.[.<rangeSc[1]] = rangeSc[1]; .} 
+#   x[,2]= ceiling(x[,2]) %>% {.[.>rangeSc[2]] = rangeSc[2]; .} 
+#   x
+# }
+
 ##### 
 printElapse<-function(strtime,bef="",add="\n"){
   if(typeof(strtime)=="integer"){

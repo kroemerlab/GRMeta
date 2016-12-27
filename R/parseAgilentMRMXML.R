@@ -16,6 +16,8 @@
   invisible(SegDF)
 }
 
+##### xmlfile
+
 parseAgilentMRMXML<-function(xmlfile,segdf,doDate=TRUE){
   
   #### 
@@ -73,10 +75,10 @@ parseAgilentMRMXML<-function(xmlfile,segdf,doDate=TRUE){
   art=do.call("cbind",art)
   dimnames(aint)=dimnames(art)=list(luscid,rownames(segdf)[as.numeric(lumrm)])
   
-  Date=ifelse(doDate,.GRgetcomptime(xmlfile),NULL)
+  cDate=ifelse(doDate,.GRgetcomptime(xmlfile),NA)
   
   
-  invisible(list(MSdat=msdat,RT=art,Int=aint,SegDF=segdf,Date=Date))
+  invisible(list(MSdat=msdat,RT=art,Int=aint,SegDF=segdf,Date=cDate))
   
   
 }

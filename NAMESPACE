@@ -14,7 +14,8 @@ partitionPeaks,.GRfindturnpoint,.GRsplitOne,.GRgenpkl,
 .GRgetArea,.GRmsExtrema,.GRipeaks,.GRchksign,.GRatan,
 .GRdoksmooth,.GRdoksmooth2,.GRasysm,.GRwhit2,
 .GRfindROIs,.GRrawMat,.GRcompSBRCef,
-.GRchkrange,printElapse
+.GRchkrange,printElapse,
+parseAgilentMRMXML,.GRparseMRMMethod
 )
 
 ### register S3 methods

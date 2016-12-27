@@ -7,12 +7,14 @@
     idx=xmlValue(x[["index"]])
     SegRes[[idx]]=lapply(xmlChildren(x[["scanElements"]]),function(y)
       c(SegIdx=idx,SegIdx2=xmlValue(y[["index"]]),Q1=xmlValue(y[["ms1LowMz"]]),Q3=xmlValue(y[["ms2LowMz"]]),Cmpd=xmlValue(y[["compoundName"]]),
-        Frag=xmlValue(y[["fragmentor"]]),Dwell=xmlValue(y[["dwell"]]),CE=xmlValue(y[["collisionEnergy"]])))
+        Frag=xmlValue(y[["fragmentor"]]),Dwell=xmlValue(y[["dwell"]]),CE=xmlValue(y[["collisionEnergy"]]),EMV=xmlValue(y[["deltaEMV"]])))
   }
   suppressWarnings(SegDF<-data.frame(do.call("rbind",unlist(SegRes,recursive = F))))
   for(i in c("SegIdx","SegIdx2","Q1","Q3","Dwell","Frag")) SegDF[,i]=as.numeric(SegDF[,i])
   SegDF$MRM=paste0(SegDF$Q1,">",SegDF$Q3)
-  rownames(SegDF)=SegDF$MRMId=paste0(SegDF$MRM,"_",SegDF$Frag)
+  SegDF$MRMId=paste0(SegDF$MRM,"_",SegDF$Frag,"_",SegDF$CE)
+  if(any(SegDF$SegIdx2>1)) SegDF$MRMId=paste0(SegDF$MRM,"_",SegDF$Frag,"_",SegDF$CE,"-",SegDF$SegIdx2)
+  rownames(SegDF)=SegDF$MRMId
   invisible(SegDF)
 }
 

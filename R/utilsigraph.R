@@ -44,3 +44,11 @@
   clu[sapply(clu,length)>(!retOne)]
 }
 
+.GRisover2<-function(vst1,ven1,vst2,ven2,retOne=FALSE,thr1=0,thr2=0){
+  isover=which(outer(ven1,vst1,"-")> (-thr1) & outer(vst1,ven1,"-")<thr1 & outer(ven2,vst2,"-")> (-thr2) & outer(vst2,ven2,"-")<thr2,arr=T)
+  if(all(isover[,1]==isover[,2])) clu=as.list(1:length(vst1)) else{
+    clu=igraph:::clusters(igraph:::graph_from_edgelist(isover,directed=F))
+    clu=tapply(1:length(clu$membership),clu$membership,c)
+  }
+  clu[sapply(clu,length)>(!retOne)]
+}

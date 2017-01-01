@@ -14,6 +14,12 @@
   SegDF$MRM=paste0(SegDF$Q1,">",SegDF$Q3)
   SegDF$MRMId=paste0(SegDF$MRM,"_",SegDF$Frag,"_",SegDF$CE)
   if(any(SegDF$SegIdx2>1)) SegDF$MRMId=paste0(SegDF$MRM,"_",SegDF$Frag,"_",SegDF$CE,"-",SegDF$SegIdx2)
+  if( any(duplicated(SegDF$MRMId))){
+    ldups=SegDF$MRMId[duplicated(SegDF$MRMId)]
+    cat("Duplicated MRMId: ",paste(unique(ldups),collapse=" "),"\n",sep="")
+    for(i in unique(ldups)) SegDF$MRMId[SegDF$MRMId==i] =paste0(SegDF$MRMId[SegDF$MRMId==i],".",1:sum(SegDF$MRMId==i))
+  }
+  
   rownames(SegDF)=SegDF$MRMId
   invisible(SegDF)
 }

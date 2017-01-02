@@ -21,13 +21,16 @@ mz	mode	annotation
 322.048121	pos	CalAgilent
 338.341736	pos	Erucamide
 355.069946	pos	Decamethylcyclopentasiloxane-CH4
-371.101227	pos	Decamethylcyclopentasiloxane-CH4
+371.101227	pos	Decamethylcyclopentasiloxane+H
 391.284271	pos	Diisoctylphtalate
 413.266235	pos	Diisoctylphtalate
 429.088715	pos	Dodecamethylcyclohexasiloxane-CH4
 445.120026	pos	Dodecamethylcyclohexasiloxane+H
 429.240173	pos	Diisoctylphtalate
 503.107513	pos	Tetradecamethylcycloheptasiloxane-CH4
+519.138794	pos	Tetradecamethylcycloheptasiloxane+H
+651.145081	pos	Octadecamethylcyclononasiloxane-CH4
+667.176392	pos	Octadecamethylcyclononasiloxane+H
 622.028960	pos	CalAgilent
 79.021210	pos	DMSO
 83.060371	pos	2ACN+H

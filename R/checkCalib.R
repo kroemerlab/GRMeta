@@ -17,7 +17,7 @@
   mdiffcal}
 
 
-chkCalib<-function(ifile,lcalib,maxdppm=121,maxdmz=0.001,minpts=5){
+chkCalib<-function(ifile,lcalib,maxdppm=121,maxdmz=0.001,minpts=5,rtlim=c(NA,NA)){
   
   xRaw <- xcmsRaw(ifile)
   
@@ -35,6 +35,9 @@ chkCalib<-function(ifile,lcalib,maxdppm=121,maxdmz=0.001,minpts=5){
   mdiffcal0=mdiffcal=mdiffcal[order(mdiffcal[,1],mdiffcal[,"calmz"],abs(mdiffcal[,"dmz"])),]
   
   #######
+  if(!is.na(rtlim[1])) mdiffcal=mdiffcal[mdiffcal[,"rt"]>=rtlim[1],,drop=F]
+  if(!is.na(rtlim[2])) mdiffcal=mdiffcal[mdiffcal[,"rt"]<=rtlim[2],,drop=F]
+  
   cat("\nFound ",length(unique(mdiffcal[,"cal"])),"/",length(lcalib)," calib m/z in ",length(unique(mdiffcal[,1])),"/",length(xRaw@scantime)," scans:\n",sep="")
   l=which(mdiffcal[,"dups"]==1)
   if(length(l)>0){

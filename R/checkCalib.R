@@ -1,19 +1,80 @@
+.removeDups<-function(mdiffcal){
+  l=which(mdiffcal[,"dups"]==1)
+  l2chk=sort(unique(mdiffcal[l,"cal"]))
+  for(i2chk in l2chk){
+    lndups=which(mdiffcal[,"cal"]==i2chk & mdiffcal[,"dups"]==0)
+    ldups=which(mdiffcal[,"cal"]==i2chk & mdiffcal[,"dups"]==1)
+    cldups=.GRsplist(mdiffcal[ldups,1],ldups,d=2.1)
+    lbest=unlist(lapply(cldups,function(y){
+      ir=range(mdiffcal[y,1])
+      lbef=lndups[which((ir[1]-mdiffcal[lndups,1])>0)];if(length(lbef)) lbef=lbef[1:min(5,length(lbef))]
+      laft=lndups[which((mdiffcal[lndups,1]-ir[2])>0)];if(length(laft)) laft=laft[1:min(5,length(laft))]
+      medaround=median(c(mdiffcal[lbef,"dppm"],mdiffcal[laft,"dppm"]))
+      tapply(y,mdiffcal[y,"scan"],function(x) x[which.min(abs(mdiffcal[x,"dppm"]-medaround))])
+    }))
+    mdiffcal[lbest,"dups"]=0
+  }
+  mdiffcal}
 
 
-.inChkCalibPlot1<-function(mdiffcal,llspl){
+chkCalib<-function(ifile,lcalib,maxdppm=121,maxdmz=0.001,minpts=5){
+  
+  xRaw <- xcmsRaw(ifile)
+  
+  ##### get all ions within maxdppm 
+  mdiffcal=do.call("rbind",lapply(1:length(lcalib),function(ical){
+    cat(lcalib[ical],"/",sep="")
+    dmz=max(c(lcalib[ical]*maxdppm*10^-6,maxdmz),na.rm=T)
+    x=.GRrawMat(xRaw,mzrange=lcalib[ical]*(1+1.001*c(-1,1)*maxdppm*10^-6))
+    if(nrow(x)<minpts) return(NULL)
+    isdups=x[,1]%in%names(which(table(x[,1])>1))*1
+    cbind(x,cal=ical,calmz=lcalib[ical],dups=isdups)}))
+  ## computing stats
+  mdiffcal=cbind(mdiffcal,"dmz"=mdiffcal[,"mz"]-mdiffcal[,"calmz"])
+  mdiffcal=cbind(mdiffcal,"dppm"=10^6*mdiffcal[,"dmz"]/mdiffcal[,"calmz"])
+  mdiffcal0=mdiffcal=mdiffcal[order(mdiffcal[,1],mdiffcal[,"calmz"],abs(mdiffcal[,"dmz"])),]
+  
+  #######
+  cat("\nFound ",length(unique(mdiffcal[,"cal"])),"/",length(lcalib)," calib m/z in ",length(unique(mdiffcal[,1])),"/",length(xRaw@scantime)," scans:\n",sep="")
+  l=which(mdiffcal[,"dups"]==1)
+  if(length(l)>0){
+    x=rev(sort(rowSums(table(mdiffcal[l,"calmz"],mdiffcal[l,"scan"])>0)))
+    cat("   ---> scans with duplicated calib: ",sum(x)," = ",paste0(round(as.numeric(names(x)),4),"(",x,")"),"\n")
+    mdiffcal=.removeDups(mdiffcal0)
+    mdiffcal=mdiffcal[which(mdiffcal[,"dups"]!=1),]
+  }
+  x=as.vector(table(mdiffcal[,1]))
+  cat("   ---> num. calib per scan: ",sprintf("mean=%.2f, median=%.2f, quartiles=[%.2f-%.2f], range=[%d-%d]\n",mean(x),median(x),
+                                              quantile(x,.25),quantile(x,.75),min(x),max(x)),sep="")
+  x=as.vector(table(mdiffcal[,"cal"]))
+  cat("   ---> num. scan per calib: ",sprintf("mean=%.2f, median=%.2f, quartiles=[%.2f-%.2f], range=[%d-%d]\n",mean(x),median(x),
+                                              quantile(x,.25),quantile(x,.75),min(x),max(x)),sep="")
+  
+  invisible(list(match=mdiffcal,calib=unique(mdiffcal[,"calmz"]),calibori=lcalib))
+}
+
+
+chkCalib.plotSum<-function(mdiffcal,llspl=NULL,nsplit=1){
+  
+  lcalib=sort(unique(mdiffcal[,"calmz"]))
+  if(is.null(llspl)) llspl=split(lcalib, ceiling(seq_along(1:length(lcalib))/nsplit))
   
   lcalib=unlist(llspl)
+  
   luscn=as.character(min(mdiffcal[,1]):max(mdiffcal[,1]))
-  matmz=do.call("rbind",tapply(1:nrow(mdiffcal),mdiffcal[,"scan"],function(x){
-    tmp=mdiffcal[x,]
-    tmp[match(lcalib,tmp[,"calmz"]),"mz"]
+  matmz=do.call("rbind",lapply(unique(mdiffcal[,"scan"]),function(ix){
+    x=which(mdiffcal[,"scan"]==ix)
+    tmp=tapply(mdiffcal[x,"mz",drop=F],mdiffcal[x,"calmz",drop=F],median)
+    tmp[match(lcalib,names(tmp))]
   }))
-  matint=do.call("rbind",tapply(1:nrow(mdiffcal),mdiffcal[,"scan"],function(x){
-    tmp=mdiffcal[x,]
-    log10(tmp[match(lcalib,tmp[,"calmz"]),"y"])
+  
+  matint=do.call("rbind",lapply(unique(mdiffcal[,"scan"]),function(ix){
+    x=which(mdiffcal[,"scan"]==ix)
+    tmp=tapply(mdiffcal[x,"y",drop=F],mdiffcal[x,"calmz",drop=F],median)
+    log10(tmp[match(lcalib,names(tmp))])
   }))
-  matint=matint[match(luscn,rownames(matint)),,drop=F]
-  matmz=matmz[match(luscn,rownames(matmz)),,drop=F]
+  matint=matint[match(luscn,unique(mdiffcal[,"scan"])),,drop=F]
+  matmz=matmz[match(luscn,unique(mdiffcal[,"scan"])),,drop=F]
   mmppm=(sweep(matmz,2,lcalib,"/")-1)*10^6
   mmmz=(sweep(matmz,2,lcalib,"-"))
   dimnames(mmmz)=dimnames(mmppm)=dimnames(matint)=dimnames(matmz)=list(luscn,lcalib)
@@ -71,8 +132,11 @@
 }
 
 
-.inChkCalibPlot2<-function(mdiffcal,llspl,what="dppm"){
+chkCalib.plotTrace<-function(mdiffcal,llspl=NULL,nsplit=1,what="dppm"){
   
+  lcalib=sort(unique(mdiffcal[,"calmz"]))
+  if(is.null(llspl)) llspl=split(lcalib, ceiling(seq_along(1:length(lcalib))/nsplit))
+
   
   def.par <- par(no.readonly = TRUE) 
   par(mar=c(3.4,3.4,1,.1),lwd=2,cex.main=1.2)
@@ -82,27 +146,34 @@
 for(lcal in llspl){
 
 tmpdat=mdiffcal[mdiffcal[,"calmz"]%in%lcal,]
-what="dppm"
+
 
 xlim=pretty(range(tmpdat[,"scan"],na.rm=T))
 colstit=brewer.pal(8,"Dark2")
-plot(range(xlim),range(ylim),cex=0,xlab="",ylab="",ylim=range(ylim)+c(0,diff(range(ylim))/10),axes=F,
+plot(range(xlim),range(ylim),cex=0,xlab="",ylab="",
+     ylim=range(c(0,ylim))+c(0,diff(range(ylim))/10),
+     xlim=range(xlim)+c(0,diff(range(xlim))/5),
+     axes=F,
      main=sprintf('Mass error [%s] for %.4f -> %.4f',what,min(lcal),max(lcal)))
-abline(h=0)
+segments(min(xlim),0,max(xlim),0,lwd=2)
 for(i in seq(xlim[1],max(xlim),100)) segments(i,min(ylim),i,max(ylim),col="grey",lty=2,lwd=2)
-axis(2,at=ylim,las=2,pos=xlim[1]);axis(1,pos=min(ylim))
+axis(2,at=ylim,las=2,pos=xlim[1]);axis(1,at=xlim,pos=min(ylim))
+#print(lcal)
 imeds=do.call("rbind",tapply(tmpdat[,what],tmpdat[,"calmz"],quantile,c(.25,.5,.75),na.rm=T))
-imeds=imeds[match(lcal,rownames(imeds)),]
-abline(h=imeds[,1],col=colstit,lty=3,lwd=1)
-abline(h=imeds[,3],col=colstit,lty=3,lwd=1)
-abline(h=imeds[,2],col=colstit,lty=2)
+#print(imeds)
+imeds=imeds[match(lcal,rownames(imeds)),,drop=F]
+for(i in 1:nrow(imeds)){
+  segments(min(xlim),imeds[i,1],max(xlim),imeds[i,1],col=colstit[i],lty=3,lwd=1)
+  segments(min(xlim),imeds[i,3],max(xlim),imeds[i,3],col=colstit[i],lty=3,lwd=1)
+  segments(min(xlim),imeds[i,2],max(xlim),imeds[i,2],col=colstit[i],lty=1,lwd=2)
+}
 for(i in 1:length(lcal)){
   l=which(tmpdat[,"calmz"]==lcal[i])
   lines(tmpdat[l,"scan"],tmpdat[l,what],lty=1,col=colstit[i])
   points(tmpdat[l,"scan"],tmpdat[l,what],pch=20,col=colstit[i])
 }
-leg=tapply(tmpdat[,1],tmpdat[,"calmz"],function(x) sprintf(" (N=%d, sc.=%d-%d)",length(x),min(x),max(x)))[as.character(lcal)]
-legend("top",paste0(round(lcal,4),leg),pch=15,col=colstit,ncol=3,bty="n",pt.cex=1.2)
+leg=tapply(tmpdat[,1],tmpdat[,"calmz"],function(x) sprintf("N=%d [%d-%d]",length(x),min(x),max(x)))[as.character(lcal)]
+legend(max(xlim),max(ylim),paste0(round(lcal,4),"\n",leg),pch=15,col=colstit,ncol=1,bty="n",pt.cex=1.2)
 }
 par(def.par)
 

@@ -3,13 +3,14 @@ mz	mode	annotation
 104.992294	pos	AcetaNa
 105.953789	pos	[ACN+65/63Cu(I)]+
 118.086255	pos	CalAgilent
+121.050873	pos	CalAgilent
 122.081169	pos	TRIS
 122.964348	pos	AcetaNa
 123.091675	pos	Dimethylaminopyridine
 130.159027	pos	Diisopropylethylamine
 144.982147	pos	[ACN*2+65/63Cu(I)]+
 146.980347	pos	[ACN*2+65/63Cu(I)]+
-149.023315	pos	"Phthalic anhydride"
+149.023315	pos	"Phthalic anhydride/CalAgilent"
 150.127731	pos	Phenyldiethylamine
 153.138626	pos	1,8-Diazabicycloundec-7-ene
 181.122299	pos	"Butylated hydroxyanisole"
@@ -24,6 +25,7 @@ mz	mode	annotation
 391.284271	pos	Diisoctylphtalate
 413.266235	pos	Diisoctylphtalate
 429.088715	pos	Dodecamethylcyclohexasiloxane-CH4
+445.120026	pos	Dodecamethylcyclohexasiloxane+H
 429.240173	pos	Diisoctylphtalate
 503.107513	pos	Tetradecamethylcycloheptasiloxane-CH4
 622.028960	pos	CalAgilent

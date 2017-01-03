@@ -56,7 +56,10 @@ chkCalib<-function(ifile,lcalib,maxdppm=121,maxdmz=0.001,minpts=5,rtlim=c(NA,NA)
   invisible(list(match=mdiffcal,calib=unique(mdiffcal[,"calmz"]),calibori=lcalib))
 }
 
-.makeCalMatrices<-function(mdiffcal,lcalib,luscn){
+.makeCalMatrices<-function(mdiffcal,lcalib=NULL,luscn=NULL){
+  
+  if(is.null(lcalib)) lcalib=sort(unique(mdiffcal[,"calmz"]))
+  if(is.null(luscn)) luscn=min(mdiffcal[,"scan"]):max(mdiffcal[,"scan"])
   
   matmz=do.call("rbind",lapply(unique(mdiffcal[,"scan"]),function(ix){
     x=which(mdiffcal[,"scan"]==ix)

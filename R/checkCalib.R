@@ -75,7 +75,7 @@ chkCalib<-function(ifile,lcalib,maxdppm=121,maxdmz=0.001,minpts=5,rtlim=c(NA,NA)
   mmmz=(sweep(matmz,2,lcalib,"-"))
   dimnames(mmmz)=dimnames(mmppm)=dimnames(matint)=dimnames(matmz)=list(luscn,lcalib)
   
-  return(list(mmmz,mmppm,matint,matmz))
+  return(list(dmz=mmmz,dppm=mmppm,int=matint,mz=matmz))
   
 }
 chkCalib.plotSum<-function(mdiffcal,llspl=NULL,nsplit=1){
@@ -88,10 +88,10 @@ chkCalib.plotSum<-function(mdiffcal,llspl=NULL,nsplit=1){
   luscn=as.character(min(mdiffcal[,1]):max(mdiffcal[,1]))
 
   re=.makeCalMatrices(mdiffcal,lcalib,luscn)
-  mmmz=re[[1]]
-  mmppm=re[[2]]
-  matint=re[[3]]
-  matmz=re[[4]]
+  mmmz=re$dmz
+  mmppm=re$dppm
+  matint=re$int
+  matmz=re$mz
   
   
   def.par <- par(no.readonly = TRUE) 
@@ -141,7 +141,7 @@ chkCalib.plotSum<-function(mdiffcal,llspl=NULL,nsplit=1){
   legend("top",leg,pch=c(15,16,18),col=c("firebrick3","darkolivegreen3","dodgerblue3"),ncol=3,bty="n",pt.cex=1.2)
 }
   par(def.par)
-  
+  invisible(re)
 }
 
 

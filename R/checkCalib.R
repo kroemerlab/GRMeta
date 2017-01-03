@@ -56,15 +56,8 @@ chkCalib<-function(ifile,lcalib,maxdppm=121,maxdmz=0.001,minpts=5,rtlim=c(NA,NA)
   invisible(list(match=mdiffcal,calib=unique(mdiffcal[,"calmz"]),calibori=lcalib))
 }
 
-
-chkCalib.plotSum<-function(mdiffcal,llspl=NULL,nsplit=1){
+.makeCalMatrices<-function(mdiffcal,lcalib,luscn){
   
-  lcalib=sort(unique(mdiffcal[,"calmz"]))
-  if(is.null(llspl)) llspl=split(lcalib, ceiling(seq_along(1:length(lcalib))/nsplit))
-  
-  lcalib=unlist(llspl)
-  
-  luscn=as.character(min(mdiffcal[,1]):max(mdiffcal[,1]))
   matmz=do.call("rbind",lapply(unique(mdiffcal[,"scan"]),function(ix){
     x=which(mdiffcal[,"scan"]==ix)
     tmp=tapply(mdiffcal[x,"mz",drop=F],mdiffcal[x,"calmz",drop=F],median)
@@ -82,6 +75,23 @@ chkCalib.plotSum<-function(mdiffcal,llspl=NULL,nsplit=1){
   mmmz=(sweep(matmz,2,lcalib,"-"))
   dimnames(mmmz)=dimnames(mmppm)=dimnames(matint)=dimnames(matmz)=list(luscn,lcalib)
   
+  return(list(mmmz,mmppm,matint,matmz))
+  
+}
+chkCalib.plotSum<-function(mdiffcal,llspl=NULL,nsplit=1){
+  
+  lcalib=sort(unique(mdiffcal[,"calmz"]))
+  if(is.null(llspl)) llspl=split(lcalib, ceiling(seq_along(1:length(lcalib))/nsplit))
+  
+  lcalib=unlist(llspl)
+  
+  luscn=as.character(min(mdiffcal[,1]):max(mdiffcal[,1]))
+
+  re=.makeCalMatrices(mdiffcal,lcalib,luscn)
+  mmmz=re[[1]]
+  mmppm=re[[2]]
+  matint=re[[3]]
+  matmz=re[[4]]
   
   
   def.par <- par(no.readonly = TRUE) 

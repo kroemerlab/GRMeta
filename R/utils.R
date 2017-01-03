@@ -51,6 +51,15 @@ printElapse<-function(strtime,bef="",add="\n"){
   dts = strsplit(gsub("\"", "", dts), "T")[[1]]
   df$completionTime=chron(dts[1], dts[2], format = c(dates = "Y-M-D", times = "h:m:s"))
   
+  ###
+  xraw=xcms:::xcmsRaw(cefi)
+  df$polarity=as.character(xraw@polarity[1])
+  df$rtmin=round(min(xraw@scantime)/60,3)
+  df$rtmax=round(max(xraw@scantime)/60,3)
+  df$nscan=length(xraw@scantime)
+  df$mzmin=round(min(xraw@mzrange),6)
+  df$mzmax=round(max(xraw@mzrange),6)
+  
   invisible(df)
 }
 

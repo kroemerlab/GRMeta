@@ -14,7 +14,7 @@ partitionPeaks,.GRfindturnpoint,.GRsplitOne,.GRgenpkl,
 .GRgetArea,.GRmsExtrema,.GRipeaks,.GRchksign,.GRatan,
 .GRdoksmooth,.GRdoksmooth2,.GRasysm,.GRwhit2,
 .GRfindROIs,.GRrawMat,.GRcompSBRCef,
-.GRchkrange,printElapse,
+.GRchkrange,printElapse,.GRgetAgilentXMLInfos,
 chkCalib,chkCalib.plotSum,chkCalib.plotTrace,
 parseAgilentMRMXML,.GRparseMRMMethod
 )

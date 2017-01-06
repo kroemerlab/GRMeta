@@ -19,13 +19,21 @@
 
 chkCalib<-function(ifile,lcalib,maxdppm=121,maxdmz=0.001,minpts=5,rtlim=c(NA,NA)){
   
-  xRaw <- xcmsRaw(ifile)
+  ## samp is an xcms file
+  if("xcmsRaw"%in%class(ifile)){
+    object=ifile
+    ifile=unclass(object@filepath)
+    cat(" As provided ",ifile,"\n",sep="")
+  }else{
+    cat(" Parsing ",ifile,"\n",sep="")
+    object <- xcmsRaw(ifile)
+  }
   
   ##### get all ions within maxdppm 
   mdiffcal=do.call("rbind",lapply(1:length(lcalib),function(ical){
     cat(lcalib[ical],"/",sep="")
     dmz=max(c(lcalib[ical]*maxdppm*10^-6,maxdmz),na.rm=T)
-    x=.GRrawMat(xRaw,mzrange=lcalib[ical]*(1+1.001*c(-1,1)*maxdppm*10^-6))
+    x=GRMeta:::.GRrawMat(object,mzrange=lcalib[ical]*(1+1.001*c(-1,1)*maxdppm*10^-6))
     if(nrow(x)<minpts) return(NULL)
     isdups=x[,1]%in%names(which(table(x[,1])>1))*1
     cbind(x,cal=ical,calmz=lcalib[ical],dups=isdups)}))
@@ -38,7 +46,7 @@ chkCalib<-function(ifile,lcalib,maxdppm=121,maxdmz=0.001,minpts=5,rtlim=c(NA,NA)
   if(!is.na(rtlim[1])) mdiffcal=mdiffcal[mdiffcal[,"rt"]>=rtlim[1],,drop=F]
   if(!is.na(rtlim[2])) mdiffcal=mdiffcal[mdiffcal[,"rt"]<=rtlim[2],,drop=F]
   
-  cat("\nFound ",length(unique(mdiffcal[,"cal"])),"/",length(lcalib)," calib m/z in ",length(unique(mdiffcal[,1])),"/",length(xRaw@scantime)," scans:\n",sep="")
+  cat("\nFound ",length(unique(mdiffcal[,"cal"])),"/",length(lcalib)," calib m/z in ",length(unique(mdiffcal[,1])),"/",length(object@scantime)," scans:\n",sep="")
   l=which(mdiffcal[,"dups"]==1)
   if(length(l)>0){
     x=rev(sort(rowSums(table(mdiffcal[l,"calmz"],mdiffcal[l,"scan"])>0)))
@@ -55,6 +63,47 @@ chkCalib<-function(ifile,lcalib,maxdppm=121,maxdmz=0.001,minpts=5,rtlim=c(NA,NA)
   
   invisible(list(match=mdiffcal,calib=unique(mdiffcal[,"calmz"]),calibori=lcalib))
 }
+
+
+setGeneric(name=".GRcorrRawPPM",def=function(object,addppm) standardGeneric(".GRcorrRawPPM"))
+
+setMethod(".GRcorrRawPPM","xcmsRaw",
+          .GRcorrRawPPM<-function(object,addppm){
+            
+     
+          #  xRaw2=xRaw
+            scsten=cbind(object@scanindex+1,c(object@scanindex[-1],length(object@env$intensity)))
+            rownames(scsten)=1:length(object@scanindex)
+            
+            newmz=object@env$mz
+            ix=450
+            for(ix in names(addppm)){
+              oldy<-xcms:::getScan(object,as.numeric(ix))[,1]
+              ppmy<- 1-addppm[ix]*10^-6
+              newy=round(oldy*ppmy,6)
+              newmz[scsten[ix,1]:scsten[ix,2]]=newy
+            }
+            print(summary((1-newmz/object@env$mz)*10^6))
+            
+            ob<-new("xcmsRaw")
+            ob@env <- new.env(parent = .GlobalEnv)
+            ob@env$mz<-as.numeric(newmz)
+            ob@env$intensity<-object@env$intensity
+            ob@scanindex<-object@scanindex
+            ob@scantime<-object@scantime
+            
+            ob@acquisitionNum<-1:length(ob@scanindex)
+            ob@filepath<-object@filepath
+            ob@mzrange<-range(ob@env$mz)
+            ob@profmethod<-object@profmethod
+            ob@tic<-object@tic
+            ob@profparam<-list()
+            ob<-xcms:::remakeTIC(ob)
+            return(ob)
+          }
+          
+          )
+
 
 .makeCalMatrices<-function(mdiffcal,lcalib=NULL,luscn=NULL){
   

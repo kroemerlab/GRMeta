@@ -41,5 +41,5 @@ import(xlsx)
 #import(dplyr)
 
 ## 
-#useDynLib(GRMeta)
+useDynLib(GRMeta)
 

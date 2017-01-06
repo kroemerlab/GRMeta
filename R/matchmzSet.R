@@ -153,5 +153,11 @@ matchmzSet<-function(obj,Analyte=NULL,annotdb=NULL,ipdb=NULL,lIP=NULL,
   ############  
   matchres=matchres[order(factor(matchres$Analyte,levels=lanalytes),factor(matchres$IP,levels=colnames(mmz)),abs(iDPPM)),]
   rownames(matchres)=NULL
+  
+  cat("  -> ",length(unique(matchres$Analyte))," unique analytes\n",sep="")
+  cat("  -> ",length(unique(matchres$entries))," unique entries\n",sep="")
+  summ=c(median(matchres$DPPM),mad(matchres$DPPM),mean(matchres$DPPM),sd(matchres$DPPM),range(matchres$DPPM))
+  cat("  -> ",sprintf("Med= %.2f/%.2f Mean=%.2f/%.2f [%.2f;%.2f]",summ[1],summ[2],summ[3],summ[4],summ[5],summ[6])," unique entries\n",sep="")
+  
   return(matchres)
 }

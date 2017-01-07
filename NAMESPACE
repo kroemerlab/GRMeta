@@ -16,7 +16,8 @@ partitionPeaks,.GRfindturnpoint,.GRsplitOne,.GRgenpkl,
 .GRfindROIs,.GRrawMat,.GRcompSBRCef,
 .GRchkrange,printElapse,.GRgetAgilentXMLInfos,
 chkCalib,chkCalib.plotSum,chkCalib.plotTrace,
-parseAgilentMRMXML,.GRparseMRMMethod
+parseAgilentMRMXML,.GRparseMRMMethod,
+.GRingetROIBl
 )
 
 ### register S3 methods

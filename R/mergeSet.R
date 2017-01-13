@@ -138,8 +138,8 @@ mergeSet<-function(...){
 #   metainfos=metainfos[lso,]
 #   fileinfos=fileinfos[lso,]
   
-  lvar2join= c("Analyte","MetName","IsSTD","RT", "LevelAnnot","OriginalName")
-  if("fluxoSet" %in%class(re[[1]])) lvar2join= c("Analyte","MetName","IsSTD","RT", "Iso","LevelAnnot","OriginalName")
+  lvar2join= c("Analyte","MetName","IsSTD","IsISO","RT", "LevelAnnot","OriginalName")
+  if("fluxoSet" %in%class(re[[1]])) lvar2join= c("Analyte","MetName","IsSTD","IsISO","RT", "Iso","LevelAnnot","OriginalName")
   
   if(!"fluxoSet" %in%class(re[[1]])) lvarfct=function(x) x$Annot$MetName
   if("fluxoSet" %in%class(re[[1]]))  lvarfct=function(x) paste(x$Annot$MetName,x$Annot$Iso,sep="_M")

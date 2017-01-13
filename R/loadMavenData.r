@@ -99,7 +99,7 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,chktime=FALSE,params=list(
   if(!"compoundName"%in%colnames(pkids)){
     nm=sprintf("%.4f@%.3f-%s",mzmed,rtmed,params$AssayName)
     nm=.rendups(nm)
-    annot=data.frame(Analyte=nm,MetName=NA,IsSTD=FALSE,RT=rtmed,MZ=mzmed,LevelAnnot=4,Method=params$AssayName,stringsAsFactors = F)
+    annot=data.frame(Analyte=nm,MetName=NA,IsSTD=FALSE,IsISO=FALSE,RT=rtmed,MZ=mzmed,LevelAnnot=4,Method=params$AssayName,stringsAsFactors = F)
   }
   
   ##############
@@ -107,9 +107,9 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,chktime=FALSE,params=list(
   if("compoundName"%in%colnames(pkids)) {
   nm=gsub("@NA$","",paste(unname(pkids[,"compoundName"]),"@",sprintf("%.3f",rtmed),"-",params$AssayName,sep=""))
   nm=.rendups(nm)
-  if(!is.null(stdData)) annot=data.frame(Analyte=nm,MetName=unname(pkids[,"compoundName"]),IsSTD=FALSE,
+  if(!is.null(stdData)) annot=data.frame(Analyte=nm,MetName=unname(pkids[,"compoundName"]),IsSTD=FALSE,IsISO=FALSE,
                                     RT=rtmed,DRT=NA,MZ=mzmed,DPPM=NA,LevelAnnot=1,Method=params$AssayName,stringsAsFactors = F)
-  if(is.null(stdData)) annot=data.frame(Analyte=nm,MetName=unname(pkids[,"compoundName"]),IsSTD=FALSE,
+  if(is.null(stdData)) annot=data.frame(Analyte=nm,MetName=unname(pkids[,"compoundName"]),IsSTD=FALSE,IsISO=FALSE,
                                     RT=rtmed,MZ=mzmed,LevelAnnot=1,Method=params$AssayName,stringsAsFactors = F)
   newnam=oldnam=unname(pkids[,"compoundName"])
   
@@ -120,6 +120,7 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,chktime=FALSE,params=list(
     nm=.rendups(nm)
     annot$Analyte=nm
     annot$IsSTD[grep("_ISTD",newnam)]=TRUE
+    annot$IsISO[grep("_ISO",newnam)]=TRUE
     annot$OriginalName=oldnam
     if(!is.null(params$AnnotDB)){
       NewDB=params$AnnotDB

@@ -12,12 +12,12 @@ partitionPeaks,.GRfindturnpoint,.GRsplitOne,.GRgenpkl,
 .GRisover,.GRisover2,.GRmergellx,.GRcombnPrim,
 .GRcodadw,.GRcodadw2,.GRcoda,
 .GRgetArea,.GRmsExtrema,.GRipeaks,.GRchksign,.GRatan,
-.GRdoksmooth,.GRdoksmooth2,.GRasysm,.GRwhit2,
+.GRdoksmooth,.GRdoksmooth2,.GRasysm,.GRwhit2,.GRbslrf,
 .GRfindROIs,.GRrawMat,.GRcompSBRCef,
 .GRchkrange,printElapse,.GRgetAgilentXMLInfos,
 chkCalib,chkCalib.plotSum,chkCalib.plotTrace,
 parseAgilentMRMXML,.GRparseMRMMethod,
-.GRingetROIBl
+.GRingetROIBl,.GRgetEICroi,.GRBlankEIC1
 )
 
 ### register S3 methods

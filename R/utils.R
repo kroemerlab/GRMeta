@@ -36,8 +36,10 @@ printElapse<-function(strtime,bef="",add="\n"){
   sprintf("%s%.2f %s%s",bef,top,units,add)
 }
 
-##############
+##################################################################################################
 .GRgetAgilentXMLInfos<-function(cefi){
+  
+  ### Slow bit using library(XML)
   system.time(doc <- xmlRoot(xmlParse(cefi, useInternal = TRUE))[[2]])
   inst=xmlChildren(xmlChildren(doc)$instrument)
   dproc=xmlChildren(xmlChildren(doc)$dataProcessing)
@@ -51,7 +53,7 @@ printElapse<-function(strtime,bef="",add="\n"){
   dts = strsplit(gsub("\"", "", dts), "T")[[1]]
   df$completionTime=chron(dts[1], dts[2], format = c(dates = "Y-M-D", times = "h:m:s"))
   
-  ###
+  ### XCMS for polarity etc...
   xraw=xcms:::xcmsRaw(cefi)
   df$polarity=as.character(xraw@polarity[1])
   df$rtmin=round(min(xraw@scantime)/60,3)
@@ -60,6 +62,39 @@ printElapse<-function(strtime,bef="",add="\n"){
   df$mzmin=round(min(xraw@mzrange),6)
   df$mzmax=round(max(xraw@mzrange),6)
   
+  rownames(df)=NULL
+  
   invisible(df)
 }
 
+##################################################################################################
+.GRgetReAdWXMLInfos<-function(cefi){
+  
+  #########################
+  ## get completion date
+  cefiraw=c(gsub("\\.mzXML",".raw",cefi),gsub("\\.mzXML",".Raw",cefi),gsub("\\.mzXML",".RAW",cefi))
+  cefiraw=cefiraw[file.exists(cefiraw)]
+  dts=NA
+  if(length(cefiraw)>0) dts=as.chron(file.info(cefiraw)[,"mtime"], format = c(dates = "Y-M-D", times = "h:m:s"))
+  
+  ########################
+  ## get run infos
+  tt=mzR:::openMSfile(cefi)
+  infos=unlist(mzR:::runInfo(tt))
+  df=data.frame(fileName=fileName(tt),completionTime=dts,polarity=NA,
+                rtmin=round(infos["dStartTime"]/60,3),rtmax=round(infos["dEndTime"]/60,3),
+                nscan=infos['scanCount'],
+                mzmin=round(infos["lowMz"],6),mzmax=round(infos["highMz"],6))
+  infos=unlist(mzR:::instrumentInfo(tt))
+  for(i in names(infos)) df[,i]=infos[i]
+  mzR:::close(tt)
+  
+  ########################
+  ## polarity
+  xraw = xcms:::xcmsRaw(cefi)
+  df$polarity = as.character(xraw@polarity[1])
+  rm(list="xraw")
+  
+  rownames(df)=NULL
+  invisible(df)
+}

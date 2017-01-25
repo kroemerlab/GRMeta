@@ -1,7 +1,7 @@
 plot.metaboSet<-function(obj,outfile=NULL,
                          lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1",log="y"),c("Height~Area",log="xy")),
                          mfrow=c(2,2),colorCol=NULL,deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,cexBX=.8,
-                         cexEL=0.4,cexPT=1.5,...){
+                         cexEL=0.4,cexPT=1.5,spacingBX=1.05,...){
 
   mgraphs=t(sapply(lgraphs,function(x) strsplit(x[1],"~")[[1]][1:2]))
   mgraphs[grep("^[0-9]$",mgraphs[,2]),2]=NA
@@ -28,7 +28,7 @@ plot.metaboSet<-function(obj,outfile=NULL,
     lanalytes=obj$Analyte
   }
   
-  ###########
+  ###########  ###########  ###########  ###########  ###########
   ## Exclude some analytes that have no information on Data to be plotted
   l1=mgraphs[mgraphs%in%names(obj$Data)]
   m1=do.call("cbind",lapply(l1,function(x) colSums(!is.na(obj$Data[[x]][,lanalytes,drop=F]))))
@@ -46,7 +46,7 @@ plot.metaboSet<-function(obj,outfile=NULL,
   }
   for(i in unique(lanalytes))
     .plotOneAnalyte(obj,analyte = i,lgraphs=lgraphs,mfrow=mfrow,colorCol=colorCol,deltaRT=deltaRT,linking=linking,orderBPlots=orderBPlots,
-                    cexBP=cexBP,cexBX=cexBX,cexEL=cexEL,cexPT=cexPT,... )
+                    cexBP=cexBP,cexBX=cexBX,cexEL=cexEL,cexPT=cexPT,spacingBX=spacingBX,... )
   
   if(!is.null(outfile)) dev.off()
   
@@ -70,10 +70,11 @@ plot.metaboSet<-function(obj,outfile=NULL,
 }
 
 
-################################
+################################################################################################################################
 .plotOneAnalyte<-function(obj,analyte=obj$Analyte[1],
                          lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1"),c("Height~Area",log="xy")),
-                         mfrow=c(2,2),colorCol=NULL,deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,cexBX=0.8,cexEL=0.4,cexPT=1.2,...){
+                         mfrow=c(2,2),colorCol=NULL,deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),
+                         cexBP=0.5,cexBX=0.8,cexEL=0.4,cexPT=1.2,spacingBX=1.05,...){
 
 # dots=list();analyte=obj$Analyte[1];lgraphs=list(c("RT~InjOrder"),c("Area~Height",log="yx"),c("Height~1"),c("Height~Sid",log="xy"));mfrow=c(2,2);deltaRT=0.05;linking=NULL;orderBPlots="sType";cexBP=0.5
 # obj$Meta$Grp=factor(obj$Meta$sType,levels=c("Sa","QC"))
@@ -222,7 +223,7 @@ for(iplot in 1:length(lgraphs)){
     if(is.character(idf$X))
       .plotLinP(idf[lsoSa,],whaty,logs=gsub("x","",logs),xlim,ylim,analyte,cexBP,cexPT,vlines=vlines,hlines=hlines)
     if(is.factor(idf$X))
-      .plotBoxP(idf[lsoSa,],whaty,logs=gsub("x","",logs),xlim,ylim,analyte,cexBX,cexPT,vlines=vlines,hlines=hlines)
+      .plotBoxP(idf[lsoSa,],whaty,logs=gsub("x","",logs),xlim,ylim,analyte,cexBX,cexPT,vlines=vlines,hlines=hlines,spacingBX=spacingBX)
 
   }  
   if(is.null(whatx) & whaty!="Eic")
@@ -308,7 +309,7 @@ on.exit(par(par.def))
   for(i in 1:nrow(idf)) axis(1,at=i,labels = idf$X[i],cex.axis=cexBP,las=2,tick=F,pos=min(ylim))
 }
 
-.plotBoxP<-function(idf,whaty,logs="",xlim,ylim,analyte,cexBX,cexPT=1,vlines=NULL,hlines=NULL){
+.plotBoxP<-function(idf,whaty,logs="",xlim,ylim,analyte,cexBX,cexPT=1,vlines=NULL,hlines=NULL,spacingBX=1.05){
 # cat("Ylim: ",ylim)
  # print(idf)
 #   #print(r)
@@ -326,7 +327,7 @@ on.exit(par(par.def))
              main=analyte,cex=0,medlwd=par("lwd"))
   if(!is.null(hlines)) abline(h=hlines,lwd=par("lwd"),col="grey",lty=2)
   if(!is.null(vlines)) abline(v=vlines,lwd=par("lwd"),col="grey",lty=2)
-  beeswarm(Y~X,data=idf,add=T,pwcol = idf$color,cex=cexPT,pch=16)
+  beeswarm(Y~X,data=idf,add=T,pwcol = idf$color,cex=cexPT,pch=16,corral="wrap",spacing=spacingBX)
   axis(2,at=ylim,las=2)
   labs=paste(re$names,"\n(",re$n,")",sep="")
   for(i in 1:length(labs)) axis(1,at=i,labels =labs[i],tick=F,cex.axis=cexBX)

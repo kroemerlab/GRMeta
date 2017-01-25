@@ -21,6 +21,7 @@
   \item{cexBX}{cex.axis value for labelling x-axis of the BoXplots}
   \item{cexEL}{cex for the Eic Legend}
   \item{cexPT}{cex for the PoinTs}
+  \item{spacingBX}{relative spacing between points for the BoXplots}
   \item{\dots}{Arguments 1) used to match analytes and 2) passed to \code{\link{par}} and \code{\link{pdf}}, excepted mfrow}
 }
 \note{ For graphing, any parameter that is equal to RT or starting by RT. will be considered as a retention time

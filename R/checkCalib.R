@@ -17,15 +17,15 @@
   mdiffcal}
 
 
-chkCalib<-function(ifile,lcalib,maxdppm=121,maxdmz=0.001,minpts=5,rtlim=c(NA,NA)){
+chkCalib<-function(ifile,lcalib,maxdppm=121,maxdmz=0.001,minpts=5,rtlim=c(NA,NA),verbose=T){
   
   ## samp is an xcms file
   if("xcmsRaw"%in%class(ifile)){
     object=ifile
     ifile=unclass(object@filepath)
-    cat(" As provided ",ifile,"\n",sep="")
+    if(verbose) cat(" As provided ",ifile,"\n",sep="")
   }else{
-    cat(" Parsing ",ifile,"\n",sep="")
+    if(verbose)  cat(" Parsing ",ifile,"\n",sep="")
     object <- xcmsRaw(ifile)
   }
   
@@ -46,19 +46,23 @@ chkCalib<-function(ifile,lcalib,maxdppm=121,maxdmz=0.001,minpts=5,rtlim=c(NA,NA)
   if(!is.na(rtlim[1])) mdiffcal=mdiffcal[mdiffcal[,"rt"]>=rtlim[1],,drop=F]
   if(!is.na(rtlim[2])) mdiffcal=mdiffcal[mdiffcal[,"rt"]<=rtlim[2],,drop=F]
   
-  cat("\nFound ",length(unique(mdiffcal[,"cal"])),"/",length(lcalib)," calib m/z in ",length(unique(mdiffcal[,1])),"/",length(object@scantime)," scans:\n",sep="")
+  if(verbose) 
+    cat("\nFound ",length(unique(mdiffcal[,"cal"])),"/",length(lcalib)," calib m/z in ",length(unique(mdiffcal[,1])),"/",length(object@scantime)," scans:\n",sep="")
   l=which(mdiffcal[,"dups"]==1)
   if(length(l)>0){
     x=rev(sort(rowSums(table(mdiffcal[l,"calmz"],mdiffcal[l,"scan"])>0)))
-    cat("   ---> scans with duplicated calib: ",sum(x)," = ",paste0(round(as.numeric(names(x)),4),"(",x,")"),"\n")
+    if(verbose) 
+      cat("   ---> scans with duplicated calib: ",sum(x)," = ",paste0(round(as.numeric(names(x)),4),"(",x,")"),"\n")
     mdiffcal=.removeDups(mdiffcal0)
     mdiffcal=mdiffcal[which(mdiffcal[,"dups"]!=1),]
   }
   x=as.vector(table(mdiffcal[,1]))
-  cat("   ---> num. calib per scan: ",sprintf("mean=%.2f, median=%.2f, quartiles=[%.2f-%.2f], range=[%d-%d]\n",mean(x),median(x),
+  if(verbose) 
+    cat("   ---> num. calib per scan: ",sprintf("mean=%.2f, median=%.2f, quartiles=[%.2f-%.2f], range=[%d-%d]\n",mean(x),median(x),
                                               quantile(x,.25),quantile(x,.75),min(x),max(x)),sep="")
   x=as.vector(table(mdiffcal[,"cal"]))
-  cat("   ---> num. scan per calib: ",sprintf("mean=%.2f, median=%.2f, quartiles=[%.2f-%.2f], range=[%d-%d]\n",mean(x),median(x),
+  if(verbose) 
+    cat("   ---> num. scan per calib: ",sprintf("mean=%.2f, median=%.2f, quartiles=[%.2f-%.2f], range=[%d-%d]\n",mean(x),median(x),
                                               quantile(x,.25),quantile(x,.75),min(x),max(x)),sep="")
   
   invisible(list(match=mdiffcal,calib=unique(mdiffcal[,"calmz"]),calibori=lcalib))

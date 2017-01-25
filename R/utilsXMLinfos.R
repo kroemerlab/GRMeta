@@ -26,7 +26,7 @@
   }
   sid = nams
   adf = cbind(data.frame(Sid = sid, sType = styp, InjOrder = order(order(adf$completionTime)), stringsAsFactors = FALSE),adf)
-  l2exp=c("Sid","sType","InjOrder","dirName","fileName","completionTime","polarity" , "rtmin","rtmax","nscan","mzmin","mzmax")
+  l2exp=c("Sid","sType","InjOrder","dirName","fileName","completionTime",'acquisitionMethod',"polarity" , "rtmin","rtmax","nscan","mzmin","mzmax")
   if(short) adf=adf[,names(adf)%in%l2exp]
   return(adf)
 }

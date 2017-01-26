@@ -10,8 +10,18 @@
   chron(dts[1],dts[2],format=c(dates="Y-M-D",times="h:m:s"))
 }
 
-loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,chktime=FALSE,params=list()){
+loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,datadir=NA,params=list()){
   
+  ####
+  infct<-function(cefi){
+    require(XML)
+    system.time(doc <- xmlRoot(xmlParse(cefi, useInternal = TRUE))[[2]])
+    dproc=xmlChildren(xmlChildren(doc)$dataProcessing)
+    dts=xmlAttrs(dproc$software)["completionTime"]
+    dts = strsplit(gsub("\"", "", dts), "T")[[1]]
+    unname(chron(dts[1], dts[2], format = c(dates = "Y-M-D", times = "h:m:s")))
+  }
+  ####
   
   paramsvals <-paramsParsing()
   if (!missing(params)) paramsvals[names(params)] <- params
@@ -26,12 +36,28 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,chktime=FALSE,params=list(
   sampids=t(xmlSApply(dat[["samples"]],xmlAttrs))
   
   filenam=sampids[,"filename"]
-  dts=rep(NA,length(filenam))
-  if(chktime)
-    for(i in which(file.exists(filenam))) dts[i]=.GRgetcomptime(filenam[i])
+  sampnams=sampids[,"name"]
   
+  dts=rep(NA,length(sampnams))
+  ### check if RAW files from Thermo
+  if(is.character(datadir)) if(dir.exists(datadir) & any(is.na(dts))) for(ftyp in c(".RAW",".raw",".Raw")){
+  lfiles=file.path(datadir, paste0(sampnams,ftyp))
+  if(!any(is.na(dts) & file.exists(lfiles)) ) next
+    l=which(is.na(dts) & file.exists(lfiles))
+    dts[l]=as.chron(file.info(lfiles[l])[,"mtime"], format = c(dates = "Y-M-D", times = "h:m:s"))
+  }
+  ### check if mzdata from Agilent
+  if(is.character(datadir)) if(dir.exists(datadir) & any(is.na(dts))){
+    lfiles=file.path(datadir, paste0(sampnams,".mzdata.xml"))
+    if(any(is.na(dts) & file.exists(lfiles)) ){
+    l=which(is.na(dts) & file.exists(lfiles))
+    dts[l]=sapply(lfiles[l],infct)
+    }
+  }
+  if(any(!is.na(dts))) dts=as.chron(dts)
   
-  nams=gsub("\\.[dD]$","",sampids[,"name"])
+  ########################################
+  nams=gsub("\\.[dD]$","",sampnams)
   if(!is.null(params$NameClean)) for(i in params$NameClean) nams=gsub(i,"",nams)
   styp=rep(NA,length(nams))
   if(length(grep(params$regTypes,nams))>0)
@@ -59,7 +85,7 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,chktime=FALSE,params=list(
   
   #################
   ## Make dat
-  m0=matrix(NA,nrow=nrow(sampids),ncol=nrow(pkids),dimnames=list(unname(sampids[,"name"]),unname(pkids[,1])))
+  m0=matrix(NA,nrow=nrow(sampids),ncol=nrow(pkids),dimnames=list(unname(sampnams),unname(pkids[,1])))
   lnames=c( "rt","rtmin", "rtmax","medianMz","mzmin","mzmax","peakArea" , "peakIntensity")
   lnames2=c( "RT","RT.min", "RT.max","MZ","MZ.min","MZ.max","Area" , "Height")
   allmat=lapply(lnames,function(x) m0)
@@ -128,7 +154,7 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,chktime=FALSE,params=list(
       lnotfound=unique(vnam0[!vnam0%in%NewDB$GName])
       if(length(lnotfound)>0) cat("Not found in annotation database:\n",lnotfound,"\n",sep=" ")
       l2add=names(NewDB)[names(NewDB)!="GName"]
-      toadd=data.frame(sapply(l2add,function(i) sapply(annot$MetName,.InDBMatchfct,i,NewDB)),stringsAsFactors = F)
+      toadd=data.frame(sapply(l2add,function(i) sapply(annot$MetName,GRMeta:::.InDBMatchfct,i,NewDB,rmISO=TRUE,rmSTD=FALSE)),stringsAsFactors = F)
       for(i in names(which(sapply(l2add,function(i) is.numeric(NewDB[,i]))))) toadd[,i]=as.numeric(toadd[,i])
       for(i in names(which(sapply(l2add,function(i) is.character(NewDB[,i]))))) toadd[,i]=as.character(toadd[,i])
       annot=cbind(annot,toadd)

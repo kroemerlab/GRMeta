@@ -1,4 +1,4 @@
-update.metaboSet<-function(obj,what="Sid",formerid=NULL,newid=NULL,exact=TRUE,swap=FALSE){
+update.metaboSet<-function(obj,what="Sid",formerid=NULL,newid=NULL,exact=TRUE,swap=FALSE,verbose=TRUE){
   
   if(!inherits(obj, "metaboSet")) stop("This is not a metaboSet object")
   
@@ -29,8 +29,11 @@ update.metaboSet<-function(obj,what="Sid",formerid=NULL,newid=NULL,exact=TRUE,sw
   if(!is.null(obj$Eic)) if(!is.null(obj$Eic$Samp)) obj$Eic$Samp$Sid=rownames(obj$Eic$Samp)=newnames
   
   if(any(newnames!=oldnames)){
-   cat("Samples with updated id:\n")
+   if(verbose){
+     cat("Samples with updated id:\n")
      print(rbind(Former=oldnames[newnames!=oldnames],New=newnames[newnames!=oldnames]))
+   } else cat("Updating samples id: ",sum(newnames!=oldnames),"/",length(newnames),"\n",sep="")
+    
   }
   }
   
@@ -42,8 +45,10 @@ update.metaboSet<-function(obj,what="Sid",formerid=NULL,newid=NULL,exact=TRUE,sw
     if(!is.null(obj$Eic))  if(!is.null(obj$Eic$File)) obj$Eic$File$Analyte=rownames(obj$Eic$File)=newnames
     
     if(any(newnames!=oldnames)){
-      cat("Analytes with updated id:\n")
+      if(verbose){
+        cat("Analytes with updated id:\n")
       print(rbind(Former=oldnames[newnames!=oldnames],New=newnames[newnames!=oldnames]))
+      } else cat("Updating analytes id: ",sum(newnames!=oldnames),"/",length(newnames),"\n",sep="")
     }
   }
   

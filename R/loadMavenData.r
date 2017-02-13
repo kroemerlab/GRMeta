@@ -75,6 +75,7 @@ loadMavenData<-function(ifile,ofile=NULL,stdData=NULL,datadir=NA,params=list()){
   }
   
   metainfos=data.frame(Sid=sid,sType=styp,InjOrder=as.numeric(sampids[,"sampleOrder"]),stringsAsFactors=FALSE)
+  if(!all(is.na(dts))) metainfos$InjOrder=order(order(dts))
   rownames(metainfos)=metainfos$Sid
   fileinfos=data.frame(File=filenam,Date=dts,Name=nams,Sid=sid,stringsAsFactors=FALSE)
   rownames(fileinfos)=fileinfos$Sid

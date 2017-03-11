@@ -82,7 +82,7 @@
 }
 
 ################
-.GRsplistMZ<-function (v, iv = 1:length(v), dppm = 21,dmz=0.01,typ="max"){
+.GRsplistMZ<-function (v, iv = 1:length(v), dppm = NA,dmz=NA,typ="max"){
   lso = order(v)
   v2 = v[lso]
   lsup=NULL

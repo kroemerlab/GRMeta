@@ -18,7 +18,8 @@ partitionPeaks,.GRfindturnpoint,.GRsplitOne,.GRgenpkl,
 .GRgetXMLFileInfos,.GRgetDirXMLInfos,
 chkCalib,chkCalib.plotSum,chkCalib.plotTrace,
 parseAgilentMRMXML,.GRparseMRMMethod,
-.GRingetROIBl,.GRgetEICroi,.GRBlankEIC1
+.GRingetROIBl,.GRgetEICroi,.GRBlankEIC1,
+xcms2mzXML
 )
 
 ### register S3 methods
@@ -43,4 +44,5 @@ import(xlsx)
 #import(dplyr)
 
 ## 
+useDynLib(GRMeta)
 

@@ -10,7 +10,16 @@
   lfi=list.files(dir,pattern = ifelse(type=="Thermo",'\\.mzXML$','\\.mzdata.xml$'),full.names = T)
   cat("Found ",length(lfi),ifelse(type=="Thermo"," Thermo/ReAdW"," Agilent/MH")," xml files in ",dir,"\n",sep="")
   if(length(lfi)==0) return(NULL)
-  system.time(adf<-do.call("rbind",lapply(lfi,.GRgetXMLFileInfos,type)))
+  adf=list()
+  for(ifi in lfi){
+    re<-try(.GRgetXMLFileInfos(ifi,type),TRUE)
+    if( "try-error"%in%class(re)){
+      cat("Error for",ifi,"\n")
+      next
+    }
+    adf[[ifi]]=re
+  }
+  adf<-do.call("rbind",adf)
   
   #####
   filenam=adf$fileName
@@ -28,6 +37,7 @@
   adf = cbind(data.frame(Sid = sid, sType = styp, InjOrder = order(order(adf$completionTime)), stringsAsFactors = FALSE),adf)
   l2exp=c("Sid","sType","InjOrder","dirName","fileName","completionTime",'acquisitionMethod',"polarity" , "rtmin","rtmax","nscan","mzmin","mzmax")
   if(short) adf=adf[,names(adf)%in%l2exp]
+  if(max(table(adf$Sid)==1)) rownames(adf)=adf$Sid
   return(adf)
 }
 

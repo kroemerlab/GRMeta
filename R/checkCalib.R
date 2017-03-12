@@ -69,45 +69,6 @@ chkCalib<-function(ifile,lcalib,maxdppm=121,maxdmz=0.001,minpts=5,rtlim=c(NA,NA)
 }
 
 
-setGeneric(name=".GRcorrRawPPM",def=function(object,addppm) standardGeneric(".GRcorrRawPPM"))
-
-setMethod(".GRcorrRawPPM","xcmsRaw",
-          .GRcorrRawPPM<-function(object,addppm){
-            
-     
-          #  xRaw2=xRaw
-            scsten=cbind(object@scanindex+1,c(object@scanindex[-1],length(object@env$intensity)))
-            rownames(scsten)=1:length(object@scanindex)
-            
-            newmz=object@env$mz
-            ix=450
-            for(ix in names(addppm)){
-              oldy<-xcms:::getScan(object,as.numeric(ix))[,1]
-              ppmy<- 1-addppm[ix]*10^-6
-              newy=round(oldy*ppmy,6)
-              newmz[scsten[ix,1]:scsten[ix,2]]=newy
-            }
-            print(summary((1-newmz/object@env$mz)*10^6))
-            
-            ob<-new("xcmsRaw")
-            ob@env <- new.env(parent = .GlobalEnv)
-            ob@env$mz<-as.numeric(newmz)
-            ob@env$intensity<-object@env$intensity
-            ob@scanindex<-object@scanindex
-            ob@scantime<-object@scantime
-            
-            ob@acquisitionNum<-1:length(ob@scanindex)
-            ob@filepath<-object@filepath
-            ob@mzrange<-range(ob@env$mz)
-            ob@profmethod<-object@profmethod
-            ob@tic<-object@tic
-            ob@profparam<-list()
-            ob<-xcms:::remakeTIC(ob)
-            return(ob)
-          }
-          
-          )
-
 
 .makeCalMatrices<-function(mdiffcal,lcalib=NULL,luscn=NULL){
   

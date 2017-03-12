@@ -1,16 +1,19 @@
+##############################################################################################################
+xcms2mzXML<-function(xr,filename,lscan2export=NULL,comment=NA){
 
-xcms2mzXML<-function(xr,filename,lscan2export=NULL,comment="GRMeta"){
-
+  require(xcms)
+  
   if("character"%in%class(xr)){
     if(!file.exists(xr)) stop(paste0(xr," does not exists!"))
     xr=xcmsRaw(xr)
   }
   infile=unclass(xr@filepath)
   
-  if(is.null(lscan2export)) lscan2export=1:length(xr@scantime)
-  lscan2export=lscan2export[lscan2export%in%(1:length(xr@scantime))]
+  if(is.null(lscan2export)) lscan2export=which(xr@scantime>0)
+  lscan2export=lscan2export[lscan2export%in%which(xr@scantime>0)]
+  if(length(lscan2export)==0) stop('No scan matching!!')
   rtrange=range(xr@scantime[lscan2export])
-  
+  if(is.na(comment)) comment=paste0('GRMeta extracts ',length(lscan2export),' scans out of ',length(xr@scantime))
   
 fprintf = function(fp, level, ..., append=TRUE)
 { # helper function
@@ -49,7 +52,7 @@ mzXML$msInstrument = paste0("  <msInstrument>\n",
                             "   <software type='acquisition' name='Xcalibur' version='unknown' />\n","  </msInstrument>\n")
 
 
-cat("Exporting ",length(lscan2export)," scans to '",filename,"' ",sep="")
+cat("Exporting ",length(lscan2export)," scans to '",filename,"' [",comment,"] ",sep="")
 
 fp  = file(filename, "w")
 fprintf(fp, 0, "<?xml version='1.0' encoding='ISO-8859-1'?>\n", append=FALSE)
@@ -108,3 +111,52 @@ sha1 = digest::digest(filename, algo="sha1", file=TRUE, length=n)
 cat(sha1, "</sha1>\n</mzXML>\n", file=filename, append=TRUE, sep="")
 invisible(NULL)
 }
+##############################################################################################################
+
+##############################################################################################################
+### Split pos neg
+splitDirPNXML<-function(dir,dirneg=NA,dirpos=NA){
+  
+  ## if NA -> newfile in dir
+  ## if NULL -> no conversion
+  
+  lfile=list.files(dir,pattern = "\\.mzXML$")
+  cat("Number of file to split: ",length(lfile),"\n",sep="")
+  if(!is.null(dirneg)) cat(" ++ neg scan in ",path.expand(ifelse(is.na(dirneg),dir,dirneg)),"\n",sep="")
+  if(!is.null(dirpos)) cat(" ++ pos scan in ",path.expand(ifelse(is.na(dirpos),dir,dirpos)),"\n",sep="")
+  
+  ifi=lfile[1]
+  for(ifi in lfile){
+    negout=dirneg
+    if(!is.null(dirneg)) if(!is.na(dirneg)) negout=file.path(dirneg, ifi) 
+    posout=dirpos
+    if(!is.null(dirpos)) if(!is.na(dirpos)) posout=file.path(dirpos, ifi) 
+    splitOnePNXML(file.path(dir, ifi) ,negout,posout)
+  }
+}
+
+
+splitOnePNXML<-function(cefi,negout=NA,posout=NA){
+  
+  ## if NA -> newfile=gsub("\\.mzXML","_NEG.mzXML",basename(cefi))
+  ## if NULL -> no newfile
+  
+  cat("Processing pos/neg scans from ",cefi,"\n")
+  require(xcms)
+  xr=xcmsRaw(cefi)
+  
+
+  if(any(xr@polarity=="negative",na.rm=T) & !is.null(negout)){
+    if(is.na(negout)) negout=gsub("\\.mzXML$","_NEG.mzXML",cefi)
+    xcms2mzXML(xr,negout,lscan2export=which(xr@polarity=="negative"),comment="GRMeta extracts all MS1 negative scans")
+  }
+  
+  if(any(xr@polarity=="positive") & !is.null(posout)){
+    if(is.na(posout)) posout=gsub("\\.mzXML","_POS.mzXML",cefi)
+    xcms2mzXML(xr,posout,lscan2export=which(xr@polarity=="positive"),comment="GRMeta extracts all MS1 positive scans")
+  }
+  
+}
+
+##############################################################################################################
+##############################################################################################################

@@ -19,7 +19,8 @@ partitionPeaks,.GRfindturnpoint,.GRsplitOne,.GRgenpkl,
 chkCalib,chkCalib.plotSum,chkCalib.plotTrace,
 parseAgilentMRMXML,.GRparseMRMMethod,
 .GRingetROIBl,.GRgetEICroi,.GRBlankEIC1,
-xcms2mzXML
+xcms2mzXML,splitOnePNXML,splitDirPNXML,
+.GRcorrRawPPM,.GRcorrRawRT
 )
 
 ### register S3 methods
@@ -40,6 +41,7 @@ import(beeswarm)
 import(impute)
 import(mgcv)
 import(xlsx)
+import(xcms)
 #import(KernSmooth)
 #import(dplyr)
 

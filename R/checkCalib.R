@@ -31,7 +31,7 @@ chkCalib<-function(ifile,lcalib,maxdppm=121,maxdmz=0.001,minpts=5,rtlim=c(NA,NA)
   
   ##### get all ions within maxdppm 
   mdiffcal=do.call("rbind",lapply(1:length(lcalib),function(ical){
-    cat(lcalib[ical],"/",sep="")
+   # cat(lcalib[ical],"/",sep="")
     dmz=max(c(lcalib[ical]*maxdppm*10^-6,maxdmz),na.rm=T)
     x=GRMeta:::.GRrawMat(object,mzrange=lcalib[ical]*(1+1.001*c(-1,1)*maxdppm*10^-6))
     if(nrow(x)<minpts) return(NULL)
@@ -95,6 +95,7 @@ chkCalib<-function(ifile,lcalib,maxdppm=121,maxdmz=0.001,minpts=5,rtlim=c(NA,NA)
   return(list(dmz=mmmz,dppm=mmppm,int=matint,mz=matmz))
   
 }
+
 chkCalib.plotSum<-function(mdiffcal,llspl=NULL,nsplit=1){
   
   lcalib=sort(unique(mdiffcal[,"calmz"]))
@@ -156,13 +157,14 @@ chkCalib.plotSum<-function(mdiffcal,llspl=NULL,nsplit=1){
   }
   leg=c(rownames(st1)[2],paste(rownames(st1)[c(2,3)],collapse="/"),paste(rownames(st1)[c(1,5)],collapse="/"))
   legend("top",leg,pch=c(15,16,18),col=c("firebrick3","darkolivegreen3","dodgerblue3"),ncol=3,bty="n",pt.cex=1.2)
-}
+  }
+  par(mfrow=c(1,1))
   par(def.par)
   invisible(re)
 }
 
 
-chkCalib.plotTrace<-function(mdiffcal,llspl=NULL,nsplit=1,what="dppm"){
+chkCalib.plotTrace<-function(mdiffcal,llspl=NULL,nsplit=10,what="dppm"){
   
   lcalib=sort(unique(mdiffcal[,"calmz"]))
   if(is.null(llspl)) llspl=split(lcalib, ceiling(seq_along(1:length(lcalib))/nsplit))
@@ -205,6 +207,7 @@ for(i in 1:length(lcal)){
 leg=tapply(tmpdat[,1],tmpdat[,"calmz"],function(x) sprintf("N=%d [%d-%d]",length(x),min(x),max(x)))[as.character(lcal)]
 legend(max(xlim),max(ylim),paste0(round(lcal,4),"\n",leg),pch=15,col=colstit,ncol=1,bty="n",pt.cex=1.2)
 }
-par(def.par)
-
+  par(mfrow=c(1,1))
+  par(def.par)
+  invisible(NULL)
 }

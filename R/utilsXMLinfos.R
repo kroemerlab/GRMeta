@@ -19,6 +19,12 @@
     }
     adf[[ifi]]=re
   }
+  lvar=unique(unlist(sapply(adf,names)))
+  for(ifi in names(adf)){
+    if(all(lvar%in%names(adf[[ifi]]))) next
+    itoadd=lvar[!lvar%in%names(x)]
+    for(i in itoadd) adf[[ifi]][,i]=NA
+  }
   adf<-do.call("rbind",adf)
   
   #####
@@ -35,7 +41,8 @@
   }
   sid = nams
   adf = cbind(data.frame(Sid = sid, sType = styp, InjOrder = order(order(adf$completionTime)), stringsAsFactors = FALSE),adf)
-  l2exp=c("Sid","sType","InjOrder","dirName","fileName","completionTime",'acquisitionMethod',"polarity", 'msLevels', "rtmin","rtmax","nscan","mzmin","mzmax")
+  l2exp=c("Sid","sType","InjOrder","dirName","fileName","completionTime",'acquisitionMethod',
+       'msLevels', "rtmin","rtmax","polarity","nscan","mzmin","mzmax","polarity2",'nscan2',"mzmin2","mzmax2",'collisionEnergy')
   if(short) adf=adf[,names(adf)%in%l2exp]
   if(max(table(adf$Sid)==1)) rownames(adf)=adf$Sid
   return(adf)
@@ -50,14 +57,24 @@
   
   ########################
   ## get run infos
+  hasMS2=FALSE
   tt=mzR:::openMSfile(cefi)
   infos=unlist(mzR:::runInfo(tt))
-  lmslevels=paste(infos[grep('msLevels',names(infos))],collapse="/")
+  lmslevels=infos[grep('msLevels',names(infos))]
+  ttheader=header(tt)
+  if(any(lmslevels==2)) hasMS2=T
   df=data.frame(dirName=normalizePath(dirname(cefi)),
-                fileName=basename(cefi),completionTime=NA,polarity=NA,msLevels=lmslevels,
+                fileName=basename(cefi),completionTime=NA,polarity=NA,msLevels=paste(lmslevels,collapse="/"),
                 rtmin=round(infos["dStartTime"]/60,4),rtmax=round(infos["dEndTime"]/60,4),
-                nscan=infos['scanCount'],
-                mzmin=round(infos["lowMz"],6),mzmax=round(infos["highMz"],6))
+                nscan=sum(ttheader$msLevel==1),
+                mzmin=round(min(ttheader$lowMZ[ttheader$msLevel==1]),6),
+                mzmax=round(max(ttheader$highMZ[ttheader$msLevel==1],6)))
+  if(any(lmslevels==2)){
+    hasMS2=T
+    df$nscan2=sum(ttheader$msLevel==2)
+    df$mzmin2=round(min(ttheader$lowMZ[ttheader$msLevel==2]),6)
+    df$mzmax2=round(max(ttheader$highMZ[ttheader$msLevel==2]),6)
+  }
   infos=unlist(mzR:::instrumentInfo(tt))
   infos=infos[infos!=""]
   for(i in names(infos)) df[,i]=infos[i]
@@ -68,6 +85,19 @@
   suppressWarnings(xraw<-xcms:::xcmsRaw(cefi))
   df$polarity=ifelse(length(xraw@polarity)==0,"none",paste(unique(as.character(xraw@polarity)),collapse="/"))
   rm(list="xraw")
+  if(hasMS2){
+    suppressWarnings(xraw<-xcms:::xcmsRaw(cefi,includeMSn = T))
+    df$polarity2=ifelse(length(xraw@polarity)==0,"none",paste(unique(as.character(xraw@polarity)),collapse="/"))
+    if(Type=="Thermo"){
+      doc <- xmlRoot(xmlParse(cefi, useInternal = TRUE))
+      allatr=do.call("rbind",lapply(xmlChildren(doc[[1]]),function(x) do.call("rbind",lapply(xmlChildren(x),function(y) xmlAttrs(y)[c("msLevel","filterLine")]))))
+      allatr=allatr[which(allatr[,1]=="2"),]
+      lce=paste(unique(gsub(".*[0-9]+@(.*) .*","\\1",allatr[,2])),collapse="/")
+      df$collisionEnergy=lce
+      rm(list="doc")
+      
+    }
+  }
   
   ###################################
   ## get completion date for Thermo

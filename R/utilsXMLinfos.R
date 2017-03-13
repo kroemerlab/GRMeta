@@ -12,6 +12,7 @@
   if(length(lfi)==0) return(NULL)
   adf=list()
   for(ifi in lfi){
+    cat(".")
     re<-try(.GRgetXMLFileInfos(ifi,type),TRUE)
     if( "try-error"%in%class(re)){
       cat("Error for",ifi,"\n")
@@ -22,7 +23,7 @@
   lvar=unique(unlist(sapply(adf,names)))
   for(ifi in names(adf)){
     if(all(lvar%in%names(adf[[ifi]]))) next
-    itoadd=lvar[!lvar%in%names(x)]
+    itoadd=lvar[!lvar%in%names(adf[[ifi]])]
     for(i in itoadd) adf[[ifi]][,i]=NA
   }
   adf<-do.call("rbind",adf)

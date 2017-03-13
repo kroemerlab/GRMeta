@@ -35,7 +35,7 @@
   }
   sid = nams
   adf = cbind(data.frame(Sid = sid, sType = styp, InjOrder = order(order(adf$completionTime)), stringsAsFactors = FALSE),adf)
-  l2exp=c("Sid","sType","InjOrder","dirName","fileName","completionTime",'acquisitionMethod',"polarity" , "rtmin","rtmax","nscan","mzmin","mzmax")
+  l2exp=c("Sid","sType","InjOrder","dirName","fileName","completionTime",'acquisitionMethod',"polarity", 'msLevels', "rtmin","rtmax","nscan","mzmin","mzmax")
   if(short) adf=adf[,names(adf)%in%l2exp]
   if(max(table(adf$Sid)==1)) rownames(adf)=adf$Sid
   return(adf)
@@ -52,9 +52,10 @@
   ## get run infos
   tt=mzR:::openMSfile(cefi)
   infos=unlist(mzR:::runInfo(tt))
+  lmslevels=paste(infos[grep('msLevels',names(infos))],collapse="/")
   df=data.frame(dirName=normalizePath(dirname(cefi)),
-                fileName=basename(cefi),completionTime=NA,polarity=NA,msLevels=infos['msLevels'],
-                rtmin=round(infos["dStartTime"]/60,3),rtmax=round(infos["dEndTime"]/60,3),
+                fileName=basename(cefi),completionTime=NA,polarity=NA,msLevels=lmslevels,
+                rtmin=round(infos["dStartTime"]/60,4),rtmax=round(infos["dEndTime"]/60,4),
                 nscan=infos['scanCount'],
                 mzmin=round(infos["lowMz"],6),mzmax=round(infos["highMz"],6))
   infos=unlist(mzR:::instrumentInfo(tt))

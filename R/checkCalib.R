@@ -96,7 +96,7 @@ chkCalib<-function(ifile,lcalib,maxdppm=121,maxdmz=0.001,minpts=5,rtlim=c(NA,NA)
   
 }
 
-chkCalib.plotSum<-function(mdiffcal,llspl=NULL,nsplit=1){
+chkCalib.plotSum<-function(mdiffcal,llspl=NULL,nsplit=1,add2main=NULL){
   
   lcalib=sort(unique(mdiffcal[,"calmz"]))
   if(is.null(llspl)) llspl=split(lcalib, ceiling(seq_along(1:length(lcalib))/nsplit))
@@ -113,7 +113,7 @@ chkCalib.plotSum<-function(mdiffcal,llspl=NULL,nsplit=1){
   
   
   def.par <- par(no.readonly = TRUE) 
-  par(mfrow=c(2,2),mar=c(3,6,1,.1),lwd=2,cex.main=1.2)
+  par(mfrow=c(2,2),mar=c(3,6,2.5,.1),lwd=2,cex.main=1)
   
   for(type in 1:4){
  if(type==1){
@@ -142,10 +142,12 @@ chkCalib.plotSum<-function(mdiffcal,llspl=NULL,nsplit=1){
     
     xlab="Intensity"
   }
-  
+  if(!is.null(add2main)) imain=paste0(add2main,xlab) else imain=xlab
+    
+    
   imed=median(st1[3,])
   ylim=range(pretty(c(0,ncol(st1)*1.06)))
-  plot(range(xlim),ylim,cex=0,xlab="",ylab="",axes=F,main=xlab)
+  plot(range(xlim),ylim,cex=0,xlab="",ylab="",axes=F,main=imain)
   abline(h=rev(cumsum(sapply(llspl,length)))[-1]+.5,col="grey20",lty=3)
   segments(imed,0.5,imed,ncol(st1)+.5,lty=2,col="grey20",lwd=2)
   axis(1,at=xlim,labels = xlabs,pos=0)
@@ -164,14 +166,14 @@ chkCalib.plotSum<-function(mdiffcal,llspl=NULL,nsplit=1){
 }
 
 
-chkCalib.plotTrace<-function(mdiffcal,llspl=NULL,nsplit=10,what="dppm"){
+chkCalib.plotTrace<-function(mdiffcal,llspl=NULL,nsplit=10,what="dppm",add2main=NULL){
   
   lcalib=sort(unique(mdiffcal[,"calmz"]))
   if(is.null(llspl)) llspl=split(lcalib, ceiling(seq_along(1:length(lcalib))/nsplit))
 
   
   def.par <- par(no.readonly = TRUE) 
-  par(mar=c(3.4,3.4,1,.1),lwd=2,cex.main=1.2)
+  par(mar=c(3.4,3.4,2.5,.1),lwd=2,cex.main=1)
   
   ylim=pretty(mdiffcal[mdiffcal[,"calmz"]%in%unlist(llspl),what])
   
@@ -182,11 +184,13 @@ tmpdat=mdiffcal[mdiffcal[,"calmz"]%in%lcal,]
 
 xlim=pretty(range(tmpdat[,"scan"],na.rm=T))
 colstit=brewer.pal(8,"Dark2")
+imain=sprintf('Mass error [%s] for %.4f -> %.4f',what,min(lcal),max(lcal))
+if(!is.null(add2main)) imain=paste0(add2main,xlab)
 plot(range(xlim),range(ylim),cex=0,xlab="",ylab="",
      ylim=range(c(0,ylim))+c(0,diff(range(ylim))/10),
      xlim=range(xlim)+c(0,diff(range(xlim))/5),
      axes=F,
-     main=sprintf('Mass error [%s] for %.4f -> %.4f',what,min(lcal),max(lcal)))
+     main=imain)
 segments(min(xlim),0,max(xlim),0,lwd=2)
 for(i in seq(xlim[1],max(xlim),100)) segments(i,min(ylim),i,max(ylim),col="grey",lty=2,lwd=2)
 axis(2,at=ylim,las=2,pos=xlim[1]);axis(1,at=xlim,pos=min(ylim))

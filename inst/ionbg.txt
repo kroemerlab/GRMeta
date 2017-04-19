@@ -1,93 +1,93 @@
-"mz"	"mode"	"annotation"	"qb"
-26.0036226	"negative"	"Acetonitrile (fragment) CON00002"	FALSE
-35.976678	"negative"	"chloride"	FALSE
-37.973728	"negative"	"chloride37"	FALSE
-44.026215	"negative"	"ethoxylate"	FALSE
-44.9982036	"negative"	"Formic acid CON00036"	FALSE
-46.005479	"negative"	"formic acid Den"	FALSE
-58.041865	"negative"	"propoxylate Den"	FALSE
-59.0138536	"negative"	"Acetic Acid CON00001"	FALSE
-60.021129	"negative"	"ethanoic acid Den"	FALSE
-74.018791	"negative"	"dimethylsiloxane Den"	FALSE
-78.9590566	"negative"	"Phosphoric acid CON00079"	FALSE
-79.926163	"negative"	"bromide Den"	FALSE
-79.9573656	"negative"	"Sulphuric acid CON00108"	FALSE
-81.924116	"negative"	"bromide81 Den"	FALSE
-94.9808406	"negative"	"Methanesulfonate CON00040"	FALSE
-96.9696216	"negative"	"Phosphoric acid CON00079"	FALSE
-97.967379	"negative"	"sulfuric acid Den"	FALSE
-97.976895	"negative"	"phosphate Den"	FALSE
-112.9855876	"negative"	"Trifluoroacetic acid/CalAgilent CON00117"	FALSE
-112.9856286	"negative"	"Formic acid CON00036"	FALSE
-113.992864	"negative"	"trifluoroacetic acid Den"	FALSE
-113.992903	"negative"	"sodium formate Den"	FALSE
-119.036	"negative"	"CalAgilent DEn"	FALSE
-126.9050256	"negative"	"Iodine anion (Iodide) CON00038"	FALSE
-141.0015735	"negative"	"Den"	TRUE
-141.0197	"negative"	"Acetate adducts of a fluorinated polymer (PTFE)"	FALSE
-162.9823936	"negative"	"Pentafluoropropionic acid CON00077"	FALSE
-171.005264	"negative"	"Den"	TRUE
-181.980326	"negative"	"sodium formate Den"	FALSE
-212.0750746	"negative"	"N-Butylbenzenesulfonamide CON00047"	FALSE
-223.0278	"negative"	"PTFE6 Den"	TRUE
-226.9784516	"negative"	"Trifluoroacetic acid CON00117"	FALSE
-248.9603966	"negative"	"Trifluoroacetic acid CON00117"	TRUE
-249.967672	"negative"	"sodium trifluoroacetate Den"	FALSE
-249.96775	"negative"	"sodium formate Den"	FALSE
-255.2329536	"negative"	"Palmitic acid CON00055"	TRUE
-281.2486036	"negative"	"Oleic acid CON00054"	TRUE
-283.2642536	"negative"	"Stearic acid CON00106"	TRUE
-301.998139	"negative"	"CalAgilent DEn"	FALSE
-305.0345	"negative"	"PTFE8"	FALSE
-316.7391016	"negative"	"Copper catalyst iodide adduct (63Cu(I)) CON00013"	FALSE
-317.955174	"negative"	"sodium formate Den"	FALSE
-318.7372946	"negative"	"Copper catalyst iodide adduct (65Cu(I)) CON00014"	FALSE
-341.978592	"negative"	"trifluoroacetic acid dimer Den"	FALSE
-385.94248	"negative"	"sodium trifluoroacetate Den"	FALSE
-387.0421	"negative"	"PTFE10"	FALSE
-455.971456	"negative"	"trifluoroacetic acid"	FALSE
-469.043	"negative"	"PTFE12 Den"	FALSE
-521.917288	"negative"	"sodium trifluoroacetate Den"	FALSE
-551.034	"negative"	"PTFE14 Den"	FALSE
-569.964319	"negative"	"trifluoroacetic acid dimer Den"	FALSE
-601.978977	"negative"	"CalAgilent DEn"	FALSE
-657.892096	"negative"	"sodium trifluoroacetate Den"	FALSE
-966.0007	"negative"	"CalAgilent DEn"	FALSE
-980.0163	"negative"	"CalAgilent DEn"	FALSE
-79.02121	"positive"	"DMSO"	FALSE
-83.060371	"positive"	"2ACN+H"	TRUE
-88.039307	"positive"	"2ACN+H"	FALSE
-103.955597	"positive"	"[ACN+65/63Cu(I)]+"	TRUE
-104.992294	"positive"	"AcetaNa"	FALSE
-105.953789	"positive"	"[ACN+65/63Cu(I)]+"	TRUE
-118.086255	"positive"	"CalAgilent"	TRUE
-121.050873	"positive"	"CalAgilent"	FALSE
-122.081169	"positive"	"TRIS"	TRUE
-122.964348	"positive"	"AcetaNa"	FALSE
-123.091675	"positive"	"Dimethylaminopyridine"	TRUE
-130.159027	"positive"	"Diisopropylethylamine"	TRUE
-144.982147	"positive"	"[ACN*2+65/63Cu(I)]+"	TRUE
-146.980347	"positive"	"[ACN*2+65/63Cu(I)]+"	TRUE
-149.023315	"positive"	"Phthalic anhydride/CalAgilent"	TRUE
-150.127731	"positive"	"Phenyldiethylamine"	FALSE
-153.138626	"positive"	"1,8-Diazabicycloundec-7-ene"	FALSE
-181.122299	"positive"	"Butylated hydroxyanisole"	TRUE
-225.196139	"positive"	"Dicyclohexylurea+H"	TRUE
-279.159088	"positive"	"Phtalate+H"	FALSE
-282.279144	"positive"	"Stearamide"	TRUE
-284.2948	"positive"	"Oleamine"	TRUE
-322.048121	"positive"	"CalAgilent"	FALSE
-338.341736	"positive"	"Erucamide"	TRUE
-355.069946	"positive"	"Decamethylcyclopentasiloxane-CH4"	FALSE
-371.101227	"positive"	"Decamethylcyclopentasiloxane+H"	FALSE
-391.284271	"positive"	"Diisoctylphtalate"	TRUE
-413.266235	"positive"	"Diisoctylphtalate"	TRUE
-429.088715	"positive"	"Dodecamethylcyclohexasiloxane-CH4"	FALSE
-429.240173	"positive"	"Diisoctylphtalate"	FALSE
-445.120026	"positive"	"Dodecamethylcyclohexasiloxane+H"	FALSE
-503.107513	"positive"	"Tetradecamethylcycloheptasiloxane-CH4"	FALSE
-519.138794	"positive"	"Tetradecamethylcycloheptasiloxane+H"	FALSE
-622.02896	"positive"	"CalAgilent"	FALSE
-651.145081	"positive"	"Octadecamethylcyclononasiloxane-CH4"	FALSE
-667.176392	"positive"	"Octadecamethylcyclononasiloxane+H"	FALSE
-922.009798	"positive"	"CalAgilent"	FALSE
+mz	mode	annotation	qb	qm
+26.0036226	negative	"Acetonitrile (fragment) CON00002"	FALSE	FALSE
+35.976678	negative	chloride	FALSE	FALSE
+37.973728	negative	chloride37	FALSE	FALSE
+44.026215	negative	ethoxylate	FALSE	FALSE
+44.9982036	negative	"Formic acid CON00036"	FALSE	FALSE
+46.005479	negative	"formic acid Den"	FALSE	FALSE
+58.041865	negative	"propoxylate Den"	FALSE	FALSE
+59.0138536	negative	"Acetic Acid CON00001"	FALSE	FALSE
+60.021129	negative	"ethanoic acid Den"	FALSE	FALSE
+74.018791	negative	"dimethylsiloxane Den"	FALSE	FALSE
+78.9590566	negative	"Phosphoric acid CON00079"	FALSE	FALSE
+79.926163	negative	"bromide Den"	FALSE	FALSE
+79.9573656	negative	"Sulphuric acid CON00108"	FALSE	FALSE
+81.924116	negative	"bromide81 Den"	FALSE	FALSE
+94.9808406	negative	"Methanesulfonate CON00040"	FALSE	FALSE
+96.9696216	negative	"Phosphoric acid CON00079"	FALSE	FALSE
+97.967379	negative	"sulfuric acid Den"	FALSE	FALSE
+97.976895	negative	"phosphate Den"	FALSE	FALSE
+112.9855876	negative	"Trifluoroacetic acid/CalAgilent CON00117"	FALSE	FALSE
+112.9856286	negative	"Formic acid CON00036"	FALSE	FALSE
+113.992864	negative	"trifluoroacetic acid Den"	FALSE	FALSE
+113.992903	negative	"sodium formate Den"	FALSE	FALSE
+119.036	negative	"CalAgilent DEn"	FALSE	FALSE
+126.9050256	negative	"Iodine anion (Iodide) CON00038"	FALSE	FALSE
+141.0015735	negative	Den	TRUE	FALSE
+141.0197	negative	"Acetate adducts of a fluorinated polymer (PTFE)"	FALSE	FALSE
+162.9823936	negative	"Pentafluoropropionic acid CON00077"	FALSE	TRUE
+171.005264	negative	Den	TRUE	FALSE
+181.980326	negative	"sodium formate Den"	FALSE	FALSE
+212.0750746	negative	"N-Butylbenzenesulfonamide CON00047"	FALSE	FALSE
+223.0278	negative	"PTFE6 Den"	TRUE	TRUE
+226.9784516	negative	"Trifluoroacetic acid CON00117"	FALSE	FALSE
+248.9603966	negative	"Trifluoroacetic acid CON00117"	TRUE	TRUE
+249.967672	negative	"sodium trifluoroacetate Den"	FALSE	FALSE
+249.96775	negative	"sodium formate Den"	FALSE	FALSE
+255.2329536	negative	"Palmitic acid CON00055"	TRUE	TRUE
+281.2486036	negative	"Oleic acid CON00054"	TRUE	TRUE
+283.2642536	negative	"Stearic acid CON00106"	TRUE	TRUE
+301.998139	negative	"CalAgilent DEn"	FALSE	FALSE
+305.0345	negative	PTFE8	FALSE	FALSE
+316.7391016	negative	"Copper catalyst iodide adduct (63Cu(I)) CON00013"	FALSE	FALSE
+317.955174	negative	"sodium formate Den"	FALSE	FALSE
+318.7372946	negative	"Copper catalyst iodide adduct (65Cu(I)) CON00014"	FALSE	FALSE
+341.978592	negative	"trifluoroacetic acid dimer Den"	FALSE	FALSE
+385.94248	negative	"sodium trifluoroacetate Den"	FALSE	FALSE
+387.0421	negative	PTFE10	FALSE	FALSE
+455.971456	negative	"trifluoroacetic acid"	FALSE	FALSE
+469.043	negative	"PTFE12 Den"	FALSE	FALSE
+521.917288	negative	"sodium trifluoroacetate Den"	FALSE	FALSE
+551.034	negative	"PTFE14 Den"	FALSE	FALSE
+569.964319	negative	"trifluoroacetic acid dimer Den"	FALSE	FALSE
+601.978977	negative	"CalAgilent DEn"	FALSE	FALSE
+657.892096	negative	"sodium trifluoroacetate Den"	FALSE	FALSE
+966.0007	negative	"CalAgilent DEn"	FALSE	FALSE
+980.0163	negative	"CalAgilent DEn"	FALSE	FALSE
+79.02121	positive	DMSO	FALSE	FALSE
+83.060371	positive	2ACN+H	TRUE	FALSE
+88.039307	positive	2ACN+H	FALSE	FALSE
+103.955597	positive	[ACN+65/63Cu(I)]+	TRUE	FALSE
+104.992294	positive	AcetaNa	FALSE	FALSE
+105.953789	positive	[ACN+65/63Cu(I)]+	TRUE	FALSE
+118.086255	positive	CalAgilent	TRUE	FALSE
+121.050873	positive	CalAgilent	FALSE	FALSE
+122.081169	positive	TRIS	TRUE	TRUE
+122.964348	positive	AcetaNa	FALSE	FALSE
+123.091675	positive	Dimethylaminopyridine	TRUE	FALSE
+130.159027	positive	Diisopropylethylamine	TRUE	TRUE
+144.982147	positive	[ACN*2+65/63Cu(I)]+	FALSE	TRUE
+146.980347	positive	[ACN*2+65/63Cu(I)]+	TRUE	TRUE
+149.023315	positive	"Phthalic anhydride/CalAgilent"	TRUE	TRUE
+150.127731	positive	Phenyldiethylamine	FALSE	FALSE
+153.138626	positive	1,8-Diazabicycloundec-7-ene	FALSE	FALSE
+181.122299	positive	"Butylated hydroxyanisole"	TRUE	FALSE
+225.196139	positive	Dicyclohexylurea+H	TRUE	FALSE
+279.159088	positive	Phtalate+H	FALSE	FALSE
+282.279144	positive	Stearamide	TRUE	TRUE
+284.2948	positive	Oleamine	TRUE	FALSE
+322.048121	positive	CalAgilent	FALSE	FALSE
+338.341736	positive	Erucamide	TRUE	FALSE
+355.069946	positive	Decamethylcyclopentasiloxane-CH4	FALSE	FALSE
+371.101227	positive	Decamethylcyclopentasiloxane+H	FALSE	TRUE
+391.284271	positive	Diisoctylphtalate	TRUE	TRUE
+413.266235	positive	Diisoctylphtalate	TRUE	TRUE
+429.088715	positive	Dodecamethylcyclohexasiloxane-CH4	FALSE	FALSE
+429.240173	positive	Diisoctylphtalate	FALSE	TRUE
+445.120026	positive	Dodecamethylcyclohexasiloxane+H	FALSE	FALSE
+503.107513	positive	Tetradecamethylcycloheptasiloxane-CH4	FALSE	FALSE
+519.138794	positive	Tetradecamethylcycloheptasiloxane+H	FALSE	FALSE
+622.02896	positive	CalAgilent	FALSE	FALSE
+651.145081	positive	Octadecamethylcyclononasiloxane-CH4	FALSE	FALSE
+667.176392	positive	Octadecamethylcyclononasiloxane+H	FALSE	TRUE
+922.009798	positive	CalAgilent	FALSE	FALSE

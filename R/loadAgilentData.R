@@ -95,13 +95,15 @@ loadAgilentData<-function(ifile,ofile=NULL,params=list()){
   nm=gsub("@NA$","",paste(lumetnams,"@",sprintf("%.2f",rtmed),"-",params$AssayName,sep=""))
   annot=data.frame(Analyte=nm,MetName=lumetnams,IsSTD=FALSE,IsISO=FALSE,RT=rtmed,LevelAnnot=1,stringsAsFactors = F)
   newnam=oldnam=lumetnams
-  
   if(params$checkNams){
-    newnam=cleanMetaboNames(oldnam,RegExpr = NA,Syno = NA)$newnam
+    lnnunk=which(!grepl("_UNK$",newnam))
+    newnam[lnnunk]=cleanMetaboNames(oldnam[lnnunk],RegExpr = NA,Syno = NA)$newnam
+ #   print(newnam)
     annot$MetName=newnam
     annot$Analyte=gsub("@NA$","",paste(newnam,"@",sprintf("%.2f",rtmed),"-",params$AssayName,sep=""))
     annot$IsSTD[grep("_ISTD$",newnam)]=TRUE
     annot$IsISO[grep("_ISO$",newnam)]=TRUE
+    annot$LevelAnnot[grep("_UNK$",newnam)]=4
     annot$OriginalName=oldnam
     if(!is.null(params$AnnotDB)){
       NewDB=params$AnnotDB
@@ -228,6 +230,7 @@ loadAgilentData<-function(ifile,ofile=NULL,params=list()){
     annot$Analyte=gsub("@NA$","",paste(newnam,"@",sprintf("%.2f",rtmed),"-",params$AssayName,sep=""))
     annot$IsSTD[grep("_ISTD$",newnam)]=TRUE
     annot$IsISO[grep("_ISO$",newnam)]=TRUE
+    annot$LevelAnnot[grep("_UNK$",newnam)]=4
     annot$OriginalName=oldnam
     if(!is.null(params$AnnotDB)){
       NewDB=params$AnnotDB

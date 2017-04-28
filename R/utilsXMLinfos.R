@@ -10,7 +10,6 @@
   dir=dir[file.exists(dir)]
   if(length(dir)==0) stop('Dir/file do not exist!')
   lfi=unique(c(dir[grep(pattern,dir)],list.files(dir,pattern = pattern,full.names = T)))
-  
   cat("Found ",length(lfi),ifelse(type=="Thermo"," Thermo/ReAdW"," Agilent/MH")," xml files in ",dir,"\n",sep="")
   if(length(lfi)==0) return(NULL)
   adf=list()
@@ -30,6 +29,12 @@
     for(i in itoadd) adf[[ifi]][,i]=NA
   }
   adf<-do.call("rbind",adf)
+  ##### check if date is.na due to NEG/POS split
+  l=which(is.na(adf$completionTime) & grepl(paste0("_[NEGPOS]{3}",pattern),adf$fileName))
+  if(length(l)) for(i in l){
+  l2=which(adf$fileName==gsub("_[POSNEG]{3}\\.",".",adf$fileName[i]) & adf$dirName==adf$dirName[i])
+  if(length(l2)==1) adf$completionTime[i]=adf$completionTime[l2] 
+  }
   
   #####
   filenam=adf$fileName

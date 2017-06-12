@@ -43,7 +43,7 @@ mergeSet<-function(...){
     l2rem=res$Method[grep(";",res$Method)]
     for(i in l2rem){
       names(res$File)=gsub(paste("\\.",i,"$",sep=""),"",names(res$File))
-      if(!is.null(res$Eic$Samp))  names(res$Eic$Samp)=gsub(paste("\\.",i,"$",sep=""),"",names(res$Eic$Samp))
+      if(!is.null(res[['Eic']]$Samp))  names(res[['Eic']]$Samp)=gsub(paste("\\.",i,"$",sep=""),"",names(res[['Eic']]$Samp))
     }
     res$Method=unlist(strsplit(res$Method,";"))
    }
@@ -269,18 +269,19 @@ mergeSet<-function(...){
   ##############
   #### works if the EIC structure is OK for all -> to be updated if no EIC stuff and/or different names
   Eic=NULL
-  leics=names(which(sapply(re,function(x) !is.null(x$Eic))))
+  leics=names(which(sapply(re,function(x) !is.null(x[['Eic']]))))
   if(length(leics)>0){
     print(leics)
   cat("-- Merge Eic file: ")
   #for(i in names(re)) re[[i]]$Data=lapply(re[[i]]$Data,function(x) x[,matexVar[,i]])
-      EicFile=do.call("rbind",lapply(re[leics],function(x) x$Eic$File))
-      EicFile=EicFile[match(lumet,EicFile$Analyte),]
+      EicFile=do.call("rbind",lapply(re[leics],function(x) x[['Eic']]$File))
+      EicFile=EicFile[match(annot$Analyte,EicFile$Analyte),]
       rownames(EicFile)=annot$Analyte
+      if("Analyte"%in%colnames(EicFile)) EicFile[,"Analyte"]=annot$Analyte
       metaeic=data.frame(Sid=lusamp,stringsAsFactors = FALSE)
       rownames(metaeic)=lusamp
       for(i in leics){
-        addfi=re[[i]]$Eic$Samp[,names(re[[i]]$Eic$Samp)!="Sid",drop=FALSE]
+        addfi=re[[i]][['Eic']]$Samp[,names(re[[i]][['Eic']]$Samp)!="Sid",drop=FALSE]
         if(i %in% lumethods) names(addfi)=paste(names(addfi),i,sep=".")
         metaeic=cbind(metaeic,addfi[matexSa[,i],,drop=FALSE])
       }
@@ -293,13 +294,25 @@ mergeSet<-function(...){
   cat("\n")
   }
   
+  EicDef=NULL
+  leics=names(which(sapply(re,function(x) !is.null(x[['EicDef']]))))
+  if(length(leics)>0){
+    cat("-- Merge EicDef infos: ")
+    #for(i in names(re)) re[[i]]$Data=lapply(re[[i]]$Data,function(x) x[,matexVar[,i]])
+    EicDef=do.call("rbind",lapply(re[leics],function(x) x[['EicDef']]))
+    EicDef=EicDef[match(annot$Analyte,EicDef$Analyte),]
+    rownames(EicDef)=EicDef$Analyte=annot$Analyte
+  }
+  
+  
   lnotfound=lnotfound[sapply(lnotfound,length)!=0]
   if(length(lnotfound)>0) for(i in names(lnotfound)) cat("  * not found in ",i,": ",paste(lnotfound[[i]],collapse=" "),"\n",sep="")
   
   allmat=lapply(allmat,function(x){dimnames(x)=list(meta$Sid,annot$Analyte);x})
   
   allmat=list(Method=unname(lumethods),Sid=meta$Sid,Analyte=annot$Analyte,Annot=annot,Meta=meta,File=fileinfos,Data=allmat)
-  if(!is.null(Eic)) allmat$Eic=Eic
+  if(!is.null(Eic)) allmat[['Eic']]=Eic
+  if(!is.null(EicDef)) allmat[['EicDef']]=EicDef
   class(allmat)=append(class(allmat),"metaboSet")
   if(any(sapply(re,function(x) "fluxoSet"%in%class(x)))) class(allmat)=append(class(allmat),"fluxoSet")
   

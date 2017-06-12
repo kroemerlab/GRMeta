@@ -1,5 +1,5 @@
 ##################################################################################################
-.GRgetDirXMLInfos<-function(dir,type="Thermo",params = list(),short=T){
+.GRgetDirXMLInfos<-function(dir,lfiles=NULL,type="Thermo",params = list(),short=T){
   
   pattern = ifelse(type=="Thermo",'\\.mzXML$','\\.mzdata.xml$')
   paramsvals <- GRMeta::paramsParsing()
@@ -10,6 +10,10 @@
   dir=dir[file.exists(dir)]
   if(length(dir)==0) stop('Dir/file do not exist!')
   lfi=unique(c(dir[grep(pattern,dir)],list.files(dir,pattern = pattern,full.names = T)))
+  if(!is.null(lfiles)){
+    lfiles=lfiles[file.exists(lfiles)] 
+    if(!is.null(lfiles)) lfi=lfi[lfi%in%lfiles]
+  }
   cat("Found ",length(lfi),ifelse(type=="Thermo"," Thermo/ReAdW"," Agilent/MH")," xml files in ",dir,"\n",sep="")
   if(length(lfi)==0) return(NULL)
   adf=list()

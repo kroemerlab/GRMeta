@@ -35,22 +35,25 @@ sortEntries<-function(obj,...){
     }
   }
   
-  
+  ############# sample sorting
   if(!is.null(ssort)){
     lso=do.call(order, as.data.frame(ssort))
     obj$Sid=obj$Sid[lso]
     obj$Meta=obj$Meta[lso,]
     obj$File=obj$File[lso,]
     obj$Data=lapply(obj$Data,function(x) x[lso,,drop=F])
-    if(!is.null(obj$Eic))  if(!is.null(obj$Eic$Samp)) obj$Eic$Samp=obj$Eic$Samp[lso,]
+    if(!is.null(obj[['Eic']]))  if(!is.null(obj[['Eic']]$Samp)) obj[['Eic']]$Samp=obj[['Eic']]$Samp[lso,]
     cat("Sorting samples based on:",colnames(ssort),"\n",sep=" ")
-  }  
+  } 
+  ############# analyte sorting
+  
   if(!is.null(asort)){
     lso=do.call(order, as.data.frame(asort))
     obj$Analyte=obj$Analyte[lso]
     obj$Annot=obj$Annot[lso,]
     obj$Data=lapply(obj$Data,function(x) x[,lso,drop=F])
-    if(!is.null(obj$Eic))  if(!is.null(obj$Eic$File)) obj$Eic$File=obj$Eic$File[lso,]
+    if(!is.null(obj[['Eic']]))  if(!is.null(obj[['Eic']]$File)) obj[['Eic']]$File=obj[['Eic']]$File[lso,]
+    if(!is.null(obj[['EicDef']])) obj[['EicDef']]=obj[['EicDef']][lso,]
     cat("Sorting analytes based on",colnames(asort),"\n",sep=" ")
   }
   

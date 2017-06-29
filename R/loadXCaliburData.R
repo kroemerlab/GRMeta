@@ -82,7 +82,7 @@ loadXCaliburData<-function(ifile,ofile=NULL,params=list()){
   
   metainfos=data.frame(Sid=sid,sType=styp,InjOrder=order(order(dts)),stringsAsFactors=FALSE)
   rownames(metainfos)=metainfos$Sid
-  fileinfos=data.frame(File=lfi,Date=dts,Name=nams,Sid=sid,stringsAsFactors=FALSE)
+  fileinfos=data.frame(File=lfi,Date=chron(dts),Name=nams,Sid=sid,stringsAsFactors=FALSE)
   rownames(fileinfos)=fileinfos$Sid
   if(!is.null(params$Batch)) fileinfos$Batch=params$Batch
   

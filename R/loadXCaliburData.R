@@ -33,7 +33,7 @@ loadXCaliburData<-function(ifile,ofile=NULL,params=list()){
     list(idats,dts,metnam)
   }
   
-  params= paramsParsing()
+#  params= paramsParsing()
   
   wb     <- loadWorkbook(ifile)
   sheets <- getSheets(wb)
@@ -101,8 +101,7 @@ loadXCaliburData<-function(ifile,ofile=NULL,params=list()){
   
   #########
   rtmed=round(apply(allmat$RT,2,median,na.rm=T),4)
-  nm=gsub("@NA$","",paste(lumetnams,"@",sprintf("%.2f",rtmed),"-",params$AssayName,sep=""))
-  annot=data.frame(Analyte=nm,MetName=lumetnams,IsSTD=FALSE,IsISO=FALSE,RT=rtmed,LevelAnnot=1,stringsAsFactors = F)
+  annot=data.frame(Analyte=NA,MetName=lumetnams,IsSTD=FALSE,IsISO=FALSE,RT=rtmed,LevelAnnot=1,stringsAsFactors = F)
   newnam=oldnam=lumetnams
   if(params$checkNams){
     lnnunk=which(!grepl("_UNK$",newnam))

@@ -26,7 +26,7 @@ update.metaboSet<-function(obj,what="Sid",formerid=NULL,newid=NULL,exact=TRUE,sw
   obj$File$Sid=rownames(obj$File)=newnames
   obj$Data=lapply(obj$Data,function(x){rownames(x)=newnames;x})
   
-  if(!is.null(obj$Eic)) if(!is.null(obj$Eic$Samp)) obj$Eic$Samp$Sid=rownames(obj$Eic$Samp)=newnames
+  if(!is.null(obj[["Eic"]])) if(!is.null(obj[["Eic"]]$Samp)) obj[["Eic"]]$Samp$Sid=rownames(obj[["Eic"]]$Samp)=newnames
   
   if(any(newnames!=oldnames)){
    if(verbose){
@@ -42,7 +42,8 @@ update.metaboSet<-function(obj,what="Sid",formerid=NULL,newid=NULL,exact=TRUE,sw
     obj$Annot$Analyte=rownames(obj$Annot)=newnames
     obj$Data=lapply(obj$Data,function(x){colnames(x)=newnames;x})
     
-    if(!is.null(obj$Eic))  if(!is.null(obj$Eic$File)) obj$Eic$File$Analyte=rownames(obj$Eic$File)=newnames
+    if(!is.null(obj[["Eic"]]))  if(!is.null(obj[["Eic"]]$File)) obj[["Eic"]]$File$Analyte=rownames(obj[["Eic"]]$File)=newnames
+    if(!is.null(obj[["EicDef"]])) obj[["EicDef"]]$Analyte=rownames(obj[["EicDef"]])=newnames
     
     if(any(newnames!=oldnames)){
       if(verbose){

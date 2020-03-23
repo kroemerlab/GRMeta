@@ -29,7 +29,7 @@ deleteEntries<-function(obj,...,verbose=TRUE){
         obj$File=obj$File[l2keep,]
         obj$Data=lapply(obj$Data,function(x) x[l2keep,,drop=F])
 
-        if(!is.null(obj$Eic))  if(!is.null(obj$Eic$Samp)) obj$Eic$Samp=obj$Eic$Samp[l2keep,]
+        if(!is.null(obj[['Eic']]))  if(!is.null(obj[['Eic']]$Samp)) obj[['Eic']]$Samp=obj[['Eic']]$Samp[l2keep,]
 
         if(any(!sidori%in%obj$Sid)){
           if(verbose) cat("Samples removed based on",argname,":\n",sidori[!sidori%in%obj$Sid],"\n",sep=" ")
@@ -60,7 +60,10 @@ deleteEntries<-function(obj,...,verbose=TRUE){
         obj$Data=lapply(obj$Data,function(x) x[,l2keep,drop=F])
         #print("OKK")
         
-        if(!is.null(obj$Eic)) if(!is.null(obj$Eic$File)) obj$Eic$File=obj$Eic$File[l2keep,]
+        if(!is.null(obj[['Eic']])) if(!is.null(obj[['Eic']]$File)) obj[['Eic']]$File=obj[['Eic']]$File[l2keep,]
+        
+        if(!is.null(obj[['EicDef']])) if(!is.null(obj[['EicDef']]$Analyte)) obj[['EicDef']]=obj[['EicDef']][obj[['EicDef']]$Analyte%in%obj$Analyte,]
+        
         
         if(any(!anaori%in%obj$Analyte)){
           if(verbose) cat("Analytes removed based on ",argname,":\n",anaori[!anaori%in%obj$Analyte],"\n",sep=" ")

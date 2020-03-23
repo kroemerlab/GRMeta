@@ -1,0 +1,198 @@
+GName	ShNam	HMDB	KEGG	PC	Chebi	Mesh	FinalClass	Class	Class2	Class	FinalClass
+Alanine	Alanine	HMDB00161	C00041	5950	chebiId:16977	68000409	"Amino acids"	"Amino acid"	"Alanine and aspartate metabolism"	"Amino acids"	"Amino acids"
+Asparagine	Asparagine	HMDB00168	C00152	6267	chebiId:17196	68001216	"Amino acids"	"Amino acid"	"Alanine and aspartate metabolism"	"Amino acids"	"Amino acids"
+"Aspartic acid"	Aspartate	HMDB00191	C00049	5960	chebiId:17053	68001224	"Amino acids"	"Amino acid"	"Alanine and aspartate metabolism"	"Amino acids"	"Amino acids"
+Cysteine	Cysteine	HMDB00574	C00097	5862	chebiId:17561	68003545	"Amino acids"	"Amino acid"	"Cysteine; methionine; SAM; taurine metabolism"	"Amino acids"	"Amino acids"
+Cystine	Cystine	HMDB00192	C00491	67678	chebiId:16283	68003553	"Amino acids"		NA	"Amino acids"	"Amino acids"
+"Glutamic acid"	Glutamate	HMDB00148	C00025	33032	chebiId:16015	68018698	"Amino acids"	"Amino acid"	"Glutamate metabolism"	"Amino acids"	"Amino acids"
+Glutamine	Glutamine	HMDB00641	C00064	5961	chebiId:18050	68005973	"Amino acids"	"Amino acid"	"Glutamate metabolism"	"Amino acids"	"Amino acids"
+Glycine	Glycine	HMDB00123	C00037	750	chebiId:15428	68005998	"Amino acids"	"Amino acid"	"Glycine; serine and threonine metabolism"	"Amino acids"	"Amino acids"
+Histidine	Histidine	HMDB00177	C00135	6274	chebiId:15971	68006639	"Amino acids"	"Amino acid"	"Histidine metabolism"	"Amino acids"	"Amino acids"
+Isoleucine	Isoleucine	HMDB00172	C00407	6306	chebiId:17191	68007532	"Amino acids"	"Amino acid"	"Valine; leucine and isoleucine metabolism"	"Amino acids"	"Amino acids"
+Leucine	Leucine	HMDB00687	C00123	6106	chebiId:15603	68007930	"Amino acids"	"Amino acid"	"Valine; leucine and isoleucine metabolism"	"Amino acids"	"Amino acids"
+Lysine	Lysine	HMDB00182	C00047	5962	chebiId:18019	68008239	"Amino acids"	"Amino acid"	"Lysine metabolism"	"Amino acids"	"Amino acids"
+Methionine	Methionine	HMDB00696	C00073	6137	chebiId:16643	68008715	"Amino acids"	"Amino acid"	"Cysteine; methionine; SAM; taurine metabolism"	"Amino acids"	"Amino acids"
+Ornithine	Ornithine	HMDB00214	C00077	6262	chebiId:15729	68009952	"Amino acids"	"Amino acid"	"Urea cycle; arginine-; proline-; metabolism"	"Amino acids"	Polyamine
+Phenylalanine	Phenylalanine	HMDB00159	C00079	6140	chebiId:17295	68010649	"Amino acids"	"Amino acid"	"Phenylalanine & tyrosine metabolism"	"Amino acids"	"Amino acids"
+Proline	Proline	HMDB00162	C00148	145742	chebiId:17203	68011392	"Amino acids"	"Amino acid"	"Urea cycle; arginine-; proline-; metabolism"	"Amino acids"	"Amino acids"
+Serine	Serine	HMDB00187	C00065	5951	chebiId:17115	68012694	"Amino acids"	"Amino acid"	"Glycine; serine and threonine metabolism"	"Amino acids"	"Amino acids"
+Threonine	Threonine	HMDB00167	C00188	6288	chebiId:16857	68013912	"Amino acids"	"Amino acid"	"Glycine; serine and threonine metabolism"	"Amino acids"	"Amino acids"
+Tryptophan	Tryptophan	HMDB00929	C00078	6305	chebiId:16828;chebiId:27897	68014364	"Amino acids"	"Amino acid"	"Tryptophan metabolism"	Indoles	"Amino acids"
+Tyrosine	Tyrosine	HMDB00158	C00082	6057	chebiId:17895	68014443	"Amino acids"	"Amino acid"	"Phenylalanine & tyrosine metabolism"	"Amino acids"	"Amino acids"
+Valine	Valine	HMDB00883	C00183	6287	chebiId:16414	68014633	"Amino acids"	"Amino acid"	"Valine; leucine and isoleucine metabolism"	"Amino acids"	"Amino acids"
+"2-aminoadipic acid"	2-aminoadipate	HMDB00510	C00956	469	chebiId:37023	68015074	"Amino acids 2"	"Amino acid"	"Lysine metabolism"	"Amino acids"	"Amino acids 2"
+3-methylhistidine	3-MeHistidine	HMDB00479	C01152	64969	chebiId:27596	67028118	"Amino acids 2"		NA	"Amino acids"	"Amino acids 2"
+4-hydroxyproline	4-OHProline	HMDB00725	C01157	5810	chebiId:18095	68006909	"Amino acids 2"	"Amino acid"	"Urea cycle; arginine-; proline-; metabolism"	"Amino acids"	"Amino acids 2"
+"5-aminovaleric acid"	5-aminovalerate	HMDB03355	C00431	138	chebiId:15887	67013809	"Amino acids 2"	"Amino acid"	"Urea cycle; arginine-; proline-; metabolism"	"Amino acids"	"Amino acids 2"
+5-oxoproline	5-oxoproline	HMDB00267	C01879	7405	chebiId:18183	68011761	"Amino acids 2"	"Amino acid"	"Glutathione metabolism"	"Amino acids"	"Amino acids 2"
+Allantoin	Allantoin	HMDB00462	C02350	204	chebiId:15678	68000481	"Amino acids 2"	Nucleotide	"Purine metabolism; urate metabolism"	"Organic acids"	"Amino acids 2"
+"Anthranilic acid"	Anthranilate	HMDB01123	C00108	227	chebiId:30754	67031385	"Amino acids 2"	"Amino acid"	"Tryptophan metabolism"	Unclassified	"Amino acids 2"
+Beta-alanine	Beta-alanine	HMDB00056	C00099	239	chebiId:16958	68015091	"Amino acids 2"	"Amino acid"	"Alanine and aspartate metabolism"	"Amino acids"	"Amino acids 2"
+Cadaverine	Cadaverine	HMDB02322	C01672	273	chebiId:18127	68002103	"Amino acids 2"	Polyamine	NA	Unclassified	"Amino acids 2"
+Citrulline	Citrulline	HMDB00904	C00327	9750	chebiId:16349	68002956	"Amino acids 2"	"Amino acid"	"Urea cycle; arginine-; proline-; metabolism"	"Amino acids"	"Amino acids 2"
+Creatine	Creatine	HMDB00064	C00300	586	chebiId:16919	68003401	"Amino acids 2"	"Amino acid"	"Creatine metabolism"	"Amino acids"	"Amino acids 2"
+dCAdoMet	dCAdoMet	HMDB00988	C01137	439415	chebiId:15625	67012702	"Amino acids 2"		NA	Nucleosides	Nucleosides
+Dimethylglycine	DiMeGlycine	HMDB00092	C01026	673	chebiId:17724	67025138	"Amino acids 2"	"Amino acid"	"Glycine; serine and threonine metabolism"	"Amino acids"	"Amino acids 2"
+Dopamine	Dopamine	HMDB00073	C03758	681	chebiId:18243	68004298	"Amino acids 2"		NA	Unclassified	"Amino acids 2"
+GABA	GABA	HMDB00112	C00334	119	chebiId:16865	68005680	"Amino acids 2"	"Amino acid"	"Glutamate metabolism"	"Amino acids"	"Amino acids 2"
+Homoserine	Homoserine	HMDB00719	C00263	12647	chebiId:15699	68006714	"Amino acids 2"	"Amino acid"	"Glycine; serine and threonine metabolism"	"Amino acids"	"Amino acids 2"
+Hypotaurine	Hypotaurine	HMDB00965	C00519	107812	chebiId:16668	67003949	"Amino acids 2"	"Amino acid"	"Cysteine; methionine; SAM; taurine metabolism"	"Organic acids"	"Amino acids 2"
+"Ketoisocaproic acid"	KIC	HMDB00695	C00233	70	chebiId:48430	67013082	"Amino acids 2"	"Amino acid"	"Valine; leucine and isoleucine metabolism"	"Organic acids"	"Amino acids 2"
+"Ketoisovaleric acid"	KIV	HMDB00019	C00141	49	chebiId:16530	67001505	"Amino acids 2"		NA	"Organic acids"	"Amino acids 2"
+Kynurenine	Kynurenine	HMDB00684	C00328	846	chebiId:16946	68007737	"Amino acids 2"	"Amino acid"	"Tryptophan metabolism"	Unclassified	"Amino acids 2"
+"N-acetylaspartic acid"	NAcAspartate	HMDB00812	C01042	65065	chebiId:21547	67000179	"Amino acids 2"	"Amino acid"	"Alanine and aspartate metabolism"	"Amino acids"	"Amino acids 2"
+Sarcosine	Sarcosine	HMDB00271	C00213	1088	chebiId:15611	68012521	"Amino acids 2"	"Amino acid"	"Glycine; serine and threonine metabolism"	"Amino acids"	"Amino acids 2"
+Taurine	Taurine	HMDB00251	C00245	1123	chebiId:15891	68013654	"Amino acids 2"	"Amino acid"	"Cysteine; methionine; SAM; taurine metabolism"	"Organic acids"	"Amino acids 2"
+Urea	Urea	HMDB00294	C00086	1176	chebiId:16199	68014508	"Amino acids 2"	"Amino acid"	"Urea cycle; arginine-; proline-; metabolism"	"Organic acids"	"Amino acids 2"
+"3-hydroxyisovaleric acid"	3-OHIsovalerate	HMDB00754		69362	chebiId:37084	67004961	"Amino acids 2"	"Amino acid"	"Valine; leucine and isoleucine metabolism"	"Fatty Acyls"	"Amino acids 2"
+Adenine	Adenine	HMDB00034	C00147	190	chebiId:16708	68000225	Bases	Nucleotide	"Purine metabolism; adenine containing"	Bases	"Nucleotides 2"
+Cytosine	Cytosine	HMDB00630	C00380	597	chebiId:16040	68003596	Bases	Nucleotide	"Pyrimidine metabolism; cytidine containing"	Bases	"Nucleotides 2"
+Guanine	Guanine	HMDB00132	C00242	764	chebiId:16235	68006147	Bases		NA	Bases	"Nucleotides 2"
+Guanosine	Guanosine	HMDB00133	C00387	6802	chebiId:16750	68006151	Bases	Nucleotide	"Purine metabolism; guanine containing"	Nucleosides	"Nucleotides 2"
+Hypoxanthine	Hypoxanthine	HMDB00157	C00262	790	chebiId:17368	68019271	Bases	Nucleotide	"Purine metabolism; (hypo)xanthine/inosine containing"	Bases	"Nucleotides 2"
+Inosine	Inosine	HMDB00195	C00294	6021	chebiId:17596	68007288	Bases	Nucleotide	"Purine metabolism; (hypo)xanthine/inosine containing"	Nucleosides	"Nucleotides 2"
+Thymine	Thymine	HMDB00262	C00178	1135	chebiId:17821	68013941	Bases	Nucleotide	"Pyrimidine metabolism; thymine containing"	Bases	"Nucleotides 2"
+Uracil	Uracil	HMDB00300	C00106	1174	chebiId:17568	68014498	Bases	Nucleotide	"Pyrimidine metabolism; uracil containing"	Bases	"Nucleotides 2"
+"Uric acid"	Urate	HMDB00289	C00366	1175	chebiId:17775	68014527	Bases	Nucleotide	"Purine metabolism; urate metabolism"	Bases	"Nucleotides 2"
+Xanthine	Xanthine	HMDB00292	C00385	1188	chebiId:17712;chebiId:48517	68019820	Bases	Nucleotide	"Purine metabolism; (hypo)xanthine/inosine containing"	Bases	"Nucleotides 2"
+Xanthosine	Xanthosine	HMDB00299	C01762	64959	chebiId:18107	67005893	Bases	Nucleotide	"Purine metabolism; (hypo)xanthine/inosine containing"	Nucleosides	"Nucleotides 2"
+Arabinose	Arabinose	HMDB00646	C00216	439195	chebiId:17108	68001089	Carbohydrates	Carbohydrate	"Nucleotide sugars; pentose metabolism"	Carbohydrates	Carbohydrates
+Arabitol	Arabitol	HMDB00568	C01904	94154	chebiId:18333	67014999	Carbohydrates	Carbohydrate	"Nucleotide sugars; pentose metabolism"	Carbohydrates	Carbohydrates
+Fructose	Fructose	HMDB00660	C00095;C02336	5984;439709	chebiId:28645	68005632	Carbohydrates	Carbohydrate	"Fructose; mannose; galactose; starch; and sucrose metabolism"	Carbohydrates	Carbohydrates
+Fructose-6-phosphate	F-6P	HMDB00124	C05345	69507	chebiId:15946	67027618	Carbohydrates	Carbohydrate	"Glycolysis; gluconeogenesis; pyruvate metabolism"	Carbohydrates	Carbohydrates
+Galactitol	Galactitol	HMDB00107	C01697	11850	chebiId:16813	68004376	Carbohydrates		NA	Carbohydrates	Carbohydrates
+Galactose	Galactose	HMDB00143	C00124;C00984	6036	chebiId:4139;chebiId:28061	68005690	Carbohydrates		NA	Carbohydrates	Carbohydrates
+Glucose	Glucose	HMDB00122;HMDB03345;HMDB00516	C00031;C00267;C00221	79025;5793	chebiId:4167;chebiId:17925;chebiId:15903	67045788;68005947	Carbohydrates	Carbohydrate	"Glycolysis; gluconeogenesis; pyruvate metabolism"	Carbohydrates	Carbohydrates
+Glucose-6-phosphate	G-6P	HMDB01401;HMDB03498	C00668;C00092;C01172	5958;439284;439427;42609823	chebiId:17665;chebiId:4170;chebiId:17719	68019298	Carbohydrates	Carbohydrate	"Glycolysis; gluconeogenesis; pyruvate metabolism"	Carbohydrates	Carbohydrates
+Glyceraldehyde-3-phosphate	GA-3P	HMDB01112	C00118	729	chebiId:17138	68005986	Carbohydrates		NA	Carbohydrates	Carbohydrates
+Inositol	Inositol	HMDB00211	C00137	892	chebiId:17268	67009217	Carbohydrates	Lipid	"Inositol metabolism"	Unclassified	Carbohydrates
+Lactose	Lactose	HMDB00186	C00243	84571	chebiId:17716	68007785	Carbohydrates		NA	Carbohydrates	Carbohydrates
+Maltose	Maltose	HMDB00163	C00208	6255	chebiId:17306	68008320	Carbohydrates	Carbohydrate	"Fructose; mannose; galactose; starch; and sucrose metabolism"	Carbohydrates	Carbohydrates
+Mannitol	Mannitol	HMDB00765	C00392	6251	chebiId:16899	68008353	Carbohydrates	Carbohydrate	"Fructose; mannose; galactose; starch; and sucrose metabolism"	Carbohydrates	Carbohydrates
+Mannose	Mannose	HMDB00169	C00159	18950	chebiId:4208	68008358	Carbohydrates	Carbohydrate	"Fructose; mannose; galactose; starch; and sucrose metabolism"	Carbohydrates	Carbohydrates
+Raffinose	Raffinose	HMDB03213	C00492	439242	chebiId:16634	68011887	Carbohydrates		NA	Carbohydrates	Carbohydrates
+Ribitol	Ribitol	HMDB00508	C00474	827	chebiId:15963	67014999	Carbohydrates	Carbohydrate	"Nucleotide sugars; pentose metabolism"	Carbohydrates	Carbohydrates
+Ribose	Ribose	HMDB00283	C00121	5779	chebiId:47013	68012266	Carbohydrates	Carbohydrate	"Nucleotide sugars; pentose metabolism"	Carbohydrates	Carbohydrates
+Ribose-5-phosphate	Ribose-5P	HMDB01548	C00117	439167;77982	chebiId:52742	67031626	Carbohydrates	Carbohydrate	"Nucleotide sugars; pentose metabolism"	Carbohydrates	Carbohydrates
+Ribulose	Ribulose	HMDB00621	C00309	151261	chebiId:17173	67100182	Carbohydrates	Carbohydrate	"Nucleotide sugars; pentose metabolism"	Carbohydrates	Carbohydrates
+Ribulose-5-phosphate	Ribulose-5P	HMDB00618	C00199	439184	chebiId:17666	67031524	Carbohydrates	Carbohydrate	"Nucleotide sugars; pentose metabolism"	Carbohydrates	Carbohydrates
+Sorbitol	Sorbitol	HMDB00247	C00794	5780	chebiId:17924	68013012	Carbohydrates	Carbohydrate	"Fructose; mannose; galactose; starch; and sucrose metabolism"	Carbohydrates	Carbohydrates
+Sucrose	Sucrose	HMDB00258	C00089	5988	chebiId:17992	68013395	Carbohydrates		NA	Carbohydrates	Carbohydrates
+Trehalose	Trehalose	HMDB00975	C01083	7427	chebiId:16551	68014199	Carbohydrates		NA	Carbohydrates	Carbohydrates
+Xylitol	Xylitol	HMDB02917	C00379	6912	chebiId:17151	68014993	Carbohydrates	Carbohydrate	"Nucleotide sugars; pentose metabolism"	Carbohydrates	Carbohydrates
+Xylose	Xylose	HMDB00098	C00181	135191	chebiId:15936;chebiId:53455	68014994	Carbohydrates		NA	Carbohydrates	Carbohydrates
+Glycerol	Glycerol	HMDB00131	C00116	753	chebiId:17754	68005990	Carbohydrates	Lipid	"Glycerolipid metabolism"	Carbohydrates	Lipids
+Alpha-tocopherol	aTocopherol	HMDB01893	C02477	14985	chebiId:18145	68014810	"Cofactors and vitamins"	"Cofactors and vitamins"	"Tocopherol metabolism"	Prenols	"Cofactors and vitamins"
+Niacinamide	Nicotinamide	HMDB01406	C00153	936	chebiId:17154	68009536	"Cofactors and vitamins"	"Cofactors and vitamins"	"Nicotinate and nicotinamide metabolism"	Unclassified	"Cofactors and vitamins"
+"Nicotinic acid"	Nicotinate	HMDB01488	C00253	938	chebiId:15940	68009525	"Cofactors and vitamins"	"Cofactors and vitamins"	"Nicotinate and nicotinamide metabolism"	Unclassified	"Cofactors and vitamins"
+"Pantothenic acid"	Pantothenate	HMDB00210	C00864	6613	chebiId:46905	68010205	"Cofactors and vitamins"	"Cofactors and vitamins"	"Pantothenate and CoA metabolism"	"Amino acids"	"Cofactors and vitamins"
+"Threonic acid"	Threonate	HMDB00943	C01620	151152	chebiId:49060	67011369	"Cofactors and vitamins"	"Cofactors and vitamins"	"Ascorbate and aldarate metabolism"	Carbohydrates	"Cofactors and vitamins"
+"2-hydroxyglutaric acid"	2-OHGlutarate	HMDB00606;HMDB59655	C02630;C01087	43	chebiId:17084	67019417	Energy	Lipid	"Fatty acid; dicarboxylate"	"Organic acids"	Energy
+"2-oxoglutaric acid"	2-oxoglutarate	HMDB00208	C00026	51	chebiId:30915	67029743	Energy		"Krebs cycle"	"Organic acids"	Energy
+"3-hydroxybutyric acid"	3-OHButyrate	HMDB00357	C01089	441	chebiId:20067	68020155	Energy		"Ketone bodies"	"Organic acids"	Energy
+"Citric acid"	Citrate	HMDB00094	C00158	311	chebiId:30769	68019343	Energy	Energy	"Krebs cycle"	"Organic acids"	"Organic acids"
+"Fumaric acid"	Fumarate	HMDB00134	C00122	444972	chebiId:18012	67032005	Energy	Energy	"Krebs cycle"	"Organic acids"	Energy
+"Glyceric acid"	Glycerate	HMDB00139	C00258	752	chebiId:32398	67042971	Energy	Carbohydrate	"Glycolysis; gluconeogenesis; pyruvate metabolism"	Carbohydrates	Energy
+"Isocitric acid"	Isocitrate	HMDB00193	C00311	1198	chebiId:30887	67034219	Energy		NA	"Organic acids"	"Organic acids"
+"Lactic acid"	Lactate	HMDB00190	C00186	612	chebiId:422	68019344	Energy	Carbohydrate	"Glycolysis; gluconeogenesis; pyruvate metabolism"	"Organic acids"	Energy
+"Malic acid"	Malate	HMDB00156	C00149	525	chebiId:6650	67030298	Energy	Energy	"Krebs cycle"	"Organic acids"	Energy
+"Malonic acid"	Malonate	HMDB00691	C00383	867	chebiId:30794	67030290	Energy		NA	"Organic acids"	Energy
+"Oxaloacetic acid"	Oxaloacetate	HMDB00223	C00036	970	chebiId:30744	68062907	Energy		NA	"Organic acids"	"Organic acids"
+"Phosphoenolpyruvic acid"	PEP	HMDB00263	C00074	1005	chebiId:44897	68010728	Energy	Carbohydrate	"Glycolysis; gluconeogenesis; pyruvate metabolism"	"Organic acids"	Energy
+"Phosphoric acid"	Phosphate	HMDB01429	C00009	1004	chebiId:26078	67030242	Energy	Energy	"Oxidative phosphorylation"	Unclassified	Energy
+"Pyruvic acid"	Pyruvate	HMDB00243	C00022	1060	chebiId:32816	68019289	Energy	Carbohydrate	"Glycolysis; gluconeogenesis; pyruvate metabolism"	"Organic acids"	"Organic acids"
+"Succinic acid"	Succinate	HMDB00254	C00042	1110	chebiId:15741	68019802	Energy	Energy	"Krebs cycle"	"Organic acids"	Energy
+"2-hydroxy-2-methylbutyric acid"	2-OH-2-MeButyrate			95433		67521666	"Fatty Acyls"		NA	"Fatty Acyls"	"Fatty Acyls"
+"2-hydroxy-3-methylbutyric acid"	2-OH-3-MeButyrate			5289545		67521666	"Fatty Acyls"		NA	"Fatty Acyls"	"Fatty Acyls"
+"2-hydroxybutyric acid"	2-OHButyrate	HMDB00008	C05984	11266	chebiId:1148	67031570	"Fatty Acyls"		"Cysteine; methionine; SAM; taurine metabolism"	"Organic acids"	"Amino acids 2"
+"2-methyl-4-oxovaleric acid"	2-Me-4-oxovalerate			225902			"Fatty Acyls"		NA		
+"2-oxovaleric acid"	2-oxovalerate	HMDB01865	C06255	74563	chebiId:33033	67015963	"Fatty Acyls"		NA		
+"3-methyl-2-oxovaleric acid"	3-Me-2-oxovalerate	HMDB00491	C03465	47	chebiId:35932	67016211	"Fatty Acyls"		NA	"Organic acids"	"Organic acids"
+"Acetic acid"	Acetate	HMDB00042	C00033	176	chebiId:15366	68019342	"Fatty Acyls"		NA	"Organic acids"	"Organic acids"
+"Acetoacetic acid"	Acetoacetate	HMDB00060	C00164	96	chebiId:13705;chebiId:15344	67016635	"Fatty Acyls"	Lipid	"Ketone bodies"	"Organic acids"	"Organic acids"
+"Arachidonic acid"	Arachidonate	HMDB01043	C00219	444899	chebiId:15843	68016718	"Fatty Acyls"	Steroids	"Long chain fatty acid"	"Fatty Acyls"	Lipids
+"Behenic acid"	Behenate	HMDB00944	C08281	8215	chebiId:28941	67007547	"Fatty Acyls"	Lipid	NA	"Fatty Acyls"	Lipids
+"Butanoic acid"	Butanoate	HMDB00039	C00246	264	chebiId:30772	68020148	"Fatty Acyls"		NA	"Fatty Acyls"	"Fatty Acyls"
+"Capric acid"	Caprate	HMDB00511	C01571	2969	chebiId:30813	67031071	"Fatty Acyls"	Lipid	"Medium chain fatty acid"	"Fatty Acyls"	Lipids
+"Caproic acid"	Caproate	HMDB00535	C01585	8892	chebiId:30776	67037652	"Fatty Acyls"	Lipid	"Medium chain fatty acid"	"Fatty Acyls"	Lipids
+"Caprylic acid"	Caprylate	HMDB00482	C06423	379	chebiId:28837	67031492	"Fatty Acyls"	Lipid	"Medium chain fatty acid"	"Fatty Acyls"	Lipids
+"Elaidic acid"	Elaidate	HMDB00573	C01712	637517	chebiId:27997	67011459	"Fatty Acyls"		NA	"Fatty Acyls"	"Fatty Acyls"
+"Heptanoic acid"	Heptanoate	HMDB00666	C17714	8094	chebiId:45571		"Fatty Acyls"		NA	"Fatty Acyls"	Lipids
+"Isobutyric acid"	Isobutyrate	HMDB01873	C02632	6590	chebiId:16135	67020380	"Fatty Acyls"		NA	"Organic acids"	"Organic acids"
+"Isocaproic acid"	Isocaproate	HMDB00689		12587	chebiId:74903	67034527	"Fatty Acyls"		NA	"Fatty Acyls"	"Fatty Acyls"
+"Isovaleric acid"	Isovalerate	HMDB00718	C08262	10430	chebiId:28484	67008216	"Fatty Acyls"	Lipid	"Fatty acid metabolism"	"Fatty Acyls"	"Fatty Acyls"
+"Lauric acid"	Laurate	HMDB00638	C02679	3893	chebiId:30805	67030358	"Fatty Acyls"	Lipid	"Medium chain fatty acid"	"Fatty Acyls"	Lipids
+"Linoleic acid"	Linoleate	HMDB00673	C01595	5280450	chebiId:17351	68019787	"Fatty Acyls"	Lipid	"Essential fatty acid"	"Fatty Acyls"	Lipids
+"Margaric acid"	Margarate	HMDB02259		10465		67013102	"Fatty Acyls"	Lipid	"Long chain fatty acid"	"Fatty Acyls"	Lipids
+"Myristic acid"	Myristate	HMDB00806	C06424	11005	chebiId:28875	68019814	"Fatty Acyls"	Lipid	"Long chain fatty acid"	"Fatty Acyls"	Lipids
+"Nonanoic acid"	Nonanoate	HMDB00847	C01601	8158	chebiId:29019	67008776	"Fatty Acyls"	Lipid	"Medium chain fatty acid"	"Fatty Acyls"	Lipids
+"Oleic acid"	Oleate	HMDB00207	C00712	445639	chebiId:16196	68019301	"Fatty Acyls"	Lipid	"Long chain fatty acid"	"Fatty Acyls"	Lipids
+"Palmitic acid"	Palmitate	HMDB00220	C00249	985	chebiId:15756	68019308	"Fatty Acyls"	Lipid	"Long chain fatty acid"	"Fatty Acyls"	Lipids
+"Palmitoleic acid"	Palmitoleate	HMDB03229	C08362	445638	chebiId:28716	67008757	"Fatty Acyls"	Lipid	"Long chain fatty acid"	"Fatty Acyls"	Lipids
+"Propionic acid"	Propionate	HMDB00237	C00163	1032	chebiId:30768	67029658	"Fatty Acyls"		NA	"Organic acids"	"Organic acids"
+"Stearic acid"	Stearate	HMDB00827	C01530	5281	chebiId:28842	67031183	"Fatty Acyls"	Lipid	"Long chain fatty acid"	"Fatty Acyls"	Lipids
+"Valeric acid"	Valerate	HMDB00892	C00803	7991	chebiId:17418	67038780	"Fatty Acyls"		NA	"Fatty Acyls"	"Fatty Acyls"
+"Sebacic acid"	Sebacate	HMDB00792	C08277	5192	chebiId:41865	67011107	"Fatty Acyls"		NA	"Fatty Acyls"	Lipids
+Glycerol-3-phosphate	Glycerol-3P	HMDB00126	C00093	439162	chebiId:15978	67029620	Lipids	Lipid	"Glycerolipid metabolism"	Lipids	Lipids
+O-phosphoethanolamine	OPEth	HMDB00224	C00346	1015	chebiId:17553	67005448	Lipids	Lipid	"Glycerolipid metabolism"	"Organic acids"	Lipids
+N1-acetylspermidine	N1-AcSpd	HMDB01276	C00612	496	chebiId:17927	67017988	Polyamine		NA	"Amino acids"	Polyamine
+N1-acetylspermine	N1-AcSpm	HMDB01186	C02567	916	chebiId:17312	67029452	Polyamine		NA	"Amino acids"	Polyamine
+N1-acetyltriethylenetetramine	MAT			10313446			Polyamine		NA	"Amino acids"	Polyamine
+N1,N10-diacetyltriethylenetetramine	DAT			76974421			Polyamine		NA	"Amino acids"	Polyamine
+N1,N12-diacetylspermine	N1,N12-DiAcSpm	HMDB02172;HMDB41876	C03413	132680	chebiId:28101	67029453	Polyamine		NA	"Amino acids"	Polyamine
+N1,N8-diacetylspermidine	N1,N8-DiAcSpd	HMDB41947		389613			Polyamine		NA	"Amino acids"	Polyamine
+N8-acetylspermidine	N8-AcSpd	HMDB02189	C01029	123689	chebiId:27911	67030223	Polyamine		NA	"Amino acids"	Polyamine
+N-acetylputrescine	NAcPutrescine	HMDB02064	C02714	122356	chebiId:17768	67026212	Polyamine		NA	"Organic acids"	Polyamine
+Putrescine	Putrescine	HMDB01414	C00134	1045	chebiId:17148	68011700	Polyamine	"Amino acid"	"Polyamine metabolism"	Unclassified	Polyamine
+S-adenosylhomocysteine	SAH	HMDB00939	C00021	439155	chebiId:16680	68012435	Polyamine	"Amino acid"	"Cysteine; methionine; SAM; taurine metabolism"	Nucleosides	Polyamine
+S-adenosylmethionine	SAM	HMDB01185	C00019	34756	chebiId:15414	68012436	Polyamine	"Amino acid"	"Cysteine; methionine; SAM; taurine metabolism"	Nucleosides	Polyamine
+Spermidine	Spermidine	HMDB01257	C00315	1102	chebiId:16610	68013095	Polyamine	"Amino acid"	"Polyamine metabolism"	Unclassified	Polyamine
+Spermine	Spermine	HMDB01256	C00750	1103	chebiId:15746	68013096	Polyamine		NA	Unclassified	Polyamine
+Triethylenetetramine	TETA		C07166	5565	chebiId:39501	68014266	Polyamine		NA	"Amino acids"	Polyamine
+"12-dehydrocholic acid"	12-dehydroCA	HMDB00400	C01292	94235	chebiId:16312	67025576	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"7,12-dihydroxy-3-oxocholanoic acid"	3-dehydroCA			5283956		67017234	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Alpha-muricholic acid"	aMCA	HMDB00506	C17647	5283852	chebiId:81243	67004821	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Beta-muricholic acid"	bMCA	HMDB00415	C17726	5283853	chebiId:81298	67004821	Steroids	Steroids	"Bile acid metabolism"	Steroids	Steroids
+"Chenodeoxycholic acid"	CDCA	HMDB00518	C02528	10133	chebiId:16755	68002635	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+Cholesterol	Cholesterol	HMDB00067	C00187	5997	chebiId:16113	68002784	Steroids	Lipid	Sterol/Steroid	Steroids	Steroids
+"Cholic acid"	CA	HMDB00619	C00695	221493	chebiId:16359	68019826	Steroids	Steroids	"Bile acid metabolism"	Steroids	Steroids
+"Cholic acid_ISO"	CA_ISO	HMDB00619	C00695	221493	chebiId:16359	68019826	Steroids	Steroids	"Bile acid metabolism"	Steroids	Steroids
+"Deoxycholic acid"	DCA	HMDB00626	C11171;C04483	222528	chebiId:28834	68003840	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Glycochenodeoxycholic acid"	G-CDCA	HMDB00637;HMDB06898	C05466	12544	chebiId:36274	68005999	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Glycocholic acid"	G-CA	HMDB00138	C01921	10140	chebiId:17687	68006000	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Glycodeoxycholic acid"	G-DCA	HMDB00631	C05464	3035026	chebiId:27471	68006002	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Glycohyocholic acid"	G-HCA			71361462	chebiId:133176		Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Glycohyodeoxycholic acid"	G-HDCA			114611		67043888	Steroids	Lipid	"Bile acid metabolism"	Steroids	
+"Glycoursodeoxycholic acid"	G-UDCA	HMDB00708		12310288		67024033	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Hyocholic acid"	HCA	HMDB00760	C17649	92805	chebiId:81244	67004821	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Hyodeoxycholic acid"	HDCA	HMDB00733		5283820	chebiId:52023	67010471	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Isodeoxycholic acid"	isoDCA	HMDB02536	C17661	164672			Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Lithocholic acid"	LCA	HMDB00761	C03990	9903	chebiId:16325	68008095	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Murideoxycholic acid"	MDCA	HMDB00811	C15515	5283821	chebiId:52030	67010471	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Omega-muricholic acid"	wMCA	HMDB00364	C17727	5283851	chebiId:81299	67004821	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Tauro-alpha-muricholic acid"	T-aMCA			101657566		67037351	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Tauro-beta-muricholic acid"	T-bMCA	HMDB00932		21124703	chebiId:133057	67037351	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Taurochenodeoxycholic acid"	T-CDCA	HMDB00951	C05465	387316	chebiId:16525	68013655	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Taurocholic acid"	T-CA	HMDB00036	C05122	6675	chebiId:28865	68013656	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Taurocholic acid_ISO"	T-CA_ISO	HMDB00036	C05122	6675	chebiId:28865	68013656	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Taurodeoxycholic acid"	T-DCA	HMDB00896	C05463	2733768	chebiId:9410	68013657	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Taurohyocholic acid"	T-HCA		C15516	11954195	chebiId:52022		Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Taurohyodeoxycholic acid"	T-HDCA			119046		67083510	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Taurolithocholic acid"	T-LCA	HMDB00722	C02592	439763	chebiId:36259	68013658	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Tauro-omega-muricholic acid"	T-wMCA			118703092			Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Tauroursodeoxycholic acid"	T-UDCA	HMDB00874		9848818		67031655	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"Ursodeoxycholic acid"	UDCA	HMDB00946	C07880	31401	chebiId:9907	68014580	Steroids	Lipid	"Bile acid metabolism"	Steroids	Steroids
+"4-hydroxymandelic acid"	4-OHMandelate	HMDB00822	C11527	328	chebiId:16388	67014600	Xenobiotics		NA	Unclassified	Xenobiotics
+"Benzoic acid"	Benzoate	HMDB01870	C00180	243	chebiId:30746	68019817	Xenobiotics		NA	Unclassified	Xenobiotics
+"Beta-hydroxypyruvic acid"	b-OHPyruvate	HMDB01352	C00168	964	chebiId:30841	67012375	Xenobiotics	"Amino acid"	"Glycine; serine and threonine metabolism"	"Organic acids"	Xenobiotics
+Erythritol	Erythritol	HMDB02994	C00503	8998	chebiId:17113	67002053	Xenobiotics	Xenobiotics	"Sugar; sugar substitute; starch"	Carbohydrates	Xenobiotics
+"Ferulic acid"	Ferulate	HMDB00537;HMDB00954	C01494	445858	chebiId:17620	67004999	Xenobiotics		NA	Flavonoids	Xenobiotics
+"Glycolic acid"	Glycolate	HMDB00115	C00160	757	chebiId:17497	67031149	Xenobiotics	Xenobiotics	Chemical	"Organic acids"	Xenobiotics
+"Hippuric acid"	Hippurate	HMDB00714	C01586	464	chebiId:18089	67030514	Xenobiotics	Xenobiotics	"Benzoate metabolism"	Unclassified	Xenobiotics
+"Indole-3-acrylic acid"	Indole-3-acrylate	HMDB00734		5375048	chebiId:132244	67001446	Xenobiotics		NA	Indoles	Indoles
+"Methylmalonic acid"	MeMalonate	HMDB00202	C02170	487	chebiId:30860	68008764	Xenobiotics		NA	"Organic acids"	"Organic acids"
+"Methylsuccinic acid"	MeSuccinate	HMDB01844		10349		67039138	Xenobiotics		NA	"Fatty Acyls"	Xenobiotics
+N-propylamine	N-propylamine	HMDB34006		7852			Xenobiotics		NA	Unclassified	Xenobiotics
+"Phenylbutyric acid"	Phenylbutyrate	HMDB00543		4775	chebiId:41500	67075773	Xenobiotics		NA	Unclassified	Xenobiotics
+Pyrocatechol	Pyrocatechol	HMDB00957	C00090	289	chebiId:18135	67034221	Xenobiotics	Xenobiotics	"Benzoate metabolism"	Unclassified	Xenobiotics
+"Shikimic acid"	Shikimate	HMDB03070	C00493	8742	chebiId:16119	68012765	Xenobiotics		NA	Unclassified	Xenobiotics

@@ -1,6 +1,6 @@
 
 corrSetQC<-function(obj,what,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[which(obj$Meta$sType=="QC")],
-                    nminQC=3,propNNA=0.5,lPcs=1:2,outfile=NULL,doplot=TRUE,Date2use="Date",complete="nothing",ipc=1,imod=4,verbose=FALSE){
+                    nminQC=3,propNNA=0.5,lPcs=1:2,Batch=NULL,outfile=NULL,doplot=TRUE,Date2use="Date",complete="nothing",ipc=1,imod=4,verbose=FALSE){
   
   if(!Date2use%in%names(obj$File)) stop("********* Date does not exist *********")
   if(any(is.na(obj$File[Samp2Corr,Date2use]))) warning("******** Date unknown for several samples! **********")
@@ -9,6 +9,8 @@ corrSetQC<-function(obj,what,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[
   
   m=obj$Data[[what]][Samp2Corr,Var2Corr]
   dts=obj$File[Samp2Corr,Date2use]
+  batchsa=rep(1,length(Samp2Corr))
+  if(!is.null(Batch)) batchsa=obj$File[Samp2Corr,Batch]
   dtsn=as.numeric(dts)#-mean(as.numeric(dts),na.rm=T)
   names(dtsn)=names(dts)=Samp2Corr
   
@@ -16,20 +18,35 @@ corrSetQC<-function(obj,what,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[
   clqc=lQC[lQC%in%Samp2Corr]
   if(length(clqc)<nminQC) stop("Not enough QC with data available")
   
+
   if(any(dts[Samp2Corr]<min(dts[clqc])))  warning(paste0("***** ",sum(dts[Samp2Corr]<min(dts[clqc]))," samples before the first QC **********"))
   if(any(dts[Samp2Corr]>max(dts[clqc])))  warning(paste0("***** ",sum(dts[Samp2Corr]>max(dts[clqc]))," samples after the last QC **********"))
   
   clqc=clqc[order(dts[clqc])]
   curmat=names(which(colSums(!is.na(m[clqc,]))>=nminQC))
   clqc=clqc[(rowSums(!is.na(m[clqc,curmat]))/length(curmat))>propNNA]
+  
+  batchcl=rep(1,length(clqc))
+  if(!is.null(Batch)) batchcl=obj$File[clqc,Batch]
+  
+  ################
+  llevs=unique(c(batchcl,batchsa))
+  batchsa=factor(batchsa,levels=llevs)
+  batchcl=factor(batchcl,levels=llevs)
+  if(length(llevs)<3){
+    batchsa=as.numeric(batchsa)
+    batchcl=as.numeric(batchcl)
+  }
+  ################  
+ 
   cat("QC samples:",clqc,"\n")
   cat("Num. of variables:",length(curmat),"out of",ncol(m),"\n")
   mqc=mqc2=log2(m[clqc,curmat])
   meqc=colMeans(mqc,na.rm=T)
   
   if(any(is.na(mqc2))) mqc2=t(impute.knn(t(mqc2),k=max(3,length(clqc)-2))$data)
-  print(str(mqc))
-  print(str(mqc2))
+  # print(str(mqc))
+  # print(str(mqc2))
   mqc2=sweep(mqc2,2,meqc)
   pcqc=prcomp(mqc2)
   lPcs=lPcs[lPcs%in%(1:ncol(pcqc$rotation))]
@@ -39,32 +56,32 @@ corrSetQC<-function(obj,what,Samp2Corr=obj$Sid,Var2Corr=obj$Analyte,lQC=obj$Sid[
   andf=andfsa=list()
   for(i in lPcs){
     cat(".")
-    ndf=data.frame(dts2=seq(min(dtsn),max(dtsn),length.out = 100)-de)
-    ndfsa=data.frame(dts2=dtsn-de)
-    
+   # ndf=data.frame(dts2=seq(min(dtsn),max(dtsn),length.out = 100)-de)
+    ndfsa=ndf=data.frame(dts2=dtsn-de,batchcl=batchsa)
+    if(length(llevs)==1) ndf=data.frame(dts2=seq(min(dtsn),max(dtsn),length.out = 100)-de,batchcl=1)
     ndfsa$dts2[ndfsa$dts2<min(ndf$dts2)]=min(ndf$dts2)
     ndfsa$dts2[ndfsa$dts2>max(ndf$dts2)]=max(ndf$dts2)
-    
-    lmm=lm(pcqc$x[,i]~dts2)
+  #  print(batchcl)
+    lmm=lm(pcqc$x[,i]~dts2+batchcl)
     ndf$pr1=predict(lmm,newdata=ndf,se=TRUE)$fit
     ndf$se1=predict(lmm,newdata=ndf,se=TRUE)$se.fit
     ndfsa$pr1=predict(lmm,newdata=ndfsa,se=TRUE)$fit
     ndfsa$se1=predict(lmm,newdata=ndfsa,se=TRUE)$se.fit
     ###
-    lmm2=lm(pcqc$x[,i]~dts2+I(dts2^2))
+    lmm2=lm(pcqc$x[,i]~dts2+I(dts2^2)+batchcl)
     ndf$pr2=predict(lmm2,newdata=ndf,se=TRUE)$fit
     ndf$se2=predict(lmm2,newdata=ndf,se=TRUE)$se.fit
     ndfsa$pr2=predict(lmm2,newdata=ndfsa,se=TRUE)$fit
     ndfsa$se2=predict(lmm2,newdata=ndfsa,se=TRUE)$se.fit
     ###
-    lmm3=lm(pcqc$x[,i]~dts2+I(dts2^2)+I(dts2^3))
+    lmm3=lm(pcqc$x[,i]~dts2+I(dts2^2)+I(dts2^3)+batchcl)
     ndf$pr3=predict(lmm3,newdata=ndf,se=TRUE)$fit
     ndf$se3=predict(lmm3,newdata=ndf,se=TRUE)$se.fit
     ndfsa$pr3=predict(lmm3,newdata=ndfsa,se=TRUE)$fit
     ndfsa$se3=predict(lmm3,newdata=ndfsa,se=TRUE)$se.fit
     ###
-    lmm4<-try(gam(pcqc$x[,i]~s(dts2)),TRUE)
-    if("try-error"%in%class(lmm4)) lmm4=gam(pcqc$x[,i]~dts2)
+    lmm4<-try(gam(pcqc$x[,i]~s(dts2)+batchcl),TRUE)
+    if("try-error"%in%class(lmm4)) lmm4=gam(pcqc$x[,i]~dts2+batchcl)
     ndf$pr4=predict(lmm4,newdata=ndf,se=TRUE)$fit
     ndf$se4=predict(lmm4,newdata=ndf,se=TRUE)$se.fit
     ndfsa$pr4=predict(lmm4,newdata=ndfsa,se=TRUE)$fit

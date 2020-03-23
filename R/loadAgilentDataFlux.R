@@ -103,12 +103,13 @@ loadAgilentDataFlux<-function(ifile,ofile=NULL,params=list()){
   newnamf=factor(newnam,levels=unique(newnam))
   lumetnams=tapply(newnam,newnamf,unique)
   annot=data.frame(Analyte=tapply(newnam,newnamf,unique),MetName=tapply(metnams2,newnamf,unique),
-                   IsSTD=FALSE,RT=NA,LevelAnnot=1,
+                   IsSTD=FALSE,IsISO=FALSE,RT=NA,LevelAnnot=1,
                    OriginalName=tapply(metnams,newnamf,unique),
                    Q1=tapply(q1,newnamf,unique),
                    Q3=tapply(q3,newnamf,unique),
                    Iso=tapply(niso,newnamf,unique),
                    stringsAsFactors = F)
+  annot$IsISO[which(annot$Iso>0)]=TRUE
   lso=order(factor(annot$MetName,levels=unique(annot$MetName)),annot$Iso)
   annot=annot[lso,]
   

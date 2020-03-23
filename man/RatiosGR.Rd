@@ -4,6 +4,7 @@
 \name{RatiosGR}
 \docType{data}
 \alias{RatiosGR}
+\alias{RatiosGR2}
 
 \title{Annotation database of ratios}
 \usage{
@@ -26,5 +27,6 @@ David Enot \email{david.enot@gustaveroussy.fr}
 
 \examples{
 str(RatiosGR)
+str(RatiosGR2)
 }    
 \keyword{datasets}

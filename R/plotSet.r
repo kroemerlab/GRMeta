@@ -2,18 +2,18 @@ plot.metaboSet<-function(obj,outfile=NULL,
                          lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1",log="y"),c("Height~Area",log="xy")),
                          mfrow=c(2,2),colorCol=NULL,deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),cexBP=0.5,cexBX=.8,
                          cexEL=0.4,cexPT=1.5,spacingBX=1.05,...){
-
+  
   mgraphs=t(sapply(lgraphs,function(x) strsplit(x[1],"~")[[1]][1:2]))
   mgraphs[grep("^[0-9]$",mgraphs[,2]),2]=NA
   ltyps=c(names(obj$Meta),names(obj$Data))
   l2keep=which(mgraphs[,1]%in%ltyps & (mgraphs[,2]%in%ltyps | is.na(mgraphs[,2])))
   if("Eic" %in% names(obj)) l2keep=sort(c(l2keep,which(mgraphs[,1]=="Eic")))
-#  print(mgraphs)
+  #  print(mgraphs)
   lgraphs=lgraphs[l2keep]
   mgraphs=na.omit(unique(as.vector(mgraphs[l2keep,])))
   
   if(length(lgraphs)==0) stop("Graphs cannot be matched to the obj$Meta or obj$Data")
-
+  
   dots<-list(...)
   lanalytes=NULL
   for(k in names(obj$Annot))  if(!is.null(dots[[k]])){
@@ -33,15 +33,15 @@ plot.metaboSet<-function(obj,outfile=NULL,
   l1=mgraphs[mgraphs%in%names(obj$Data)]
   m1=do.call("cbind",lapply(l1,function(x) colSums(!is.na(obj$Data[[x]][,lanalytes,drop=F]))))
   lanalytes=names(which(rowSums(m1>1)>0))
- if(any(rowSums(m1>1)==0)) cat("Excluded:",names(which(rowSums(m1>1)==0)),"\n")
+  if(any(rowSums(m1>1)==0)) cat("Excluded:",names(which(rowSums(m1>1)==0)),"\n")
   ###
   
   if(!is.null(outfile)){
-      if(msg) cat("Analytes could not be matched: all are exported to ",outfile,"\n",sep="")
+    if(msg) cat("Analytes could not be matched: all are exported to ",outfile,"\n",sep="")
     pdf(file=outfile,width = ifelse(is.null(dots$width),8,dots$width),height = ifelse(is.null(dots$height),6,dots$height))
   }
   if(msg & is.null(outfile)){
-    cat("Analytes could not be matched, using",lanalytes[1],"\n",sep="")
+    cat("Analytes could not be matched, using ",lanalytes[1],"\n",sep="")
     lanalytes=lanalytes[1]
   }
   for(i in unique(lanalytes))
@@ -72,209 +72,211 @@ plot.metaboSet<-function(obj,outfile=NULL,
 
 ################################################################################################################################
 .plotOneAnalyte<-function(obj,analyte=obj$Analyte[1],
-                         lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1"),c("Height~Area",log="xy")),
-                         mfrow=c(2,2),colorCol=NULL,deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),
-                         cexBP=0.5,cexBX=0.8,cexEL=0.4,cexPT=1.2,spacingBX=1.05,...){
-
-# dots=list();analyte=obj$Analyte[1];lgraphs=list(c("RT~InjOrder"),c("Area~Height",log="yx"),c("Height~1"),c("Height~Sid",log="xy"));mfrow=c(2,2);deltaRT=0.05;linking=NULL;orderBPlots="sType";cexBP=0.5
-# obj$Meta$Grp=factor(obj$Meta$sType,levels=c("Sa","QC"))
-#print(lgraphs)
-dots<-list(...)
-dots=dots[names(dots)%in%names(par())]
-
-lparams=unique(unlist(lapply(lgraphs,function(x) strsplit(x[1],"[~\\|]")[[1]])))
-#print(lparams)
-#print(lparams)
-lparams1=unique(c(lparams[lparams%in%names(obj$Meta)],orderBPlots[orderBPlots%in%names(obj$Meta)]))
-lparams2=lparams[lparams%in%names(obj$Data)]
-
-idf=obj$Meta[,unique(c("Sid","sType",lparams1))]
-for(i in lparams2)
-  if(sum(!is.na(obj$Data[[i]][,analyte]))>2)
-    eval(parse(text=paste("idf$",i,"=obj$Data[[i]][,analyte]",sep="")))
-
-idf$color=brewer.pal(9,"Set1")[-6][as.numeric(factor(idf$sType))]
-if(!is.null(colorCol)) if(!is.na(colorCol)) if(colorCol%in%names(obj$Meta)) idf$color=obj$Meta[,colorCol]
-
-idf$color[is.na(idf$color)]="black"
-rownames(idf)=idf$Sid
-#print(str(idf))
-if("InjOrder"%in%names(idf)) idf=idf[order(idf$InjOrder),]
-
-par.def=par(no.readonly = TRUE)
-#print(par.def)
-###############
-# Set RT/InjOrder/MZ
-medRT0=injlim=NULL
-.getrtlim<-function(idf,irt="RT",deltaRT){
-  nround=ceiling(abs(log10(0.05)))
-  medRT0=median(idf[,irt],na.rm=TRUE)
-  medRT=round(median(idf[,irt],na.rm=TRUE),nround)
-  rtlim=c(medRT0+c(-1,1)*deltaRT)
-#  print(c(medRT0,medRT,deltaRT,rtlim))
-  rtlim=c(floor(rtlim[1]*10^nround),ceiling(rtlim[2]*10^nround))/10^nround
-  rtlim=seq(rtlim[1],rtlim[2],deltaRT/5)
-  ly=range(idf$RT,medRT+deltaRT/2,medRT-deltaRT/2,na.rm=TRUE)
-  rtlim=rtlim[rtlim>=min(ly) & rtlim<=max(ly)]
-  return(list(rtlim=rtlim,medRT0=medRT0,medRT=medRT))
-}
-
-if("InjOrder"%in%lparams){
-  injlim=range(idf$InjOrder,na.rm=TRUE)*c(.9,1)
-  f=ifelse(diff(injlim)>80,20,10)
-  injlim=seq(floor(injlim[1]/f),ceiling(injlim[2]/f)*f,f)
-}
-#####
-
-if(!is.null(mfrow)) par(mfrow=mfrow)
-for(iplot in 1:length(lgraphs)){
+                          lgraphs=list(c("RT~InjOrder"),c("Area~InjOrder",log="y"),c("Area~1"),c("Height~Area",log="xy")),
+                          mfrow=c(2,2),colorCol=NULL,deltaRT=0.05,linking="QC",orderBPlots=c("sType","InjOrder"),
+                          cexBP=0.5,cexBX=0.8,cexEL=0.4,cexPT=1.2,spacingBX=1.05,...){
   
-  logs="";vlines=hlines=NULL;
-  x=lgraphs[[iplot]]
-#  print(x)
-  if("log"%in%names(lgraphs[[iplot]])){
-    logs=x["log"]
-    x=x[!names(x)%in%"log"]
-  }
-  if("h"%in%names(lgraphs[[iplot]])){
-    hlines=as.numeric(strsplit(x["h"],";")[[1]])
-    x=x[!names(x)%in%"h"]
-  }
-  if("v"%in%names(lgraphs[[iplot]])){
-    vlines=as.numeric(strsplit(x["v"],";")[[1]])
-    x=x[!names(x)%in%"v"]
+  # dots=list();analyte=obj$Analyte[1];lgraphs=list(c("RT~InjOrder"),c("Area~Height",log="yx"),c("Height~1"),c("Height~Sid",log="xy"));mfrow=c(2,2);deltaRT=0.05;linking=NULL;orderBPlots="sType";cexBP=0.5
+  # obj$Meta$Grp=factor(obj$Meta$sType,levels=c("Sa","QC"))
+  #print(lgraphs)
+  dots<-list(...)
+  dots=dots[names(dots)%in%names(par())]
+  
+  lparams=unique(unlist(lapply(lgraphs,function(x) strsplit(x[1],"[~\\|]")[[1]])))
+  #print(lparams)
+  #print(lparams)
+  lparams1=unique(c(lparams[lparams%in%names(obj$Meta)],orderBPlots[orderBPlots%in%names(obj$Meta)]))
+  lparams2=lparams[lparams%in%names(obj$Data)]
+  
+  idf=obj$Meta[,unique(c("Sid","sType",lparams1))]
+  for(i in lparams2)
+    if(sum(!is.na(obj$Data[[i]][,analyte]))>2)
+      eval(parse(text=paste("idf$",i,"=obj$Data[[i]][,analyte]",sep="")))
+  
+  idf$color=brewer.pal(9,"Set1")[-6][as.numeric(factor(idf$sType))]
+  if(!is.null(colorCol)) if(!is.na(colorCol)) if(colorCol%in%names(obj$Meta)) idf$color=obj$Meta[,colorCol]
+  
+  idf$color[is.na(idf$color)]="black"
+  rownames(idf)=idf$Sid
+  #print(str(idf))
+  #if("InjOrder"%in%names(idf)) idf=idf[order(idf$InjOrder),]
+  
+  par.def=par(no.readonly = TRUE)
+  #print(par.def)
+  ###############
+  # Set RT/InjOrder/MZ
+  medRT0=injlim=NULL
+  .getrtlim<-function(idf,irt="RT",deltaRT){
+    nround=ceiling(abs(log10(0.05)))
+    medRT0=median(idf[,irt],na.rm=TRUE)
+    medRT=round(median(idf[,irt],na.rm=TRUE),nround)
+    rtlim=c(medRT0+c(-1,1)*deltaRT)
+    #  print(c(medRT0,medRT,deltaRT,rtlim))
+    rtlim=c(floor(rtlim[1]*10^nround),ceiling(rtlim[2]*10^nround))/10^nround
+    rtlim=seq(rtlim[1],rtlim[2],deltaRT/5)
+    ly=range(idf$RT,medRT+deltaRT/2,medRT-deltaRT/2,na.rm=TRUE)
+    rtlim=rtlim[rtlim>=min(ly) & rtlim<=max(ly)]
+    return(list(rtlim=rtlim,medRT0=medRT0,medRT=medRT))
   }
   
- # print(logs)
-  whatx=strsplit(x,"~")[[1]][2]
-  whaty=strsplit(x,"~")[[1]][1]
-  ########################
-  #### y-axis
-  if(!whaty%in%c(names(idf),"Eic")){
-    plot(0:1,0:1,axes=F,xlab="",ylab="",cex=0)
-    text(.5,.5,lgraphs[[iplot]][1])
-    next}
-  ylim=NULL
-  if(whaty=="Eic") ylim=c(0,Inf)
-  if(whaty!="Eic"){
-    vy=idf[,whaty]
-  if(whaty=="RT" | grepl("^RT\\.",whaty)){
-    rtlims=.getrtlim(idf,whaty,deltaRT);rtlim=rtlims$rtlim;medRT0=rtlims$medRT0;medRT=rtlims$medRT;
-    ylim=rtlim;vy[which(vy>=max(rtlim))]=max(rtlim);vy[which(vy<=min(rtlim))]=min(rtlim)
+  if("InjOrder"%in%lparams){
+    injlim=range(idf$InjOrder,na.rm=TRUE)*c(.9,1)
+    f=ifelse(diff(injlim)>80,20,10)
+    injlim=seq(floor(injlim[1]/f),ceiling(injlim[2]/f)*f,f)
   }
-  if(whaty=="InjOrder") ylim=injlim
-  if(is.null(ylim)){
-    if(length(grep("y",logs))>0){
-      vy[which(vy<=0)]=min(vy,na.rm=TRUE)/2
-      ylim=.infctlimlog(vy)
-    } else ylim=pretty(seq(min(vy,na.rm=TRUE),max(vy,na.rm=TRUE),length.out = 7))
-  }
-  idf$Y=vy
-  if(sum(!is.na(vy))<2){
-    plot(0:1,0:1,axes=F,xlab="",ylab="",cex=0)
-    text(.5,.5,lgraphs[[iplot]][1])
-    next
+  #####
+  
+  if(!is.null(mfrow)) par(mfrow=mfrow)
+  for(iplot in 1:length(lgraphs)){
+    
+    logs="";vlines=hlines=NULL;
+    x=lgraphs[[iplot]]
+    #  print(x)
+    if("log"%in%names(lgraphs[[iplot]])){
+      logs=x["log"]
+      x=x[!names(x)%in%"log"]
     }
-  }
-#  print(logs)
-  ########################
-  #### x-axis
-  if(whaty!="Eic"){
-  if(is.na(whatx) | !whatx%in%names(idf)){
-    whatx=NULL
-    logs=gsub("x","",logs)
-  }
-  xlim=vx=NULL
-  if(!is.null(whatx) & whaty!="Eic"){
-    vx=idf[,whatx]
-    if(whatx=="RT" | grepl("^RT\\.",whatx)){
-      rtlims=.getrtlim(idf,whatx,deltaRT);rtlim=rtlims$rtlim;medRT0=rtlims$medRT0;medRT=rtlims$medRT;
-      xlim=rtlim;vx[which(vx>=max(rtlim))]=max(rtlim);vx[which(vx<=min(rtlim))]=min(rtlim)
+    if("h"%in%names(lgraphs[[iplot]])){
+      hlines=as.numeric(strsplit(x["h"],";")[[1]])
+      x=x[!names(x)%in%"h"]
     }
-    if(whatx=="InjOrder") xlim=injlim
-    if(is.character(vx)) xlim=c(0.3,length(vx)+.7)      
-    if(is.factor(vx)) xlim=c(0.3,nlevels(vx)+.7)      
-    if(is.null(xlim)){
-      if(length(grep("x",logs))>0){
-        vx[which(vx<=0)]=min(vx,na.rm=T)/2
-        xlim=.infctlimlog(vx)
-      } else xlim=pretty(seq(min(vx),max(vx),length.out = 7))
+    if("v"%in%names(lgraphs[[iplot]])){
+      vlines=as.numeric(strsplit(x["v"],";")[[1]])
+      x=x[!names(x)%in%"v"]
     }
-    idf$X=vx
-    if(!is.null(whatx)) if(sum(!is.na(idf[,whatx]))<2){
+    
+    # print(logs)
+    whatx=strsplit(x,"~")[[1]][2]
+    whaty=strsplit(x,"~")[[1]][1]
+    ########################
+    #### y-axis
+    if(!whaty%in%c(names(idf),"Eic")){
       plot(0:1,0:1,axes=F,xlab="",ylab="",cex=0)
       text(.5,.5,lgraphs[[iplot]][1])
       next}
-  }
-  }
-  ########################
-  par(dots)
-#  print(dots)
-  lsoSa=1:nrow(idf)
-  sortSample=orderBPlots[orderBPlots%in%names(idf)]
-  if(!is.null(sortSample)){
-    lsoSa=paste("order(",paste(paste("idf$",sortSample,sep=""),collapse=","),")",sep="")
-    lsoSa=eval(parse(text=lsoSa))
-  }
-  
-  if(!is.null(whatx)){
-    if(is.numeric(idf$X))
-      .plotXY(idf,whatx,whaty,logs,xlim,ylim,analyte,linking,medRT0,deltaRT,cexPT,vlines=vlines,hlines=hlines)
-    if(is.character(idf$X))
-      .plotLinP(idf[lsoSa,],whaty,logs=gsub("x","",logs),xlim,ylim,analyte,cexBP,cexPT,vlines=vlines,hlines=hlines)
-    if(is.factor(idf$X))
-      .plotBoxP(idf[lsoSa,],whaty,logs=gsub("x","",logs),xlim,ylim,analyte,cexBX,cexPT,vlines=vlines,hlines=hlines,spacingBX=spacingBX)
-
-  }  
-  if(is.null(whatx) & whaty!="Eic")
-    .plotBarP(idf[lsoSa,],whaty,gsub("x","",logs),ylim,analyte,cexBP)
-
-  ################
-  if(whaty=="Eic"){
-    
-    sepx=strsplit(whatx,"\\|")[[1]]
-    whichrt=sepx[1]
-    llsids=list(All=unique(idf$Sid))
-    if(sepx[2]%in%names(idf)) llsids=tapply(idf$Sid,idf[,sepx[2]],unique)
-
-    ifeic=obj$Eic$File[analyte,]$EicFile
-    if(is.null(obj$Eic$Path)) ifeic=paste(obj$Eic$Path,ifeic,sep="")
-    ieicpk=obj$Eic$File[analyte,]$EicPK
-    ieic=obj$Eic$File[analyte,]$EicId
-    if(!file.exists(ifeic) | is.null(ieicpk) | is.na(ieicpk) | is.na(ieic)){
-      for(i in names(llsids)){
+    ylim=NULL
+    if(whaty=="Eic") ylim=c(0,Inf)
+    if(whaty!="Eic"){
+      vy=idf[,whaty]
+      if(whaty=="RT" | grepl("^RT\\.",whaty)){
+        rtlims=.getrtlim(idf,whaty,deltaRT);rtlim=rtlims$rtlim;medRT0=rtlims$medRT0;medRT=rtlims$medRT;
+        ylim=rtlim;vy[which(vy>=max(rtlim))]=max(rtlim);vy[which(vy<=min(rtlim))]=min(rtlim)
+      }
+      if(whaty=="InjOrder") ylim=injlim
+      if(is.null(ylim)){
+        if(length(grep("y",logs))>0){
+          vy[which(vy<=0)]=min(vy,na.rm=TRUE)/2
+          ylim=.infctlimlog(vy)
+        } else ylim=pretty(seq(min(vy,na.rm=TRUE),max(vy,na.rm=TRUE),length.out = 7))
+      }
+      idf$Y=vy
+      if(sum(!is.na(vy))<2){
         plot(0:1,0:1,axes=F,xlab="",ylab="",cex=0)
-        text(.5,.5,i)
+        text(.5,.5,lgraphs[[iplot]][1])
         next
       }
     }
-    cat("Found",ifeic)
-    dfeic<-eicpk<-NULL
-    load(ifeic)
-    cat(".\n")
+    #  print(logs)
+    ########################
+    #### x-axis
+    if(whaty!="Eic"){
+      if(is.na(whatx) | !whatx%in%names(idf)){
+        whatx=NULL
+        logs=gsub("x","",logs)
+      }
+      xlim=vx=NULL
+      if(!is.null(whatx) & whaty!="Eic"){
+        vx=idf[,whatx]
+        if(whatx=="RT" | grepl("^RT\\.",whatx)){
+          rtlims=.getrtlim(idf,whatx,deltaRT);rtlim=rtlims$rtlim;medRT0=rtlims$medRT0;medRT=rtlims$medRT;
+          xlim=rtlim;vx[which(vx>=max(rtlim))]=max(rtlim);vx[which(vx<=min(rtlim))]=min(rtlim)
+        }
+        if(whatx=="InjOrder") xlim=injlim
+        if(is.character(vx)) xlim=c(0.3,length(vx)+.7)      
+        if(is.factor(vx)) xlim=c(0.3,nlevels(vx)+.7)      
+        if(is.null(xlim)){
+          if(length(grep("x",logs))>0){
+            vx[which(vx<=0)]=min(vx,na.rm=T)/2
+            xlim=.infctlimlog(vx)
+          } else xlim=pretty(seq(min(vx),max(vx),length.out = 7))
+        }
+        idf$X=vx
+        if(!is.null(whatx)) if(sum(!is.na(idf[,whatx]))<2){
+          plot(0:1,0:1,axes=F,xlab="",ylab="",cex=0)
+          text(.5,.5,lgraphs[[iplot]][1])
+          next}
+      }
+    }
+    ########################
+    par(dots)
+    #  print(dots)
+    lsoSa=1:nrow(idf)
+    if(length(orderBPlots)){
+      sortSample=orderBPlots[orderBPlots%in%names(idf)]
+      if(!is.null(sortSample)){
+        lsoSa=paste("order(",paste(paste("idf$",sortSample,sep=""),collapse=","),")",sep="")
+        lsoSa=eval(parse(text=lsoSa))
+      }
+    }
     
-    if(is.null(whichrt))  whichrt="rtcor"
-    if(whichrt%in%names(dfeic)) whichrt="rt"
+    if(!is.null(whatx)){
+      if(is.numeric(idf$X))
+        .plotXY(idf,whatx,whaty,logs,xlim,ylim,analyte,linking,medRT0,deltaRT,cexPT,vlines=vlines,hlines=hlines)
+      if(is.character(idf$X))
+        .plotLinP(idf[lsoSa,],whaty,logs=gsub("x","",logs),xlim,ylim,analyte,cexBP,cexPT,vlines=vlines,hlines=hlines)
+      if(is.factor(idf$X))
+        .plotBoxP(idf[lsoSa,],whaty,logs=gsub("x","",logs),xlim,ylim,analyte,cexBX,cexPT,vlines=vlines,hlines=hlines,spacingBX=spacingBX)
+      
+    }  
+    if(is.null(whatx) & whaty!="Eic")
+      .plotBarP(idf[lsoSa,],whaty,gsub("x","",logs),ylim,analyte,cexBP)
     
-    ceic=dfeic[dfeic$Eic==ieic & dfeic$Samp%in%obj$Eic$Sample$Samp,]
-    ceic$Sid=obj$Eic$Sample$Sid[match(ceic$Samp,obj$Eic$Sample$Samp)]
-    ceic$cols=idf[ceic$Sid,]$color
+    ################
+    if(whaty=="Eic"){
+      
+      sepx=strsplit(whatx,"\\|")[[1]]
+      whichrt=sepx[1]
+      llsids=list(All=unique(idf$Sid))
+      if(sepx[2]%in%names(idf)) llsids=tapply(idf$Sid,idf[,sepx[2]],unique)
+      
+      ifeic=obj$Eic$File[analyte,]$EicFile
+      if(is.null(obj$Eic$Path)) ifeic=paste(obj$Eic$Path,ifeic,sep="")
+      ieicpk=obj$Eic$File[analyte,]$EicPK
+      ieic=obj$Eic$File[analyte,]$EicId
+      if(!file.exists(ifeic) | is.null(ieicpk) | is.na(ieicpk) | is.na(ieic)){
+        for(i in names(llsids)){
+          plot(0:1,0:1,axes=F,xlab="",ylab="",cex=0)
+          text(.5,.5,i)
+          next
+        }
+      }
+      cat("Found",ifeic)
+      dfeic<-eicpk<-NULL
+      load(ifeic)
+      cat(".\n")
+      
+      if(is.null(whichrt))  whichrt="rtcor"
+      if(whichrt%in%names(dfeic)) whichrt="rt"
+      
+      ceic=dfeic[dfeic$Eic==ieic & dfeic$Samp%in%obj$Eic$Sample$Samp,]
+      ceic$Sid=obj$Eic$Sample$Sid[match(ceic$Samp,obj$Eic$Sample$Samp)]
+      ceic$cols=idf[ceic$Sid,]$color
+      
+      rtr=range(ceic[,whichrt])
+      rtr=rtr+c(-.5,1)*0.1*diff(rtr)
+      rtr[1]=max(0,rtr[1])
+      
+      ipkmat=eicpk[[ieic]]$Pks[[ieicpk]]
+      ipkmat=ipkmat[rownames(ipkmat)%in%obj$Eic$Sample$Samp,]
+      rownames(ipkmat)=obj$Eic$Sample$Sid[match(rownames(ipkmat),obj$Eic$Sample$Samp)]
+      Mint=obj$Eic$File[analyte,]$Mint
+      .plotEIC(ceic,ipkmat,whichrt,llsids,Mint=Mint,rtr=rtr,cexEL=cexEL)
+      rm(list=c('dfeic','eicpk'))
+    } ### end of Eic
     
-    rtr=range(ceic[,whichrt])
-    rtr=rtr+c(-.5,1)*0.1*diff(rtr)
-    rtr[1]=max(0,rtr[1])
-
-    ipkmat=eicpk[[ieic]]$Pks[[ieicpk]]
-    ipkmat=ipkmat[rownames(ipkmat)%in%obj$Eic$Sample$Samp,]
-    rownames(ipkmat)=obj$Eic$Sample$Sid[match(rownames(ipkmat),obj$Eic$Sample$Samp)]
-    Mint=obj$Eic$File[analyte,]$Mint
-    .plotEIC(ceic,ipkmat,whichrt,llsids,Mint=Mint,rtr=rtr,cexEL=cexEL)
-    rm(list=c('dfeic','eicpk'))
-  } ### end of Eic
+  }
   
-}
-
-on.exit(par(par.def))
+  on.exit(par(par.def))
 }
 
 #######################################################################
@@ -282,7 +284,7 @@ on.exit(par(par.def))
 ##### whatx is null
 .plotBarP<-function(idf,whaty,logs="",ylim,analyte,cexBP){
   
-#  print(idf)
+  #  print(idf)
   l=which(!is.na(idf$Y))
   if(length(l)<nrow(idf)){
     if(grepl("y",logs)) ylim=.infctlimlog(idf$Y[l])
@@ -310,14 +312,14 @@ on.exit(par(par.def))
 }
 
 .plotBoxP<-function(idf,whaty,logs="",xlim,ylim,analyte,cexBX,cexPT=1,vlines=NULL,hlines=NULL,spacingBX=1.05){
-# cat("Ylim: ",ylim)
- # print(idf)
-#   #print(r)
-#   ylim2=which(ylim>min(idf$Y[l],na.rm=T) & ylim<max(idf$Y[l],na.rm=T))
-#   if(length(ylim2)<2) ylim2=1:length(ylim)
-#   print(ylim2)
-#   ylim2=max(which.min(ylim2),1):min(which.max(ylim2)+1,length(ylim))
-#   print(ylim2)
+  # cat("Ylim: ",ylim)
+  # print(idf)
+  #   #print(r)
+  #   ylim2=which(ylim>min(idf$Y[l],na.rm=T) & ylim<max(idf$Y[l],na.rm=T))
+  #   if(length(ylim2)<2) ylim2=1:length(ylim)
+  #   print(ylim2)
+  #   ylim2=max(which.min(ylim2),1):min(which.max(ylim2)+1,length(ylim))
+  #   print(ylim2)
   l=which(!is.na(idf$X) & !is.na(idf$Y))
   if(length(l)<nrow(idf)){
     if(grepl("y",logs)) ylim=.infctlimlog(idf$Y[l])
@@ -340,7 +342,7 @@ on.exit(par(par.def))
   vx=idf$X
   vy=idf$Y
   
-
+  
   plot(range(xlim),range(ylim),cex=0,axes=F,xlab=whatx,ylab=whaty,bty="n",log=logs,xlim=range(xlim),ylim=range(ylim),main=analyte)
   if(!is.null(hlines)) abline(h=hlines,lwd=par("lwd"),col="grey",lty=2)
   if(!is.null(vlines)) abline(v=vlines,lwd=par("lwd"),col="grey",lty=2)
@@ -374,9 +376,9 @@ on.exit(par(par.def))
   if(logs=="x")  pr=inlm(y~s(log10(x)),y~log10(x),trdf,ndf)
   
   if(!is.null(pr)){
-  lines(pr$x,pr$fit,col="grey20")
-  lines(pr$x,pr$fitl,col="grey30",lty=2)
-  lines(pr$x,pr$fitu,col="grey30",lty=2)
+    lines(pr$x,pr$fit,col="grey20")
+    lines(pr$x,pr$fitl,col="grey30",lty=2)
+    lines(pr$x,pr$fitu,col="grey30",lty=2)
   }
   points(vx,vy,col=idf$color,pch=16,cex=cexPT)
   if(!is.null(linking) & "InjOrder"==whatx)
@@ -439,7 +441,7 @@ on.exit(par(par.def))
     
     legend("topleft",namsamp,bty="n",cex=par("cex.main"))
     xaxt=axTicks(1) #pretty(seq(rtr[1],rtr[2],length.out = 7))
-   # xaxt=c(min(xaxt)-diff(xaxt)[1],xaxt,max(xaxt)+rev(diff(xaxt))[1])
+    # xaxt=c(min(xaxt)-diff(xaxt)[1],xaxt,max(xaxt)+rev(diff(xaxt))[1])
     yaxt=axTicks(2)
     yaxt=c(yaxt,max(yaxt)+rev(diff(yaxt))[1])
     axis(1,at=xaxt,las=1)

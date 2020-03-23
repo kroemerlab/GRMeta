@@ -2,7 +2,8 @@ print.metaboSet<-function(x,length=12){
   
   cat("** ",length(x$Analyte)," analyte",ifelse(length(x$Analyte)==1,"","s"),": ",paste(names(table(x$Annot$Method)),"(",(table(x$Annot$Method)),") ",sep=""),"\n",sep="")
   cat("** Annotation level: ",paste(names(table(x$Annot$LevelAnnot)),"(",(table(x$Annot$LevelAnnot)),") ",sep=""),"\n",sep="")
-  
+  cat(paste0("** Std: ",sum(x$Annot$IsSTD),"/",sum(!x$Annot$IsSTD)," Iso: ",sum(x$Annot$IsISO),"/",sum(!x$Annot$IsISO)),"\n",sep="")
+
   if("fluxoSet"%in%class(x)){
     tab=as.matrix(table(x$Annot$Iso,x$Annot$LevelAnnot))
     for(i in rownames(tab))

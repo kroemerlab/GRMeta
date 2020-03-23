@@ -12,6 +12,6 @@ LazyData: yes
 ByteCompile: yes
 Encoding: UTF-8
 License: GPL (>= 2)
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 NeedsCompilation: yes
 Packaged: 2018-04-05 15:17:05 UTC; MolDev

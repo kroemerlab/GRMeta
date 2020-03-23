@@ -1,13 +1,17 @@
 Package: GRMeta
 Type: Package
 Title: Processing MetX data
-Version: 1.01
+Version: 1.03
 Date: 2015-10-07
 Author: David Enot <david.enot@gustaveroussy.fr>
 Maintainer: David Enot <david.enot@gustaveroussy.fr>
-Depends: graphics, stats, R (>= 3.0.0), xlsx, chron, RColorBrewer,mgcv,impute,car,beeswarm, XML
+Depends: graphics, stats, R (>= 3.0.0), xlsx, chron,
+        RColorBrewer,mgcv,impute,car,beeswarm, XML
 Description: GRMeta is a package to convert, organise and analyse chemical data from Agilent at GR.
 LazyData: yes
 ByteCompile: yes
 Encoding: UTF-8
 License: GPL (>= 2)
+RoxygenNote: 6.0.1
+NeedsCompilation: yes
+Packaged: 2018-04-05 15:17:05 UTC; MolDev

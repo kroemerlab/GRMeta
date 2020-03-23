@@ -1,5 +1,5 @@
 export(cleanMetaboNames,compSetSBR,compSetStats,compSetRatios,corrSetQC,paramsParsing,
-loadXCaliburData,loadAgilentData,loadMavenData,loadAgilentDataFlux,
+loadXCaliburData,loadAgilentData,loadSciexData,loadMavenData,loadAgilentDataFlux,
 mapSetKegg,matchmzSet,mergeSet,deleteEntries,sortEntries, exportSetXLSX,plotSetMEic,
 parseSampEIC,parseOneSampEIC,.GRparseSampEICCl,
 gatherMultiEICs,.GRgatherMultiEICCl,gatherOneEIC,.GRaddmiss,.GRmergeInterval,.GRmergingEIC,
